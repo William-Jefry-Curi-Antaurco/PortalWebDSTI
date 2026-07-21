@@ -1,4 +1,3 @@
-import { useMemo, useState } from "react";
 import {
     getCategory,
     getTitle,
@@ -6,7 +5,6 @@ import {
     getStatus,
     getFileExtension,
     getFileUrl,
-    getEtiquetasTexto,
 } from "../../utils/portalUtils";
 import { ResourceButton } from "./ResourceButton";
 import PortalPlaceholderIcon from "./PortalPlaceholderIcon";
@@ -70,28 +68,6 @@ export default function TutorialRail({
                                          onOpenResource = null,
                                          imgDefaultCard = null,
                                      }) {
-    const [search, setSearch] = useState("");
-
-    const filteredItems = useMemo(() => {
-        const term = normalizeText(search);
-
-        if (!term) return items || [];
-
-        return (items || []).filter((item) => {
-            const searchable = normalizeText(
-                [
-                    getTitle(item),
-                    getDescription(item),
-                    getCategory(item),
-                    getFileExtension(item),
-                    getEtiquetasTexto(item),
-                ].join(" ")
-            );
-
-            return searchable.includes(term);
-        });
-    }, [items, search]);
-
     if (!items || items.length === 0) {
         return (
             <div className="portal-empty-state">
@@ -108,53 +84,16 @@ export default function TutorialRail({
 
     return (
         <div className="portal-tutorial-wrapper">
-            <div className="portal-tutorial-toolbar">
-                <div className="portal-search portal-search-inline">
-                    <input
-                        type="search"
-                        value={search}
-                        onChange={(event) => setSearch(event.target.value)}
-                        placeholder="Buscar tutorial, guía o video..."
-                        aria-label="Buscar tutoriales y recursos"
+            <div className="portal-tutorial-rail">
+                {items.map((item, index) => (
+                    <TutorialCard
+                        key={item.idtutorial || item.id || index}
+                        item={item}
+                        onOpenResource={onOpenResource}
+                        imgDefaultCard={imgDefaultCard}
                     />
-                </div>
-
-                <span
-                    className="portal-tutorial-counter"
-                    aria-live="polite"
-                >
-                    {filteredItems.length === 1
-                        ? "1 recurso encontrado"
-                        : `${filteredItems.length} recursos encontrados`}
-                </span>
+                ))}
             </div>
-
-            {filteredItems.length === 0 ? (
-                <div className="portal-empty-state">
-                    <p>
-                        No se encontraron recursos relacionados con
-                        “{search}”.
-                    </p>
-
-                    <button
-                        type="button"
-                        onClick={() => setSearch("")}
-                    >
-                        Limpiar búsqueda
-                    </button>
-                </div>
-            ) : (
-                <div className="portal-tutorial-rail">
-                    {filteredItems.map((item, index) => (
-                        <TutorialCard
-                            key={item.idtutorial || item.id || index}
-                            item={item}
-                            onOpenResource={onOpenResource}
-                            imgDefaultCard={imgDefaultCard}
-                        />
-                    ))}
-                </div>
-            )}
         </div>
     );
 }

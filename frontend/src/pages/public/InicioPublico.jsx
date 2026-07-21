@@ -1061,6 +1061,11 @@ export default function InicioPublico() {
     const [noticiaModalSlug, setNoticiaModalSlug] = useState(null);
     const [filtrosCategorias, setFiltrosCategorias] = useState({});
     const [busquedaNoticias, setBusquedaNoticias] = useState("");
+    const [busquedaServicios, setBusquedaServicios] = useState("");
+    const [busquedaDocumentos, setBusquedaDocumentos] = useState("");
+    const [busquedaEventos, setBusquedaEventos] = useState("");
+    const [busquedaProyectos, setBusquedaProyectos] = useState("");
+    const [busquedaTutoriales, setBusquedaTutoriales] = useState("");
 
     // ── Queries ───────────────────────────────────────────────────────────────
     const configuracionQuery = useQuery({
@@ -1110,7 +1115,7 @@ export default function InicioPublico() {
         faqs:       cfgNumber(cfgModulos.paginacion_faqs,       SECTION_PER_PAGE_DEFAULT.faqs),
     }), [cfgModulos]);
 
-    const serviciosQuery  = useQuery({ queryKey: ["servicios",  perPage.servicios],  queryFn: () => getPublicServicios(buildParams({ perPage: perPage.servicios })).then(getList),    staleTime: 0, gcTime: GC_MEDIO });
+    const serviciosQuery  = useQuery({ queryKey: ["servicios",  busquedaServicios,  perPage.servicios],  queryFn: () => getPublicServicios(buildParams({ search: busquedaServicios, perPage: perPage.servicios })).then(getList),    staleTime: 0, gcTime: GC_MEDIO });
     const sistemasQuery = useQuery({
         queryKey: ["sistemas"],
         queryFn: () => getPublicSistemas().then(getList),
@@ -1120,10 +1125,10 @@ export default function InicioPublico() {
         refetchOnWindowFocus: true,
     });
     const noticiasQuery   = useQuery({ queryKey: ["noticias",   busquedaNoticias, perPage.noticias], queryFn: () => getPublicNoticias(buildParams({ search: busquedaNoticias, perPage: perPage.noticias })).then(getList), staleTime: 0, gcTime: GC_MEDIO });
-    const proyectosQuery  = useQuery({ queryKey: ["proyectos",  perPage.proyectos],  queryFn: () => getPublicProyectos(buildParams({ perPage: perPage.proyectos })).then(getList),   staleTime: 0, gcTime: GC_MEDIO });
-    const documentosQuery = useQuery({ queryKey: ["documentos", perPage.documentos], queryFn: () => getPublicDocumentos(buildParams({ perPage: perPage.documentos })).then(getList), staleTime: 0, gcTime: GC_MEDIO });
-    const eventosQuery    = useQuery({ queryKey: ["eventos",    perPage.eventos],    queryFn: () => getPublicEventos(buildParams({ perPage: perPage.eventos })).then(getList),       staleTime: 0, gcTime: GC_MEDIO });
-    const tutorialesQuery = useQuery({ queryKey: ["tutoriales", perPage.tutoriales], queryFn: () => getPublicTutoriales(buildParams({ perPage: perPage.tutoriales })).then(getList), staleTime: 0, gcTime: GC_MEDIO });
+    const proyectosQuery  = useQuery({ queryKey: ["proyectos",  busquedaProyectos,  perPage.proyectos],  queryFn: () => getPublicProyectos(buildParams({ search: busquedaProyectos, perPage: perPage.proyectos })).then(getList),   staleTime: 0, gcTime: GC_MEDIO });
+    const documentosQuery = useQuery({ queryKey: ["documentos", busquedaDocumentos, perPage.documentos], queryFn: () => getPublicDocumentos(buildParams({ search: busquedaDocumentos, perPage: perPage.documentos })).then(getList), staleTime: 0, gcTime: GC_MEDIO });
+    const eventosQuery    = useQuery({ queryKey: ["eventos",    busquedaEventos,    perPage.eventos],    queryFn: () => getPublicEventos(buildParams({ search: busquedaEventos, perPage: perPage.eventos })).then(getList),       staleTime: 0, gcTime: GC_MEDIO });
+    const tutorialesQuery = useQuery({ queryKey: ["tutoriales", busquedaTutoriales, perPage.tutoriales], queryFn: () => getPublicTutoriales(buildParams({ search: busquedaTutoriales, perPage: perPage.tutoriales })).then(getList), staleTime: 0, gcTime: GC_MEDIO });
     const faqsQuery       = useQuery({ queryKey: ["faqs",       perPage.faqs],       queryFn: () => getPublicFaqs(buildParams({ perPage: perPage.faqs })).then(getList),             staleTime: 0, gcTime: GC_MEDIO });
 
     // ── Configuración dinámica ────────────────────────────────────────────────
@@ -1386,6 +1391,23 @@ export default function InicioPublico() {
         );
     }, [seccionData.noticias, busquedaNoticias]);
 
+    // Igual que noticiasFiltradasPorBusqueda: refuerzo client-side para cuando
+    // la búsqueda del servidor no arroja resultados y seccionData cae al
+    // fallback de /inicio (que no respeta el término buscado).
+    function filtrarPorBusqueda(items, termino) {
+        const q = normalize(termino);
+        if (!q) return items;
+        return items.filter((item) =>
+            normalize(`${getTitle(item)} ${getDescription(item)} ${getCategory(item)} ${getEtiquetasTexto(item)}`).includes(q)
+        );
+    }
+
+    const serviciosFiltradosPorBusqueda  = useMemo(() => filtrarPorBusqueda(seccionData.servicios,  busquedaServicios),  [seccionData.servicios,  busquedaServicios]);
+    const documentosFiltradosPorBusqueda = useMemo(() => filtrarPorBusqueda(seccionData.documentos, busquedaDocumentos), [seccionData.documentos, busquedaDocumentos]);
+    const eventosFiltradosPorBusqueda    = useMemo(() => filtrarPorBusqueda(seccionData.eventos,    busquedaEventos),    [seccionData.eventos,    busquedaEventos]);
+    const proyectosFiltradosPorBusqueda  = useMemo(() => filtrarPorBusqueda(seccionData.proyectos,  busquedaProyectos),  [seccionData.proyectos,  busquedaProyectos]);
+    const tutorialesFiltradosPorBusqueda = useMemo(() => filtrarPorBusqueda(seccionData.tutoriales, busquedaTutoriales), [seccionData.tutoriales, busquedaTutoriales]);
+
     // Topbar links
     const topbarLinks = useMemo(() => [
         { texto: cfgText(cfgTextos.topbar_link1_texto, ""), href: cfgText(cfgTextos.topbar_link1_href, "#") },
@@ -1530,7 +1552,12 @@ export default function InicioPublico() {
     }
 
     // ── Helper para renderizar secciones ─────────────────────────────────────
-    function renderSection(sectionId, query, Component, data, categoria, title, subtitle, className = "", extraProps = {}) {
+    function renderSection(sectionId, query, Component, data, categoria, title, subtitle, className = "", extraProps = {}, searchProps = {}) {
+        const { searchValue = "", onSearch = null, searchPlaceholder } = searchProps;
+        const limpiarFiltros = () => {
+            limpiarCategoriaNav(sectionId);
+            if (onSearch) onSearch("");
+        };
         return (
             <ModuleSection id={sectionId} catalogos={catalogos} title={title} subtitle={subtitle} className={className}>
                 <SectionTools
@@ -1538,6 +1565,9 @@ export default function InicioPublico() {
                     selectedCategory={categoria}
                     onSelect={seleccionarCategoriaNav}
                     onClear={() => limpiarCategoriaNav(sectionId)}
+                    searchValue={searchValue}
+                    onSearch={onSearch}
+                    searchPlaceholder={searchPlaceholder}
                     {...(sectionId === "servicios" ? { disabled: !serviciosMostrarFiltros } : {})}
                 />
                 <ActiveFilter label={categoria?.nombre} onClear={() => limpiarCategoriaNav(sectionId)} />
@@ -1550,7 +1580,7 @@ export default function InicioPublico() {
                         <Suspense fallback={<LoadingSection text={emptyTextos.loading} />}>
                             <Component
                                 items={data}
-                                emptyAction={categoria ? () => limpiarCategoriaNav(sectionId) : null}
+                                emptyAction={(categoria || searchValue) ? limpiarFiltros : null}
                                 onOpenResource={openResourceViewer}
                                 {...extraProps}
                             />
@@ -1767,7 +1797,7 @@ export default function InicioPublico() {
                 </ModuleSection>
 
                 {/* ── Servicios ── */}
-                {renderSection("servicios", serviciosQuery, ServiceShowcase, seccionData.servicios, categoriaServicios, secTitulos.servicios, secTitulos.serviciosSub, "", { cfg: cfgServicios, contactos: contactoInstitucional, emptyText: emptyTextos.servicios })}
+                {renderSection("servicios", serviciosQuery, ServiceShowcase, serviciosFiltradosPorBusqueda, categoriaServicios, secTitulos.servicios, secTitulos.serviciosSub, "", { cfg: cfgServicios, contactos: contactoInstitucional, emptyText: emptyTextos.servicios }, { searchValue: busquedaServicios, onSearch: setBusquedaServicios, searchPlaceholder: "Buscar servicios..." })}
 
                 {/* ── Sistemas ── */}
                 {renderSection("sistemas", sistemasQuery, SystemsPanel, seccionData.sistemas, categoriaSistemas, secTitulos.sistemas, secTitulos.sistemasSub, "portal-section-alt")}
@@ -1804,16 +1834,16 @@ export default function InicioPublico() {
                 </ModuleSection>
 
                 {/* ── Proyectos ── */}
-                {renderSection("proyectos", proyectosQuery, ProjectTimeline, seccionData.proyectos, categoriaProyectos, secTitulos.proyectos, secTitulos.proyectosSub, "portal-section-alt", { imgDefaultCard })}
+                {renderSection("proyectos", proyectosQuery, ProjectTimeline, proyectosFiltradosPorBusqueda, categoriaProyectos, secTitulos.proyectos, secTitulos.proyectosSub, "portal-section-alt", { imgDefaultCard }, { searchValue: busquedaProyectos, onSearch: setBusquedaProyectos, searchPlaceholder: "Buscar proyectos..." })}
 
                 {/* ── Documentos ── */}
-                {renderSection("documentos", documentosQuery, DocumentList, seccionData.documentos, categoriaDocumentos, secTitulos.documentos, secTitulos.documentosSub, "", { imgDefaultCard })}
+                {renderSection("documentos", documentosQuery, DocumentList, documentosFiltradosPorBusqueda, categoriaDocumentos, secTitulos.documentos, secTitulos.documentosSub, "", { imgDefaultCard }, { searchValue: busquedaDocumentos, onSearch: setBusquedaDocumentos, searchPlaceholder: "Buscar documentos..." })}
 
                 {/* ── Eventos ── */}
-                {renderSection("eventos", eventosQuery, EventAgenda, seccionData.eventos, categoriaEventos, secTitulos.eventos, secTitulos.eventosSub, "portal-section-alt", { imgDefaultCard })}
+                {renderSection("eventos", eventosQuery, EventAgenda, eventosFiltradosPorBusqueda, categoriaEventos, secTitulos.eventos, secTitulos.eventosSub, "portal-section-alt", { imgDefaultCard }, { searchValue: busquedaEventos, onSearch: setBusquedaEventos, searchPlaceholder: "Buscar eventos..." })}
 
                 {/* ── Tutoriales ── */}
-                {renderSection("tutoriales", tutorialesQuery, TutorialRail, seccionData.tutoriales, categoriaTutoriales, secTitulos.tutoriales, secTitulos.tutorialesSub, "", { imgDefaultCard })}
+                {renderSection("tutoriales", tutorialesQuery, TutorialRail, tutorialesFiltradosPorBusqueda, categoriaTutoriales, secTitulos.tutoriales, secTitulos.tutorialesSub, "", { imgDefaultCard }, { searchValue: busquedaTutoriales, onSearch: setBusquedaTutoriales, searchPlaceholder: "Buscar tutoriales..." })}
 
                 {/* ── FAQs ── */}
                 <ModuleSection id="faqs" catalogos={catalogos} title={secTitulos.faqs} subtitle={secTitulos.faqsSub} className="portal-section-alt">

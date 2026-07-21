@@ -257,6 +257,37 @@ class PortalPublicController extends Controller
         return $item;
     }
 
+    /**
+     * Filtra por texto libre en $campos y, adicionalmente, por coincidencia
+     * en el nombre de alguna etiqueta interna asociada (no se exponen las
+     * etiquetas como filtro visual, solo mejoran la relevancia de la
+     * búsqueda de texto).
+     */
+    private function aplicarBusquedaTexto(
+        $query,
+        string $search,
+        array $campos,
+        string $entidadEtiqueta,
+        string $columnaIdCalificada
+    ) {
+        return $query->where(function ($subQuery) use ($search, $campos, $entidadEtiqueta, $columnaIdCalificada) {
+            foreach ($campos as $indice => $campo) {
+                $metodo = $indice === 0 ? 'where' : 'orWhere';
+                $subQuery->{$metodo}($campo, 'like', "%{$search}%");
+            }
+
+            $subQuery->orWhereExists(function ($etiquetaQuery) use ($search, $entidadEtiqueta, $columnaIdCalificada) {
+                $etiquetaQuery->select(DB::raw(1))
+                    ->from('etiquetas_contenido as ec')
+                    ->join('etiquetas as e', 'e.idetiqueta', '=', 'ec.idetiqueta')
+                    ->whereColumn('ec.identidad', $columnaIdCalificada)
+                    ->where('ec.entidad', $entidadEtiqueta)
+                    ->where('e.activo', 1)
+                    ->where('e.nombre', 'like', "%{$search}%");
+            });
+        });
+    }
+
     // ── Endpoints públicos ────────────────────────────────────────────────────
 
     public function catalogos()
@@ -597,10 +628,11 @@ class PortalPublicController extends Controller
 
     public function proyectos(Request $request)
     {
-        $params = $request->only(['categoria', 'modulo', 'per_page', 'page']);
+        $params = $request->only(['categoria', 'modulo', 'search', 'per_page', 'page']);
         $cacheKey = $this->cacheKey('proyectos', $params);
+        $ttl = $request->filled('search') ? self::TTL_CORTO : self::TTL_MEDIO;
 
-        $data = Cache::remember($cacheKey, $this->ttl(self::TTL_MEDIO), function () use ($request) {
+        $data = Cache::remember($cacheKey, $this->ttl($ttl), function () use ($request) {
             $query = Proyecto::with([
                 'categoria:idcategoria,nombre,slug,activo,idmodulo',
                 'estado:idestado,nombre',
@@ -627,6 +659,16 @@ class PortalPublicController extends Controller
 
             $this->aplicarFiltrosPublicos($request, $query, 'proyectos-tecnologicos');
 
+            $query->when($request->filled('search'), function ($q) use ($request) {
+                $this->aplicarBusquedaTexto(
+                    $q,
+                    trim($request->search),
+                    ['titulo', 'descripcion'],
+                    EtiquetaEntidad::PROYECTOS,
+                    'proyectos.idproyecto'
+                );
+            });
+
             $paginator = $query
                 ->orderBy('orden')
                 ->orderByDesc('created_at')
@@ -644,10 +686,11 @@ class PortalPublicController extends Controller
 
     public function servicios(Request $request)
     {
-        $params = $request->only(['categoria', 'modulo', 'per_page', 'page']);
+        $params = $request->only(['categoria', 'modulo', 'search', 'per_page', 'page']);
         $cacheKey = $this->cacheKey('servicios', $params);
+        $ttl = $request->filled('search') ? self::TTL_CORTO : self::TTL_MEDIO;
 
-        $data = Cache::remember($cacheKey, $this->ttl(self::TTL_MEDIO), function () use ($request) {
+        $data = Cache::remember($cacheKey, $this->ttl($ttl), function () use ($request) {
             $query = Servicio::with('categoria:idcategoria,nombre,slug')
                 ->where('activo', 1)
                 ->select(
@@ -672,6 +715,16 @@ class PortalPublicController extends Controller
                 );
 
             $this->aplicarFiltrosPublicos($request, $query, 'servicios-tecnologicos');
+
+            $query->when($request->filled('search'), function ($q) use ($request) {
+                $this->aplicarBusquedaTexto(
+                    $q,
+                    trim($request->search),
+                    ['nombre', 'descripcion_corta', 'descripcion_larga'],
+                    EtiquetaEntidad::SERVICIOS,
+                    'servicios.idservicio'
+                );
+            });
 
             $paginator = $query
                 ->orderBy('orden')
@@ -781,22 +834,13 @@ class PortalPublicController extends Controller
             });
 
             $query->when($request->filled('search'), function ($q) use ($request) {
-                $search = trim($request->search);
-
-                $q->where(function ($subQuery) use ($search) {
-                    $subQuery->where('titulo', 'like', "%{$search}%")
-                        ->orWhere('resumen', 'like', "%{$search}%")
-                        ->orWhere('contenido', 'like', "%{$search}%")
-                        ->orWhereExists(function ($etiquetaQuery) use ($search) {
-                            $etiquetaQuery->select(DB::raw(1))
-                                ->from('etiquetas_contenido as ec')
-                                ->join('etiquetas as e', 'e.idetiqueta', '=', 'ec.idetiqueta')
-                                ->whereColumn('ec.identidad', 'noticias.idnoticia')
-                                ->where('ec.entidad', EtiquetaEntidad::NOTICIAS)
-                                ->where('e.activo', 1)
-                                ->where('e.nombre', 'like', "%{$search}%");
-                        });
-                });
+                $this->aplicarBusquedaTexto(
+                    $q,
+                    trim($request->search),
+                    ['titulo', 'resumen', 'contenido'],
+                    EtiquetaEntidad::NOTICIAS,
+                    'noticias.idnoticia'
+                );
             });
 
             $paginator = $query
@@ -920,13 +964,15 @@ class PortalPublicController extends Controller
             'categoria',
             'modulo',
             'tipo',
+            'search',
             'per_page',
             'page',
         ]);
 
         $cacheKey = $this->cacheKey('documentos', $params);
+        $ttl = $request->filled('search') ? self::TTL_CORTO : self::TTL_MEDIO;
 
-        $data = Cache::remember($cacheKey, $this->ttl(self::TTL_MEDIO), function () use ($request) {
+        $data = Cache::remember($cacheKey, $this->ttl($ttl), function () use ($request) {
             $query = Documento::with([
                 'archivo:idarchivo,ruta,mime_type,extension,peso_bytes,nombre_original',
                 'categoria:idcategoria,nombre,slug,activo,idmodulo',
@@ -954,6 +1000,16 @@ class PortalPublicController extends Controller
 
             $query->when($request->filled('tipo'), function ($q) use ($request) {
                 $q->where('idtipodocumento', $request->tipo);
+            });
+
+            $query->when($request->filled('search'), function ($q) use ($request) {
+                $this->aplicarBusquedaTexto(
+                    $q,
+                    trim($request->search),
+                    ['titulo', 'descripcion'],
+                    EtiquetaEntidad::DOCUMENTOS,
+                    'documentos.iddocumento'
+                );
             });
 
             $paginator = $query
@@ -1009,13 +1065,15 @@ class PortalPublicController extends Controller
             'modulo',
             'tipo',
             'modalidad',
+            'search',
             'per_page',
             'page',
         ]);
 
         $cacheKey = $this->cacheKey('eventos', $params);
+        $ttl = $request->filled('search') ? self::TTL_CORTO : self::TTL_MEDIO;
 
-        $data = Cache::remember($cacheKey, $this->ttl(self::TTL_MEDIO), function () use ($request) {
+        $data = Cache::remember($cacheKey, $this->ttl($ttl), function () use ($request) {
             $query = Evento::with([
                 'categoria:idcategoria,nombre,slug',
                 'estado:idestado,nombre',
@@ -1051,6 +1109,16 @@ class PortalPublicController extends Controller
 
             $query->when($request->filled('modalidad'), function ($q) use ($request) {
                 $q->where('idmodalidad', $request->modalidad);
+            });
+
+            $query->when($request->filled('search'), function ($q) use ($request) {
+                $this->aplicarBusquedaTexto(
+                    $q,
+                    trim($request->search),
+                    ['titulo', 'descripcion'],
+                    EtiquetaEntidad::EVENTOS,
+                    'eventos.idevento'
+                );
             });
 
             $paginator = $query
@@ -1124,13 +1192,15 @@ class PortalPublicController extends Controller
             'categoria',
             'modulo',
             'tipo',
+            'search',
             'per_page',
             'page',
         ]);
 
         $cacheKey = $this->cacheKey('tutoriales', $params);
+        $ttl = $request->filled('search') ? self::TTL_CORTO : self::TTL_MEDIO;
 
-        $data = Cache::remember($cacheKey, $this->ttl(self::TTL_MEDIO), function () use ($request) {
+        $data = Cache::remember($cacheKey, $this->ttl($ttl), function () use ($request) {
             $query = Tutorial::with([
                 'categoria:idcategoria,nombre,slug,activo,idmodulo',
                 'estado:idestado,nombre',
@@ -1159,6 +1229,16 @@ class PortalPublicController extends Controller
 
             $query->when($request->filled('tipo'), function ($q) use ($request) {
                 $q->where('idtipotutorial', $request->tipo);
+            });
+
+            $query->when($request->filled('search'), function ($q) use ($request) {
+                $this->aplicarBusquedaTexto(
+                    $q,
+                    trim($request->search),
+                    ['titulo', 'descripcion'],
+                    EtiquetaEntidad::TUTORIALES,
+                    'tutoriales.idtutorial'
+                );
             });
 
             $paginator = $query
