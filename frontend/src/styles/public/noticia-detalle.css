@@ -195,6 +195,10 @@
     border: 1px solid rgba(8, 8, 70, 0.08);
     box-shadow: 0 18px 50px rgba(5, 5, 45, 0.08);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    width: 100%;
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
 }
 
 .noticia-relacionada-card:hover {
@@ -271,5 +275,71 @@
     .noticia-relacionada-img {
         width: 100%;
         height: 180px;
+    }
+}
+
+/* ── Modal de noticia (portal público) ──────────────────────────────────── */
+
+.portal-noticia-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: clamp(16px, 4vw, 48px) 16px;
+    background: rgba(4, 4, 24, 0.62);
+    backdrop-filter: blur(6px);
+    overflow-y: auto;
+}
+
+.portal-noticia-modal-dialog {
+    position: relative;
+    width: min(1120px, 100%);
+    margin: auto;
+    background:
+            radial-gradient(circle at top left, rgba(0, 209, 255, 0.12), transparent 34rem),
+            linear-gradient(180deg, #f7fbff 0%, #ffffff 45%, #f6f7fb 100%);
+    border-radius: 32px;
+    box-shadow: 0 40px 120px rgba(4, 4, 24, 0.45);
+    overflow: hidden;
+}
+
+.portal-noticia-modal-dialog .noticia-container {
+    padding-top: 64px;
+}
+
+.portal-noticia-modal-close {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    z-index: 2;
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    border: 1px solid rgba(8, 8, 70, 0.12);
+    background: rgba(255, 255, 255, 0.92);
+    color: #09094f;
+    font-size: 1.4rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.portal-noticia-modal-close:hover {
+    background: #ffffff;
+    transform: scale(1.06);
+}
+
+@media (max-width: 720px) {
+    .portal-noticia-modal-overlay {
+        padding: 0;
+    }
+
+    .portal-noticia-modal-dialog {
+        border-radius: 0;
+        min-height: 100vh;
     }
 }

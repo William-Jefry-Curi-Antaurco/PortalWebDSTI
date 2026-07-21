@@ -34,6 +34,7 @@ import PortalErrorBoundary from "../../components/portal/PortalErrorBoundary";
 
 // ── Lazy components ───────────────────────────────────────────────────────────
 const ResourceViewerModal = lazy(() => import("../../components/portal/ResourceViewerModal"));
+const NoticiaModal         = lazy(() => import("../../components/portal/NoticiaModal"));
 const NewsShowcase         = lazy(() => import("../../components/portal/NewsShowcase"));
 const SystemsPanel         = lazy(() => import("../../components/portal/SystemsPanel"));
 const ProjectTimeline      = lazy(() => import("../../components/portal/ProjectTimeline"));
@@ -1050,6 +1051,7 @@ export default function InicioPublico() {
     const queryClient = useQueryClient();
     const [navOpen, setNavOpen] = useState(false);
     const [resourceViewer, setResourceViewer] = useState(null);
+    const [noticiaModalSlug, setNoticiaModalSlug] = useState(null);
     const [filtrosCategorias, setFiltrosCategorias] = useState({});
     const [busquedaNoticias, setBusquedaNoticias] = useState("");
 
@@ -1464,6 +1466,9 @@ export default function InicioPublico() {
     const openResourceViewer  = useCallback((item, type) => setResourceViewer({ item, type }), []);
     const closeResourceViewer = useCallback(() => setResourceViewer(null), []);
 
+    const openNoticiaModal  = useCallback((slug) => setNoticiaModalSlug(slug), []);
+    const closeNoticiaModal = useCallback(() => setNoticiaModalSlug(null), []);
+
     function getContactoHref(item) {
         const c = String(item?.contenido || "").trim();
         if (!c) return null;
@@ -1758,6 +1763,7 @@ export default function InicioPublico() {
                                     items={noticiasFiltradasPorBusqueda}
                                     emptyAction={categoriaNoticias || busquedaNoticias ? () => { setBusquedaNoticias(""); limpiarCategoriaNav("noticias"); } : null}
                                     onOpenResource={openResourceViewer}
+                                    onOpenNoticia={openNoticiaModal}
                                 />
                             </Suspense>
                         </PortalErrorBoundary>
@@ -1855,6 +1861,18 @@ export default function InicioPublico() {
                     onClose={closeResourceViewer}
                 />
             </Suspense>
+
+            {/* ── Noticia Modal ── */}
+            {noticiaModalSlug && (
+                <Suspense fallback={null}>
+                    <NoticiaModal
+                        key={noticiaModalSlug}
+                        slug={noticiaModalSlug}
+                        onClose={closeNoticiaModal}
+                        onOpenNoticia={openNoticiaModal}
+                    />
+                </Suspense>
+            )}
         </div>
     );
 }

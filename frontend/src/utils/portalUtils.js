@@ -263,6 +263,10 @@ export function getCategory(item) {
     );
 }
 
+export function getEtiquetas(item) {
+    return Array.isArray(item?.etiquetas) ? item.etiquetas : [];
+}
+
 export function getStatus(item) {
     return (
         item?.estadoOperativo?.nombre ||

@@ -8,11 +8,13 @@ import {
     formatDate,
 } from "../../utils/portalUtils";
 import { ResourceButton } from "./ResourceButton.jsx";
+import EtiquetaBadges from "./EtiquetaBadges.jsx";
 
 export default function NewsShowcase({
                                          items,
                                          emptyAction,
                                          onOpenResource = null,
+                                         onOpenNoticia = null,
                                      }) {
     const trackRef = useRef(null);
 
@@ -85,6 +87,7 @@ export default function NewsShowcase({
                             item={item}
                             index={index}
                             onOpenResource={onOpenResource}
+                            onOpenNoticia={onOpenNoticia}
                         />
                     ))}
                 </div>
@@ -93,7 +96,7 @@ export default function NewsShowcase({
     );
 }
 
-function NewsCarouselCard({ item, index, onOpenResource }) {
+function NewsCarouselCard({ item, index, onOpenResource, onOpenNoticia }) {
     const title = getTitle(item);
     const description = getDescription(item);
     const category = getCategory(item);
@@ -159,6 +162,8 @@ function NewsCarouselCard({ item, index, onOpenResource }) {
 
                 {description && <p>{description}</p>}
 
+                <EtiquetaBadges item={item} />
+
                 <div className="portal-news-carousel-actions">
                     {fileUrl && (
                         <ResourceButton
@@ -169,12 +174,17 @@ function NewsCarouselCard({ item, index, onOpenResource }) {
                     )}
 
                     {!fileUrl && item?.slug && (
-                        <a
-                            href={`/noticias/${item.slug}`}
+                        <button
+                            type="button"
                             className="portal-card-button"
+                            onClick={() =>
+                                onOpenNoticia
+                                    ? onOpenNoticia(item.slug)
+                                    : (window.location.href = `/noticias/${item.slug}`)
+                            }
                         >
                             Leer más
-                        </a>
+                        </button>
                     )}
                 </div>
             </div>

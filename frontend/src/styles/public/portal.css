@@ -1333,6 +1333,26 @@ a { color: inherit; }
     background: var(--institutional-primary);
 }
 
+.portal-etiquetas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 10px 0;
+}
+
+.portal-etiqueta-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 11px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1.4;
+    color: var(--etiqueta-color, var(--institutional-primary));
+    background: color-mix(in srgb, var(--etiqueta-color, var(--institutional-primary)) 12%, white);
+    border: 1px solid color-mix(in srgb, var(--etiqueta-color, var(--institutional-primary)) 35%, #dbe3ef);
+}
+
 .portal-card-date {
     display: inline-flex;
     align-items: center;
