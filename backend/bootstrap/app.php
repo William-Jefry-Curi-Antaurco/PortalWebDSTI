@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\RoleMiddleware;
+use App\Http\Middleware\PermissionMiddleware;
 use App\Http\Middleware\SetUsuarioAuditoria;
 use App\Http\Middleware\ModoMantenimiento; // ← AGREGAR
 use Illuminate\Foundation\Application;
@@ -17,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'role'          => RoleMiddleware::class,
+            'permission'    => PermissionMiddleware::class,
             'set.usuario'   => SetUsuarioAuditoria::class,
             'mantenimiento' => ModoMantenimiento::class, // ← AGREGAR
         ]);

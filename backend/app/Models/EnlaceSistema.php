@@ -23,6 +23,8 @@ class EnlaceSistema extends Model
         'icono',
         'idcategoria',
         'idestadooperativo',
+        'idarchivo_manual',
+        'idarchivo_documentacion',
         'orden',
         'activo',
     ];
@@ -30,6 +32,8 @@ class EnlaceSistema extends Model
     protected $casts = [
         'idcategoria' => 'integer',
         'idestadooperativo' => 'integer',
+        'idarchivo_manual' => 'integer',
+        'idarchivo_documentacion' => 'integer',
         'orden' => 'integer',
         'activo' => 'boolean',
         'created_at' => 'datetime',
@@ -44,5 +48,15 @@ class EnlaceSistema extends Model
     public function categoria(): BelongsTo
     {
         return $this->belongsTo(Categoria::class, 'idcategoria', 'idcategoria');
+    }
+
+    public function archivoManual(): BelongsTo
+    {
+        return $this->belongsTo(Archivo::class, 'idarchivo_manual', 'idarchivo');
+    }
+
+    public function archivoDocumentacion(): BelongsTo
+    {
+        return $this->belongsTo(Archivo::class, 'idarchivo_documentacion', 'idarchivo');
     }
 }

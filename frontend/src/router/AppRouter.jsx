@@ -5,6 +5,7 @@ import Dashboard from '../pages/Dashboard';
 import Noticias from '../pages/Noticias';
 import AdminLayout from '../layouts/AdminLayout';
 import ProtectedRoute from '../components/ProtectedRoute';
+import RequirePermission from '../components/RequirePermission';
 
 import InicioPublico from '../pages/public/InicioPublico.jsx';
 
@@ -64,39 +65,42 @@ export default function AppRouter() {
 
                     <Route path="dashboard" element={<Dashboard />} />
 
-                    <Route path="/admin/configuracion" element={<Configuracion />} />
+                    <Route
+                        path="/admin/configuracion"
+                        element={<RequirePermission permiso="catalogos.ver"><Configuracion /></RequirePermission>}
+                    />
 
-                    <Route path="noticias" element={<Noticias />} />
+                    <Route path="noticias" element={<RequirePermission permiso="noticias.ver"><Noticias /></RequirePermission>} />
 
-                    <Route path="modulos" element={<Modulos />} />
-                    <Route path="categorias" element={<Categorias />} />
-                    <Route path="estados" element={<Estados />} />
-                    <Route path="tipos-entidad" element={<TiposEntidad />} />
-                    <Route path="tipos-publicacion" element={<TiposPublicacion />} />
-                    <Route path="tipos-documento" element={<TiposDocumento />} />
-                    <Route path="estados-operativos" element={<EstadosOperativos />} />
-                    <Route path="tipos-evento" element={<TiposEvento />} />
-                    <Route path="modalidades-evento" element={<ModalidadesEvento />} />
-                    <Route path="tipos-tutorial" element={<TiposTutorial />} />
-                    <Route path="tipos-soporte" element={<TiposSoporte />} />
-                    <Route path="prioridades" element={<Prioridades />} />
-                    <Route path="etiquetas" element={<Etiquetas />} />
+                    <Route path="modulos" element={<RequirePermission permiso="catalogos.ver"><Modulos /></RequirePermission>} />
+                    <Route path="categorias" element={<RequirePermission permiso="catalogos.ver"><Categorias /></RequirePermission>} />
+                    <Route path="estados" element={<RequirePermission permiso="catalogos.ver"><Estados /></RequirePermission>} />
+                    <Route path="tipos-entidad" element={<RequirePermission permiso="catalogos.ver"><TiposEntidad /></RequirePermission>} />
+                    <Route path="tipos-publicacion" element={<RequirePermission permiso="catalogos.ver"><TiposPublicacion /></RequirePermission>} />
+                    <Route path="tipos-documento" element={<RequirePermission permiso="catalogos.ver"><TiposDocumento /></RequirePermission>} />
+                    <Route path="estados-operativos" element={<RequirePermission permiso="catalogos.ver"><EstadosOperativos /></RequirePermission>} />
+                    <Route path="tipos-evento" element={<RequirePermission permiso="catalogos.ver"><TiposEvento /></RequirePermission>} />
+                    <Route path="modalidades-evento" element={<RequirePermission permiso="catalogos.ver"><ModalidadesEvento /></RequirePermission>} />
+                    <Route path="tipos-tutorial" element={<RequirePermission permiso="catalogos.ver"><TiposTutorial /></RequirePermission>} />
+                    <Route path="tipos-soporte" element={<RequirePermission permiso="catalogos.ver"><TiposSoporte /></RequirePermission>} />
+                    <Route path="prioridades" element={<RequirePermission permiso="catalogos.ver"><Prioridades /></RequirePermission>} />
+                    <Route path="etiquetas" element={<RequirePermission permiso="catalogos.ver"><Etiquetas /></RequirePermission>} />
 
-                    <Route path="roles" element={<Roles />} />
-                    <Route path="usuarios" element={<Usuarios />} />
-                    <Route path="permisos" element={<Permisos />} />
-                    <Route path="logs" element={<Auditoria />} />
+                    <Route path="roles" element={<RequirePermission permiso="seguridad.ver"><Roles /></RequirePermission>} />
+                    <Route path="usuarios" element={<RequirePermission permiso="seguridad.ver"><Usuarios /></RequirePermission>} />
+                    <Route path="permisos" element={<RequirePermission permiso="seguridad.ver"><Permisos /></RequirePermission>} />
+                    <Route path="logs" element={<RequirePermission permiso="seguridad.ver"><Auditoria /></RequirePermission>} />
 
-                    <Route path="institucional" element={<InfoInstitucional />} />
-                    <Route path="autoridades" element={<Autoridades />} />
-                    <Route path="proyectos" element={<ProyectosTecnologicos />} />
-                    <Route path="servicios" element={<Servicios />} />
-                    <Route path="sistemas" element={<SistemasInstitucionales />} />
-                    <Route path="documentos" element={<DocumentosManuales />} />
-                    <Route path="eventos" element={<EventosCapacitaciones />} />
-                    <Route path="tutoriales" element={<Tutoriales />} />
-                    <Route path="faqs" element={<Faqs />} />
-                    <Route path="soporte" element={<Soporte />} />
+                    <Route path="institucional" element={<RequirePermission permiso="institucional.ver"><InfoInstitucional /></RequirePermission>} />
+                    <Route path="autoridades" element={<RequirePermission permiso="institucional.ver"><Autoridades /></RequirePermission>} />
+                    <Route path="proyectos" element={<RequirePermission permiso="proyectos.ver"><ProyectosTecnologicos /></RequirePermission>} />
+                    <Route path="servicios" element={<RequirePermission permiso="servicios.ver"><Servicios /></RequirePermission>} />
+                    <Route path="sistemas" element={<RequirePermission permiso="sistemas.ver"><SistemasInstitucionales /></RequirePermission>} />
+                    <Route path="documentos" element={<RequirePermission permiso="documentos.ver"><DocumentosManuales /></RequirePermission>} />
+                    <Route path="eventos" element={<RequirePermission permiso="eventos.ver"><EventosCapacitaciones /></RequirePermission>} />
+                    <Route path="tutoriales" element={<RequirePermission permiso="tutoriales.ver"><Tutoriales /></RequirePermission>} />
+                    <Route path="faqs" element={<RequirePermission permiso="tutoriales.ver"><Faqs /></RequirePermission>} />
+                    <Route path="soporte" element={<RequirePermission permiso="soporte.ver"><Soporte /></RequirePermission>} />
 
                 </Route>
 

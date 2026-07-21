@@ -116,7 +116,7 @@ Route::prefix('public')
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth:sanctum', 'role:admin', SetUsuarioAuditoria::class])
+Route::middleware(['auth:sanctum', 'role:admin,editor,lector', SetUsuarioAuditoria::class])
     ->prefix('admin')
     ->group(function () {
 
@@ -125,10 +125,10 @@ Route::middleware(['auth:sanctum', 'role:admin', SetUsuarioAuditoria::class])
         Route::prefix('configuracion')
             ->controller(ConfiguracionController::class)
             ->group(function () {
-                Route::get('/', 'index');
-                Route::put('/', 'update');
-                Route::post('/archivo', 'updateArchivo');
-                Route::delete('/archivo/{clave}', 'eliminarArchivo');
+                Route::get('/', 'index')->middleware('permission:catalogos.ver');
+                Route::put('/', 'update')->middleware('permission:catalogos.editar');
+                Route::post('/archivo', 'updateArchivo')->middleware('permission:catalogos.editar');
+                Route::delete('/archivo/{clave}', 'eliminarArchivo')->middleware('permission:catalogos.editar');
             });
 
 
@@ -136,121 +136,121 @@ Route::middleware(['auth:sanctum', 'role:admin', SetUsuarioAuditoria::class])
         Route::prefix('modulos')
             ->controller(ModuloController::class)
             ->group(function () {
-                Route::get('/', 'index');
-                Route::post('/', 'store');
-                Route::get('/{id}', 'show');
-                Route::put('/{id}', 'update');
-                Route::delete('/{id}', 'destroy');
+                Route::get('/', 'index')->middleware('permission:catalogos.ver');
+                Route::post('/', 'store')->middleware('permission:catalogos.crear');
+                Route::get('/{id}', 'show')->middleware('permission:catalogos.ver');
+                Route::put('/{id}', 'update')->middleware('permission:catalogos.editar');
+                Route::delete('/{id}', 'destroy')->middleware('permission:catalogos.eliminar');
             });
 
         Route::prefix('categorias')
             ->controller(CategoriaController::class)
             ->group(function () {
-                Route::get('/', 'index');
-                Route::post('/', 'store');
-                Route::get('/{id}', 'show');
-                Route::put('/{id}', 'update');
-                Route::delete('/{id}', 'destroy');
+                Route::get('/', 'index')->middleware('permission:catalogos.ver');
+                Route::post('/', 'store')->middleware('permission:catalogos.crear');
+                Route::get('/{id}', 'show')->middleware('permission:catalogos.ver');
+                Route::put('/{id}', 'update')->middleware('permission:catalogos.editar');
+                Route::delete('/{id}', 'destroy')->middleware('permission:catalogos.eliminar');
             });
 
         Route::prefix('tipos-entidad')
             ->controller(TipoEntidadController::class)
             ->group(function () {
-                Route::get('/', 'index');
-                Route::post('/', 'store');
-                Route::get('/{id}', 'show');
-                Route::put('/{id}', 'update');
-                Route::delete('/{id}', 'destroy');
+                Route::get('/', 'index')->middleware('permission:catalogos.ver');
+                Route::post('/', 'store')->middleware('permission:catalogos.crear');
+                Route::get('/{id}', 'show')->middleware('permission:catalogos.ver');
+                Route::put('/{id}', 'update')->middleware('permission:catalogos.editar');
+                Route::delete('/{id}', 'destroy')->middleware('permission:catalogos.eliminar');
             });
 
         Route::prefix('estados')
             ->controller(EstadoController::class)
             ->group(function () {
-                Route::get('/', 'index');
-                Route::post('/', 'store');
-                Route::get('/{id}', 'show');
-                Route::put('/{id}', 'update');
-                Route::delete('/{id}', 'destroy');
+                Route::get('/', 'index')->middleware('permission:catalogos.ver');
+                Route::post('/', 'store')->middleware('permission:catalogos.crear');
+                Route::get('/{id}', 'show')->middleware('permission:catalogos.ver');
+                Route::put('/{id}', 'update')->middleware('permission:catalogos.editar');
+                Route::delete('/{id}', 'destroy')->middleware('permission:catalogos.eliminar');
             });
 
         Route::prefix('tipos-publicacion')
             ->controller(TipoPublicacionController::class)
             ->group(function () {
-                Route::get('/', 'index');
-                Route::post('/', 'store');
-                Route::get('/{id}', 'show');
-                Route::put('/{id}', 'update');
-                Route::delete('/{id}', 'destroy');
+                Route::get('/', 'index')->middleware('permission:catalogos.ver');
+                Route::post('/', 'store')->middleware('permission:catalogos.crear');
+                Route::get('/{id}', 'show')->middleware('permission:catalogos.ver');
+                Route::put('/{id}', 'update')->middleware('permission:catalogos.editar');
+                Route::delete('/{id}', 'destroy')->middleware('permission:catalogos.eliminar');
             });
 
         Route::prefix('tipos-documento')
             ->controller(TipoDocumentoController::class)
             ->group(function () {
-                Route::get('/', 'index');
-                Route::post('/', 'store');
-                Route::get('/{id}', 'show');
-                Route::put('/{id}', 'update');
-                Route::delete('/{id}', 'destroy');
+                Route::get('/', 'index')->middleware('permission:catalogos.ver');
+                Route::post('/', 'store')->middleware('permission:catalogos.crear');
+                Route::get('/{id}', 'show')->middleware('permission:catalogos.ver');
+                Route::put('/{id}', 'update')->middleware('permission:catalogos.editar');
+                Route::delete('/{id}', 'destroy')->middleware('permission:catalogos.eliminar');
             });
 
         Route::prefix('estados-operativos')
             ->controller(EstadoOperativoController::class)
             ->group(function () {
-                Route::get('/', 'index');
-                Route::post('/', 'store');
-                Route::get('/{id}', 'show');
-                Route::put('/{id}', 'update');
-                Route::delete('/{id}', 'destroy');
+                Route::get('/', 'index')->middleware('permission:catalogos.ver');
+                Route::post('/', 'store')->middleware('permission:catalogos.crear');
+                Route::get('/{id}', 'show')->middleware('permission:catalogos.ver');
+                Route::put('/{id}', 'update')->middleware('permission:catalogos.editar');
+                Route::delete('/{id}', 'destroy')->middleware('permission:catalogos.eliminar');
             });
 
         Route::prefix('tipos-evento')
             ->controller(TipoEventoController::class)
             ->group(function () {
-                Route::get('/', 'index');
-                Route::post('/', 'store');
-                Route::get('/{id}', 'show');
-                Route::put('/{id}', 'update');
-                Route::delete('/{id}', 'destroy');
+                Route::get('/', 'index')->middleware('permission:catalogos.ver');
+                Route::post('/', 'store')->middleware('permission:catalogos.crear');
+                Route::get('/{id}', 'show')->middleware('permission:catalogos.ver');
+                Route::put('/{id}', 'update')->middleware('permission:catalogos.editar');
+                Route::delete('/{id}', 'destroy')->middleware('permission:catalogos.eliminar');
             });
 
         Route::prefix('modalidades-evento')
             ->controller(ModalidadEventoController::class)
             ->group(function () {
-                Route::get('/', 'index');
-                Route::post('/', 'store');
-                Route::get('/{id}', 'show');
-                Route::put('/{id}', 'update');
-                Route::delete('/{id}', 'destroy');
+                Route::get('/', 'index')->middleware('permission:catalogos.ver');
+                Route::post('/', 'store')->middleware('permission:catalogos.crear');
+                Route::get('/{id}', 'show')->middleware('permission:catalogos.ver');
+                Route::put('/{id}', 'update')->middleware('permission:catalogos.editar');
+                Route::delete('/{id}', 'destroy')->middleware('permission:catalogos.eliminar');
             });
 
         Route::prefix('tipos-tutorial')
             ->controller(TipoTutorialController::class)
             ->group(function () {
-                Route::get('/', 'index');
-                Route::post('/', 'store');
-                Route::get('/{id}', 'show');
-                Route::put('/{id}', 'update');
-                Route::delete('/{id}', 'destroy');
+                Route::get('/', 'index')->middleware('permission:catalogos.ver');
+                Route::post('/', 'store')->middleware('permission:catalogos.crear');
+                Route::get('/{id}', 'show')->middleware('permission:catalogos.ver');
+                Route::put('/{id}', 'update')->middleware('permission:catalogos.editar');
+                Route::delete('/{id}', 'destroy')->middleware('permission:catalogos.eliminar');
             });
 
         Route::prefix('tipos-soporte')
             ->controller(TipoSoporteController::class)
             ->group(function () {
-                Route::get('/', 'index');
-                Route::post('/', 'store');
-                Route::get('/{id}', 'show');
-                Route::put('/{id}', 'update');
-                Route::delete('/{id}', 'destroy');
+                Route::get('/', 'index')->middleware('permission:catalogos.ver');
+                Route::post('/', 'store')->middleware('permission:catalogos.crear');
+                Route::get('/{id}', 'show')->middleware('permission:catalogos.ver');
+                Route::put('/{id}', 'update')->middleware('permission:catalogos.editar');
+                Route::delete('/{id}', 'destroy')->middleware('permission:catalogos.eliminar');
             });
 
         Route::prefix('prioridades')
             ->controller(PrioridadController::class)
             ->group(function () {
-                Route::get('/', 'index');
-                Route::post('/', 'store');
-                Route::get('/{id}', 'show');
-                Route::put('/{id}', 'update');
-                Route::delete('/{id}', 'destroy');
+                Route::get('/', 'index')->middleware('permission:catalogos.ver');
+                Route::post('/', 'store')->middleware('permission:catalogos.crear');
+                Route::get('/{id}', 'show')->middleware('permission:catalogos.ver');
+                Route::put('/{id}', 'update')->middleware('permission:catalogos.editar');
+                Route::delete('/{id}', 'destroy')->middleware('permission:catalogos.eliminar');
             });
 
         // ── Módulos funcionales ───────────────────────────────────────────────
@@ -258,78 +258,80 @@ Route::middleware(['auth:sanctum', 'role:admin', SetUsuarioAuditoria::class])
         Route::prefix('servicios')
             ->controller(ServicioController::class)
             ->group(function () {
-                Route::get('/', 'index');
-                Route::post('/', 'store');
-                Route::get('/{id}', 'show');
-                Route::put('/{id}', 'update');
-                Route::delete('/{id}', 'destroy');
+                Route::get('/', 'index')->middleware('permission:servicios.ver');
+                Route::post('/', 'store')->middleware('permission:servicios.crear');
+                Route::get('/{id}', 'show')->middleware('permission:servicios.ver');
+                Route::put('/{id}', 'update')->middleware('permission:servicios.editar');
+                Route::delete('/{id}', 'destroy')->middleware('permission:servicios.eliminar');
             });
 
         Route::prefix('enlaces-sistemas')
             ->controller(EnlaceSistemaController::class)
             ->group(function () {
-                Route::get('/', 'index');
-                Route::post('/', 'store');
-                Route::get('/{id}', 'show');
-                Route::put('/{id}', 'update');
-                Route::delete('/{id}', 'destroy');
+                Route::get('/', 'index')->middleware('permission:sistemas.ver');
+                Route::post('/', 'store')->middleware('permission:sistemas.crear');
+                Route::get('/{id}', 'show')->middleware('permission:sistemas.ver');
+                Route::post('/{id}', 'update')->middleware('permission:sistemas.editar');
+                Route::delete('/{id}', 'destroy')->middleware('permission:sistemas.eliminar');
             });
 
         Route::prefix('documentos')
             ->controller(DocumentoController::class)
             ->group(function () {
-                Route::get('/', 'index');
-                Route::post('/', 'store');
-                Route::get('/{id}', 'show');
-                Route::post('/{id}', 'update');
-                Route::delete('/{id}', 'destroy');
+                Route::get('/', 'index')->middleware('permission:documentos.ver');
+                Route::post('/', 'store')->middleware('permission:documentos.crear');
+                Route::get('/{id}', 'show')->middleware('permission:documentos.ver');
+                Route::post('/{id}', 'update')->middleware('permission:documentos.editar');
+                Route::delete('/{id}', 'destroy')->middleware('permission:documentos.eliminar');
             });
 
         Route::prefix('eventos')
             ->controller(EventoController::class)
             ->group(function () {
-                Route::get('/', 'index');
-                Route::post('/', 'store');
-                Route::get('/{id}', 'show');
-                Route::post('/{id}', 'update');
-                Route::delete('/{id}', 'destroy');
+                Route::get('/', 'index')->middleware('permission:eventos.ver');
+                Route::post('/', 'store')->middleware('permission:eventos.crear');
+                Route::get('/{id}', 'show')->middleware('permission:eventos.ver');
+                Route::post('/{id}', 'update')->middleware('permission:eventos.editar');
+                Route::delete('/{id}', 'destroy')->middleware('permission:eventos.eliminar');
 
-                Route::post('/{id}/archivos', 'subirArchivo');
-                Route::post('/archivos/{id}', 'actualizarArchivo');
-                Route::delete('/archivos/{id}', 'eliminarArchivo');
+                Route::post('/{id}/archivos', 'subirArchivo')->middleware('permission:eventos.editar');
+                Route::post('/archivos/{id}', 'actualizarArchivo')->middleware('permission:eventos.editar');
+                Route::delete('/archivos/{id}', 'eliminarArchivo')->middleware('permission:eventos.eliminar');
             });
 
         Route::prefix('tutoriales')
             ->controller(TutorialController::class)
             ->group(function () {
-                Route::get('/', 'index');
-                Route::post('/', 'store');
-                Route::get('/{id}', 'show');
-                Route::post('/{id}', 'update');
-                Route::delete('/{id}', 'destroy');
+                Route::get('/', 'index')->middleware('permission:tutoriales.ver');
+                Route::post('/', 'store')->middleware('permission:tutoriales.crear');
+                Route::get('/{id}', 'show')->middleware('permission:tutoriales.ver');
+                Route::post('/{id}', 'update')->middleware('permission:tutoriales.editar');
+                Route::delete('/{id}', 'destroy')->middleware('permission:tutoriales.eliminar');
             });
 
+        // FAQs no tiene módulo propio en la tabla de permisos; se agrupa con
+        // "Tutoriales y recursos" porque comparte el patrón ver/crear/editar/eliminar.
         Route::prefix('faqs')
             ->controller(FaqController::class)
             ->group(function () {
-                Route::get('/', 'index');
-                Route::post('/', 'store');
-                Route::get('/{id}', 'show');
-                Route::put('/{id}', 'update');
-                Route::delete('/{id}', 'destroy');
+                Route::get('/', 'index')->middleware('permission:tutoriales.ver');
+                Route::post('/', 'store')->middleware('permission:tutoriales.crear');
+                Route::get('/{id}', 'show')->middleware('permission:tutoriales.ver');
+                Route::put('/{id}', 'update')->middleware('permission:tutoriales.editar');
+                Route::delete('/{id}', 'destroy')->middleware('permission:tutoriales.eliminar');
             });
 
         Route::prefix('solicitudes-soporte')
             ->controller(SolicitudSoporteController::class)
             ->group(function () {
-                Route::get('/', 'index');
-                Route::post('/', 'store');
-                Route::get('/{id}', 'show');
-                Route::post('/{id}', 'update');
-                Route::delete('/{id}', 'destroy');
+                Route::get('/', 'index')->middleware('permission:soporte.ver');
+                Route::post('/', 'store')->middleware('permission:soporte.responder');
+                Route::get('/{id}', 'show')->middleware('permission:soporte.ver');
+                Route::post('/{id}', 'update')->middleware('permission:soporte.editar_estado');
+                Route::delete('/{id}', 'destroy')->middleware('permission:soporte.eliminar');
 
-                Route::post('/{id}/respuestas', 'responder');
-                Route::delete('/respuestas/{id}', 'eliminarRespuesta');
+                Route::post('/{id}/respuestas', 'responder')->middleware('permission:soporte.responder');
+                Route::delete('/respuestas/{id}', 'eliminarRespuesta')->middleware('permission:soporte.eliminar');
             });
 
         // ── Institucional ─────────────────────────────────────────────────────
@@ -337,31 +339,31 @@ Route::middleware(['auth:sanctum', 'role:admin', SetUsuarioAuditoria::class])
         Route::prefix('info-institucional')
             ->controller(InfoInstitucionalController::class)
             ->group(function () {
-                Route::get('/', 'index');
-                Route::post('/', 'store');
-                Route::get('/{id}', 'show');
-                Route::put('/{id}', 'update');
-                Route::delete('/{id}', 'destroy');
+                Route::get('/', 'index')->middleware('permission:institucional.ver');
+                Route::post('/', 'store')->middleware('permission:institucional.crear');
+                Route::get('/{id}', 'show')->middleware('permission:institucional.ver');
+                Route::put('/{id}', 'update')->middleware('permission:institucional.editar');
+                Route::delete('/{id}', 'destroy')->middleware('permission:institucional.eliminar');
             });
 
         Route::prefix('autoridades')
             ->controller(AutoridadController::class)
             ->group(function () {
-                Route::get('/', 'index');
-                Route::post('/', 'store');
-                Route::get('/{id}', 'show');
-                Route::post('/{id}', 'update');
-                Route::delete('/{id}', 'destroy');
+                Route::get('/', 'index')->middleware('permission:institucional.ver');
+                Route::post('/', 'store')->middleware('permission:institucional.crear');
+                Route::get('/{id}', 'show')->middleware('permission:institucional.ver');
+                Route::post('/{id}', 'update')->middleware('permission:institucional.editar');
+                Route::delete('/{id}', 'destroy')->middleware('permission:institucional.eliminar');
             });
 
         Route::prefix('proyectos')
             ->controller(ProyectoController::class)
             ->group(function () {
-                Route::get('/', 'index');
-                Route::post('/', 'store');
-                Route::get('/{id}', 'show');
-                Route::post('/{id}', 'update');
-                Route::delete('/{id}', 'destroy');
+                Route::get('/', 'index')->middleware('permission:proyectos.ver');
+                Route::post('/', 'store')->middleware('permission:proyectos.crear');
+                Route::get('/{id}', 'show')->middleware('permission:proyectos.ver');
+                Route::post('/{id}', 'update')->middleware('permission:proyectos.editar');
+                Route::delete('/{id}', 'destroy')->middleware('permission:proyectos.eliminar');
             });
 
         // ── Etiquetas ─────────────────────────────────────────────────────────
@@ -369,15 +371,15 @@ Route::middleware(['auth:sanctum', 'role:admin', SetUsuarioAuditoria::class])
         Route::prefix('etiquetas')
             ->controller(EtiquetaController::class)
             ->group(function () {
-                Route::get('/', 'index');
-                Route::post('/', 'store');
-                Route::get('/{id}', 'show');
-                Route::put('/{id}', 'update');
-                Route::delete('/{id}', 'destroy');
+                Route::get('/', 'index')->middleware('permission:catalogos.ver');
+                Route::post('/', 'store')->middleware('permission:catalogos.crear');
+                Route::get('/{id}', 'show')->middleware('permission:catalogos.ver');
+                Route::put('/{id}', 'update')->middleware('permission:catalogos.editar');
+                Route::delete('/{id}', 'destroy')->middleware('permission:catalogos.eliminar');
 
-                Route::post('/contenido/asignar', 'asignarContenido');
-                Route::get('/contenido/listar', 'etiquetasPorContenido');
-                Route::delete('/contenido/quitar', 'quitarContenido');
+                Route::post('/contenido/asignar', 'asignarContenido')->middleware('permission:catalogos.editar');
+                Route::get('/contenido/listar', 'etiquetasPorContenido')->middleware('permission:catalogos.ver');
+                Route::delete('/contenido/quitar', 'quitarContenido')->middleware('permission:catalogos.editar');
             });
 
         // ── Seguridad ─────────────────────────────────────────────────────────
@@ -385,39 +387,39 @@ Route::middleware(['auth:sanctum', 'role:admin', SetUsuarioAuditoria::class])
         Route::prefix('permisos')
             ->controller(PermisoController::class)
             ->group(function () {
-                Route::get('/', 'index');
-                Route::post('/', 'store');
-                Route::get('/{id}', 'show');
-                Route::put('/{id}', 'update');
-                Route::delete('/{id}', 'destroy');
+                Route::get('/', 'index')->middleware('permission:seguridad.ver');
+                Route::post('/', 'store')->middleware('permission:seguridad.crear');
+                Route::get('/{id}', 'show')->middleware('permission:seguridad.ver');
+                Route::put('/{id}', 'update')->middleware('permission:seguridad.editar');
+                Route::delete('/{id}', 'destroy')->middleware('permission:seguridad.eliminar');
             });
 
         Route::prefix('roles')
             ->controller(RolController::class)
             ->group(function () {
-                Route::get('/', 'index');
-                Route::post('/', 'store');
-                Route::get('/{id}', 'show');
-                Route::put('/{id}', 'update');
-                Route::delete('/{id}', 'destroy');
+                Route::get('/', 'index')->middleware('permission:seguridad.ver');
+                Route::post('/', 'store')->middleware('permission:seguridad.crear');
+                Route::get('/{id}', 'show')->middleware('permission:seguridad.ver');
+                Route::put('/{id}', 'update')->middleware('permission:seguridad.editar');
+                Route::delete('/{id}', 'destroy')->middleware('permission:seguridad.eliminar');
 
-                Route::post('/{id}/permisos', 'asignarPermiso');
-                Route::delete('/{id}/permisos', 'quitarPermiso');
-                Route::put('/{id}/permisos/sincronizar', 'sincronizarPermisos');
+                Route::post('/{id}/permisos', 'asignarPermiso')->middleware('permission:seguridad.editar');
+                Route::delete('/{id}/permisos', 'quitarPermiso')->middleware('permission:seguridad.editar');
+                Route::put('/{id}/permisos/sincronizar', 'sincronizarPermisos')->middleware('permission:seguridad.editar');
             });
 
         Route::prefix('usuarios')
             ->controller(UsuarioController::class)
             ->group(function () {
-                Route::get('/', 'index');
-                Route::post('/', 'store');
-                Route::get('/{id}', 'show');
-                Route::put('/{id}', 'update');
-                Route::delete('/{id}', 'destroy');
+                Route::get('/', 'index')->middleware('permission:seguridad.ver');
+                Route::post('/', 'store')->middleware('permission:seguridad.crear');
+                Route::get('/{id}', 'show')->middleware('permission:seguridad.ver');
+                Route::put('/{id}', 'update')->middleware('permission:seguridad.editar');
+                Route::delete('/{id}', 'destroy')->middleware('permission:seguridad.eliminar');
 
-                Route::put('/{id}/password', 'cambiarPassword');
-                Route::put('/{id}/activar', 'activar');
-                Route::put('/{id}/desactivar', 'desactivar');
+                Route::put('/{id}/password', 'cambiarPassword')->middleware('permission:seguridad.editar');
+                Route::put('/{id}/activar', 'activar')->middleware('permission:seguridad.editar');
+                Route::put('/{id}/desactivar', 'desactivar')->middleware('permission:seguridad.editar');
             });
 
         // ── Noticias ──────────────────────────────────────────────────────────
@@ -425,20 +427,20 @@ Route::middleware(['auth:sanctum', 'role:admin', SetUsuarioAuditoria::class])
         Route::prefix('noticias')
             ->controller(NoticiaController::class)
             ->group(function () {
-                Route::get('/', 'index');
-                Route::post('/', 'store');
-                Route::get('/{id}', 'show');
-                Route::put('/{id}', 'update');
-                Route::delete('/{id}', 'destroy');
+                Route::get('/', 'index')->middleware('permission:noticias.ver');
+                Route::post('/', 'store')->middleware('permission:noticias.crear');
+                Route::get('/{id}', 'show')->middleware('permission:noticias.ver');
+                Route::put('/{id}', 'update')->middleware('permission:noticias.editar');
+                Route::delete('/{id}', 'destroy')->middleware('permission:noticias.eliminar');
 
-                Route::post('/{id}/imagenes', 'subirImagen');
+                Route::post('/{id}/imagenes', 'subirImagen')->middleware('permission:noticias.editar');
             });
 
         Route::prefix('noticias/imagenes')
             ->controller(NoticiaController::class)
             ->group(function () {
-                Route::post('/{id}', 'actualizarImagen');
-                Route::delete('/{id}', 'eliminarImagen');
+                Route::post('/{id}', 'actualizarImagen')->middleware('permission:noticias.editar');
+                Route::delete('/{id}', 'eliminarImagen')->middleware('permission:noticias.eliminar');
             });
 
         // ── Auditoría ─────────────────────────────────────────────────────────
@@ -446,9 +448,9 @@ Route::middleware(['auth:sanctum', 'role:admin', SetUsuarioAuditoria::class])
         Route::prefix('logs-actividad')
             ->controller(LogActividadController::class)
             ->group(function () {
-                Route::get('/', 'index');
-                Route::get('/{id}', 'show');
-                Route::delete('/{id}', 'destroy');
-                Route::delete('/', 'limpiar');
+                Route::get('/', 'index')->middleware('permission:seguridad.ver');
+                Route::get('/{id}', 'show')->middleware('permission:seguridad.ver');
+                Route::delete('/{id}', 'destroy')->middleware('permission:seguridad.eliminar');
+                Route::delete('/', 'limpiar')->middleware('permission:seguridad.eliminar');
             });
     });

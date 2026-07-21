@@ -234,7 +234,7 @@ const Usuarios = () => {
             activo: form.activo ? 1 : 0,
         };
 
-        if (form.password) {
+        if (!isEditing && form.password) {
             payload.password = form.password;
             payload.password_confirmation = form.password_confirmation;
         }
@@ -255,6 +255,14 @@ const Usuarios = () => {
 
             if (isEditing) {
                 await usuariosApi.actualizar(editingUser.idusuario, payload);
+
+                if (form.password) {
+                    await usuariosApi.cambiarPassword(editingUser.idusuario, {
+                        password: form.password,
+                        password_confirmation: form.password_confirmation,
+                    });
+                }
+
                 setSuccessMessage('Usuario actualizado correctamente.');
             } else {
                 await usuariosApi.crear(payload);

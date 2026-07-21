@@ -23,6 +23,11 @@ export const usuariosApi = {
         return response.data;
     },
 
+    cambiarPassword: async (idusuario, payload) => {
+        const response = await api.put(`${BASE_URL}/${idusuario}/password`, payload);
+        return response.data;
+    },
+
     eliminar: async (idusuario) => {
         const response = await api.delete(`${BASE_URL}/${idusuario}`);
         return response.data;

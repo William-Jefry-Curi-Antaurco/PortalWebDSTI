@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Archivo;
 use App\Models\EnlaceSistema;
 use App\Services\EtiquetaContenidoService;
 use App\Support\EtiquetaEntidad;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -18,7 +21,7 @@ class EnlaceSistemaController extends Controller
         Request $request,
         EtiquetaContenidoService $etiquetaService
     ) {
-        $query = EnlaceSistema::with(['categoria', 'estadoOperativo'])
+        $query = EnlaceSistema::with(['categoria', 'estadoOperativo', 'archivoManual', 'archivoDocumentacion'])
             ->orderBy('orden')
             ->orderByDesc('created_at');
 
@@ -80,6 +83,14 @@ class EnlaceSistemaController extends Controller
             ], 422);
         }
 
+        $archivoManual = $request->hasFile('archivo_manual')
+            ? $this->guardarArchivo($request->file('archivo_manual'))
+            : null;
+
+        $archivoDocumentacion = $request->hasFile('archivo_documentacion')
+            ? $this->guardarArchivo($request->file('archivo_documentacion'))
+            : null;
+
         $enlace = EnlaceSistema::create([
             'nombre_sistema' => $request->nombre_sistema,
             'slug' => $this->generarSlugUnico($request->nombre_sistema),
@@ -88,6 +99,8 @@ class EnlaceSistemaController extends Controller
             'icono' => $request->icono,
             'idcategoria' => $request->idcategoria,
             'idestadooperativo' => $request->idestadooperativo,
+            'idarchivo_manual' => $archivoManual?->idarchivo,
+            'idarchivo_documentacion' => $archivoDocumentacion?->idarchivo,
             'orden' => $request->orden ?? 0,
             'activo' => $request->has('activo')
                 ? $request->boolean('activo')
@@ -102,7 +115,7 @@ class EnlaceSistemaController extends Controller
 
         $this->limpiarCachePublico();
 
-        $enlace->load(['categoria', 'estadoOperativo']);
+        $enlace->load(['categoria', 'estadoOperativo', 'archivoManual', 'archivoDocumentacion']);
 
         $enlace->etiquetas = $etiquetaService->obtener(
             EtiquetaEntidad::SISTEMAS,
@@ -120,7 +133,7 @@ class EnlaceSistemaController extends Controller
         $id,
         EtiquetaContenidoService $etiquetaService
     ) {
-        $enlace = EnlaceSistema::with(['categoria', 'estadoOperativo'])->find($id);
+        $enlace = EnlaceSistema::with(['categoria', 'estadoOperativo', 'archivoManual', 'archivoDocumentacion'])->find($id);
 
         if (!$enlace) {
             return response()->json([
@@ -173,6 +186,20 @@ class EnlaceSistemaController extends Controller
             ? $this->generarSlugUnico($request->nombre_sistema, $enlace->idenlace)
             : $enlace->slug;
 
+        $archivoManualAnteriorId = $enlace->idarchivo_manual;
+        $archivoDocumentacionAnteriorId = $enlace->idarchivo_documentacion;
+
+        $idarchivoManual = $archivoManualAnteriorId;
+        $idarchivoDocumentacion = $archivoDocumentacionAnteriorId;
+
+        if ($request->hasFile('archivo_manual')) {
+            $idarchivoManual = $this->guardarArchivo($request->file('archivo_manual'))->idarchivo;
+        }
+
+        if ($request->hasFile('archivo_documentacion')) {
+            $idarchivoDocumentacion = $this->guardarArchivo($request->file('archivo_documentacion'))->idarchivo;
+        }
+
         $enlace->update([
             'nombre_sistema' => $request->nombre_sistema,
             'slug' => $slug,
@@ -181,6 +208,8 @@ class EnlaceSistemaController extends Controller
             'icono' => $request->icono,
             'idcategoria' => $request->idcategoria,
             'idestadooperativo' => $request->idestadooperativo,
+            'idarchivo_manual' => $idarchivoManual,
+            'idarchivo_documentacion' => $idarchivoDocumentacion,
             'orden' => $request->orden ?? 0,
             'activo' => $request->has('activo')
                 ? $request->boolean('activo')
@@ -195,7 +224,15 @@ class EnlaceSistemaController extends Controller
 
         $this->limpiarCachePublico();
 
-        $enlace->load(['categoria', 'estadoOperativo']);
+        if ($request->hasFile('archivo_manual') && $archivoManualAnteriorId) {
+            $this->eliminarArchivoSiHuerfano($archivoManualAnteriorId);
+        }
+
+        if ($request->hasFile('archivo_documentacion') && $archivoDocumentacionAnteriorId) {
+            $this->eliminarArchivoSiHuerfano($archivoDocumentacionAnteriorId);
+        }
+
+        $enlace->load(['categoria', 'estadoOperativo', 'archivoManual', 'archivoDocumentacion']);
 
         $enlace->etiquetas = $etiquetaService->obtener(
             EtiquetaEntidad::SISTEMAS,
@@ -227,9 +264,20 @@ class EnlaceSistemaController extends Controller
             $enlace->idenlace
         );
 
+        $archivoManualId = $enlace->idarchivo_manual;
+        $archivoDocumentacionId = $enlace->idarchivo_documentacion;
+
         $enlace->delete();
 
         $this->limpiarCachePublico();
+
+        if ($archivoManualId) {
+            $this->eliminarArchivoSiHuerfano($archivoManualId);
+        }
+
+        if ($archivoDocumentacionId) {
+            $this->eliminarArchivoSiHuerfano($archivoDocumentacionId);
+        }
 
         return response()->json([
             'success' => true,
@@ -273,6 +321,18 @@ class EnlaceSistemaController extends Controller
                 'integer',
                 'exists:estados_operativos,idestadooperativo',
             ],
+            'archivo_manual' => [
+                'nullable',
+                'file',
+                'mimes:pdf,doc,docx,xls,xlsx,ppt,pptx',
+                'max:10240',
+            ],
+            'archivo_documentacion' => [
+                'nullable',
+                'file',
+                'mimes:pdf,doc,docx,xls,xlsx,ppt,pptx',
+                'max:10240',
+            ],
             'orden' => [
                 'nullable',
                 'integer',
@@ -307,6 +367,10 @@ class EnlaceSistemaController extends Controller
             'idcategoria.exists' => 'La categoría seleccionada no existe.',
             'idestadooperativo.required' => 'El estado operativo es obligatorio.',
             'idestadooperativo.exists' => 'El estado operativo seleccionado no existe.',
+            'archivo_manual.mimes' => 'El manual debe ser PDF, Word, Excel o PowerPoint.',
+            'archivo_manual.max' => 'El manual no debe superar los 10 MB.',
+            'archivo_documentacion.mimes' => 'La documentación debe ser PDF, Word, Excel o PowerPoint.',
+            'archivo_documentacion.max' => 'La documentación no debe superar los 10 MB.',
             'etiquetas.array' => 'Las etiquetas deben enviarse como una lista.',
             'etiquetas.*.exists' => 'Una de las etiquetas seleccionadas no existe.',
         ];
@@ -336,5 +400,42 @@ class EnlaceSistemaController extends Controller
     {
         Cache::increment('public:cache_version');
         Cache::forget('public:inicio');
+    }
+
+    private function guardarArchivo(UploadedFile $archivoSubido): Archivo
+    {
+        $extension = $archivoSubido->getClientOriginalExtension();
+        $nombreGuardado = 'enlace_' . now()->format('YmdHis') . '_' . Str::random(10) . '.' . $extension;
+        $ruta = $archivoSubido->storeAs('enlaces-sistemas', $nombreGuardado, 'public');
+
+        return Archivo::create([
+            'nombre_original' => $archivoSubido->getClientOriginalName(),
+            'nombre_guardado' => $nombreGuardado,
+            'ruta' => $ruta,
+            'extension' => $extension,
+            'mime_type' => $archivoSubido->getMimeType(),
+            'peso_bytes' => $archivoSubido->getSize(),
+            'descargas' => 0,
+        ]);
+    }
+
+    private function eliminarArchivoSiHuerfano(int $idarchivo): void
+    {
+        $enUso = EnlaceSistema::where('idarchivo_manual', $idarchivo)
+            ->orWhere('idarchivo_documentacion', $idarchivo)
+            ->exists();
+
+        if ($enUso) {
+            return;
+        }
+
+        $archivo = Archivo::find($idarchivo);
+
+        if (!$archivo) {
+            return;
+        }
+
+        Storage::disk('public')->delete($archivo->ruta);
+        $archivo->delete();
     }
 }

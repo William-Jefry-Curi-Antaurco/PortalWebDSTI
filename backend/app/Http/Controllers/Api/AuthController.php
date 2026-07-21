@@ -35,6 +35,7 @@ class AuthController extends Controller
                     'email' => $usuario->email,
                     'idrol' => $usuario->idrol,
                     'rol' => $usuario->rol?->nombre,
+                    'permisos' => $usuario->rol?->permisos->pluck('nombre')->values() ?? [],
                 ],
             ],
         ]);
@@ -42,7 +43,7 @@ class AuthController extends Controller
 
     public function me(Request $request): JsonResponse
     {
-        $usuario = $request->user()->load('rol');
+        $usuario = $request->user()->load('rol.permisos');
 
         return response()->json([
             'success' => true,
@@ -53,6 +54,7 @@ class AuthController extends Controller
                     'email' => $usuario->email,
                     'idrol' => $usuario->idrol,
                     'rol' => $usuario->rol?->nombre,
+                    'permisos' => $usuario->rol?->permisos->pluck('nombre')->values() ?? [],
                 ],
             ],
         ]);

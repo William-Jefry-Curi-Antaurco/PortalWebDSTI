@@ -10,7 +10,7 @@ class AuthService
 {
     public function login(string $email, string $password): array
     {
-        $usuario = User::with('rol')
+        $usuario = User::with('rol.permisos')
             ->where('email', $email)
             ->first();
 
@@ -33,7 +33,7 @@ class AuthService
         $token = $usuario->createToken('panel-admin')->plainTextToken;
 
         return [
-            'usuario' => $usuario->load('rol'),
+            'usuario' => $usuario->load('rol.permisos'),
             'token' => $token,
         ];
     }

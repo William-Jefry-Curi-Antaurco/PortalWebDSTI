@@ -16,7 +16,7 @@ export const crearSistemaInstitucional = async (payload) => {
 };
 
 export const actualizarSistemaInstitucional = async (id, payload) => {
-    const response = await api.put(`/admin/enlaces-sistemas/${id}`, payload);
+    const response = await api.post(`/admin/enlaces-sistemas/${id}`, payload);
     return response.data;
 };
 

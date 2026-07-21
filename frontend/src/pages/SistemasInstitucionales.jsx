@@ -11,6 +11,7 @@ import {
     PowerOff,
     Eye,
     ExternalLink,
+    Download,
     Link as LinkIcon,
     Tag,
     Tags,
@@ -39,6 +40,8 @@ import {
 
 import '../styles/modules/sistemasInstitucionales.css';
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://127.0.0.1:8000';
+
 const initialForm = {
     nombre_sistema: '',
     descripcion: '',
@@ -49,6 +52,8 @@ const initialForm = {
     orden: 0,
     activo: true,
     etiquetas: [],
+    archivo_manual: null,
+    archivo_documentacion: null,
 };
 
 const initialPagination = {
@@ -65,6 +70,35 @@ const MAX_URL_LENGTH = 255;
 const MAX_ICONO_LENGTH = 100;
 const MAX_SEARCH_LENGTH = 120;
 const MAX_ORDEN = 255;
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+
+const DOCUMENT_MIMES = [
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.ms-powerpoint',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+];
+
+const getFileUrl = (path) => {
+    if (!path) return '#';
+
+    const value = String(path);
+
+    if (value.startsWith('http://') || value.startsWith('https://')) {
+        return value;
+    }
+
+    const cleanPath = value
+        .replace(/^public\//, '')
+        .replace(/^storage\//, '')
+        .replace(/^\/storage\//, '')
+        .replace(/^\//, '');
+
+    return `${BACKEND_URL}/storage/${cleanPath}`;
+};
 
 const normalizarRespuestaPaginada = (response) => {
     const data = response?.data;
@@ -199,6 +233,7 @@ export default function SistemasInstitucionales() {
 
     const [form, setForm] = useState(initialForm);
     const [editingId, setEditingId] = useState(null);
+    const [editingSistema, setEditingSistema] = useState(null);
     const [selectedSistema, setSelectedSistema] = useState(null);
 
     const [showForm, setShowForm] = useState(false);
@@ -311,6 +346,7 @@ export default function SistemasInstitucionales() {
             etiquetas: [],
         });
         setEditingId(null);
+        setEditingSistema(null);
     };
 
     const abrirFormularioCrear = () => {
@@ -347,6 +383,15 @@ export default function SistemasInstitucionales() {
         setForm({
             ...form,
             [name]: type === 'checkbox' ? checked : value,
+        });
+    };
+
+    const handleFileChange = (e) => {
+        const { name, files } = e.target;
+
+        setForm({
+            ...form,
+            [name]: files && files[0] ? files[0] : null,
         });
     };
 
@@ -460,20 +505,54 @@ export default function SistemasInstitucionales() {
             return false;
         }
 
+        for (const [campo, etiqueta] of [
+            ['archivo_manual', 'El manual'],
+            ['archivo_documentacion', 'La documentación'],
+        ]) {
+            const archivo = form[campo];
+
+            if (!archivo) continue;
+
+            if (archivo.type && !DOCUMENT_MIMES.includes(archivo.type)) {
+                notifyError(`${etiqueta} debe ser PDF, Word, Excel o PowerPoint.`);
+                return false;
+            }
+
+            if (archivo.size > MAX_FILE_SIZE) {
+                notifyError(`${etiqueta} no debe superar los 10 MB.`);
+                return false;
+            }
+        }
+
         return true;
     };
 
-    const buildPayload = () => ({
-        nombre_sistema: form.nombre_sistema.trim(),
-        descripcion: form.descripcion.trim(),
-        url: form.url.trim(),
-        icono: form.icono.trim(),
-        idcategoria: Number(form.idcategoria),
-        idestadooperativo: Number(form.idestadooperativo),
-        orden: Number(form.orden || 0),
-        activo: form.activo ? 1 : 0,
-        etiquetas: getEtiquetasIds(form.etiquetas),
-    });
+    const buildFormData = () => {
+        const data = new FormData();
+
+        data.append('nombre_sistema', form.nombre_sistema.trim());
+        data.append('descripcion', form.descripcion.trim());
+        data.append('url', form.url.trim());
+        data.append('icono', form.icono.trim());
+        data.append('idcategoria', form.idcategoria);
+        data.append('idestadooperativo', form.idestadooperativo);
+        data.append('orden', String(form.orden || 0));
+        data.append('activo', form.activo ? '1' : '0');
+
+        getEtiquetasIds(form.etiquetas).forEach((idetiqueta) => {
+            data.append('etiquetas[]', String(idetiqueta));
+        });
+
+        if (form.archivo_manual) {
+            data.append('archivo_manual', form.archivo_manual);
+        }
+
+        if (form.archivo_documentacion) {
+            data.append('archivo_documentacion', form.archivo_documentacion);
+        }
+
+        return data;
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -489,7 +568,7 @@ export default function SistemasInstitucionales() {
         );
 
         try {
-            const payload = buildPayload();
+            const payload = buildFormData();
 
             if (isEditing) {
                 await actualizarSistemaInstitucional(editingId, payload);
@@ -516,6 +595,7 @@ export default function SistemasInstitucionales() {
 
     const handleEdit = (sistema) => {
         setEditingId(sistema.idenlace);
+        setEditingSistema(sistema);
         setShowForm(true);
 
         setForm({
@@ -532,6 +612,8 @@ export default function SistemasInstitucionales() {
             etiquetas: Array.isArray(sistema.etiquetas)
                 ? sistema.etiquetas.map((item) => Number(item.idetiqueta))
                 : [],
+            archivo_manual: null,
+            archivo_documentacion: null,
         });
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -854,6 +936,54 @@ export default function SistemasInstitucionales() {
                                     placeholder="0"
                                     disabled={saving}
                                 />
+                            </div>
+
+                            <div className="sistemas-field">
+                                <label>Manual (PDF, Word, Excel o PowerPoint)</label>
+                                <input
+                                    type="file"
+                                    name="archivo_manual"
+                                    accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
+                                    onChange={handleFileChange}
+                                    disabled={saving}
+                                />
+                                {editingSistema?.archivo_manual && !form.archivo_manual && (
+                                    <small className="sistemas-help-text">
+                                        Actual:{' '}
+                                        <a
+                                            href={getFileUrl(editingSistema.archivo_manual.ruta)}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                        >
+                                            {editingSistema.archivo_manual.nombre_original}
+                                        </a>
+                                        . Sube un archivo para reemplazarlo.
+                                    </small>
+                                )}
+                            </div>
+
+                            <div className="sistemas-field">
+                                <label>Documentación (PDF, Word, Excel o PowerPoint)</label>
+                                <input
+                                    type="file"
+                                    name="archivo_documentacion"
+                                    accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
+                                    onChange={handleFileChange}
+                                    disabled={saving}
+                                />
+                                {editingSistema?.archivo_documentacion && !form.archivo_documentacion && (
+                                    <small className="sistemas-help-text">
+                                        Actual:{' '}
+                                        <a
+                                            href={getFileUrl(editingSistema.archivo_documentacion.ruta)}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                        >
+                                            {editingSistema.archivo_documentacion.nombre_original}
+                                        </a>
+                                        . Sube un archivo para reemplazarlo.
+                                    </small>
+                                )}
                             </div>
 
                             <div className="sistemas-field span-2">
@@ -1403,6 +1533,28 @@ export default function SistemasInstitucionales() {
                                         <LinkIcon size={16} />
                                         Abrir enlace institucional
                                     </a>
+
+                                    {selectedSistema.archivo_manual && (
+                                        <a
+                                            href={getFileUrl(selectedSistema.archivo_manual.ruta)}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                        >
+                                            <Download size={16} />
+                                            Descargar manual
+                                        </a>
+                                    )}
+
+                                    {selectedSistema.archivo_documentacion && (
+                                        <a
+                                            href={getFileUrl(selectedSistema.archivo_documentacion.ruta)}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                        >
+                                            <Download size={16} />
+                                            Descargar documentación
+                                        </a>
+                                    )}
                                 </div>
                             </div>
                         ) : (

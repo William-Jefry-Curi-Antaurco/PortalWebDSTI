@@ -45,6 +45,7 @@ const menuGroups = [
                 label: 'Dashboard',
                 path: '/admin/dashboard',
                 icon: <LayoutDashboard size={iconSize} />,
+                permiso: null,
             },
         ],
     },
@@ -55,6 +56,7 @@ const menuGroups = [
                 label: 'Configuración general',
                 path: '/admin/configuracion',
                 icon: <Settings size={iconSize} />,
+                permiso: 'catalogos.ver',
             },
         ],
     },
@@ -67,41 +69,49 @@ const menuGroups = [
                 label: 'Noticias y comunicados',
                 path: '/admin/noticias',
                 icon: <Newspaper size={iconSize} />,
+                permiso: 'noticias.ver',
             },
             {
                 label: 'Servicios tecnológicos',
                 path: '/admin/servicios',
                 icon: <Wrench size={iconSize} />,
+                permiso: 'servicios.ver',
             },
             {
                 label: 'Sistemas institucionales',
                 path: '/admin/sistemas',
                 icon: <Link2 size={iconSize} />,
+                permiso: 'sistemas.ver',
             },
             {
                 label: 'Documentos y manuales',
                 path: '/admin/documentos',
                 icon: <FileText size={iconSize} />,
+                permiso: 'documentos.ver',
             },
             {
                 label: 'Eventos y capacitaciones',
                 path: '/admin/eventos',
                 icon: <Calendar size={iconSize} />,
+                permiso: 'eventos.ver',
             },
             {
                 label: 'Tutoriales',
                 path: '/admin/tutoriales',
                 icon: <GraduationCap size={iconSize} />,
+                permiso: 'tutoriales.ver',
             },
             {
                 label: 'Preguntas frecuentes',
                 path: '/admin/faqs',
                 icon: <HelpCircle size={iconSize} />,
+                permiso: 'tutoriales.ver',
             },
             {
                 label: 'Solicitudes de soporte',
                 path: '/admin/soporte',
                 icon: <Headphones size={iconSize} />,
+                permiso: 'soporte.ver',
             },
         ],
     },
@@ -112,16 +122,19 @@ const menuGroups = [
                 label: 'Información institucional',
                 path: '/admin/institucional',
                 icon: <Building2 size={iconSize} />,
+                permiso: 'institucional.ver',
             },
             {
                 label: 'Autoridades',
                 path: '/admin/autoridades',
                 icon: <UsersRound size={iconSize} />,
+                permiso: 'institucional.ver',
             },
             {
                 label: 'Proyectos tecnológicos',
                 path: '/admin/proyectos',
                 icon: <Rocket size={iconSize} />,
+                permiso: 'proyectos.ver',
             },
         ],
     },
@@ -132,67 +145,80 @@ const menuGroups = [
                 label: 'Módulos',
                 path: '/admin/modulos',
                 icon: <Boxes size={iconSize} />,
+                permiso: 'catalogos.ver',
             },
             {
                 label: 'Categorías',
                 path: '/admin/categorias',
                 icon: <Tags size={iconSize} />,
+                permiso: 'catalogos.ver',
             },
             {
                 label: 'Estados',
                 path: '/admin/estados',
                 icon: <CheckCircle2 size={iconSize} />,
+                permiso: 'catalogos.ver',
             },
             {
                 label: 'Tipos de entidad',
                 path: '/admin/tipos-entidad',
                 icon: <Shapes size={iconSize} />,
+                permiso: 'catalogos.ver',
             },
             {
                 label: 'Tipos de publicación',
                 path: '/admin/tipos-publicacion',
                 icon: <FileType size={iconSize} />,
+                permiso: 'catalogos.ver',
             },
             {
                 label: 'Tipos de documento',
                 path: '/admin/tipos-documento',
                 icon: <BookOpen size={iconSize} />,
+                permiso: 'catalogos.ver',
             },
 
             {
                 label: 'Estados operativos',
                 path: '/admin/estados-operativos',
                 icon: <Activity size={iconSize} />,
+                permiso: 'catalogos.ver',
             },
             {
                 label: 'Tipos de evento',
                 path: '/admin/tipos-evento',
                 icon: <Calendar size={iconSize} />,
+                permiso: 'catalogos.ver',
             },
             {
                 label: 'Modalidades de evento',
                 path: '/admin/modalidades-evento',
                 icon: <MapPinned size={iconSize} />,
+                permiso: 'catalogos.ver',
             },
             {
                 label: 'Tipos de tutorial',
                 path: '/admin/tipos-tutorial',
                 icon: <Video size={iconSize} />,
+                permiso: 'catalogos.ver',
             },
             {
                 label: 'Tipos de soporte',
                 path: '/admin/tipos-soporte',
                 icon: <LifeBuoy size={iconSize} />,
+                permiso: 'catalogos.ver',
             },
             {
                 label: 'Prioridades',
                 path: '/admin/prioridades',
                 icon: <SignalHigh size={iconSize} />,
+                permiso: 'catalogos.ver',
             },
             {
                 label: 'Etiquetas',
                 path: '/admin/etiquetas',
                 icon: <Badge size={iconSize} />,
+                permiso: 'catalogos.ver',
             },
         ],
     },
@@ -203,21 +229,25 @@ const menuGroups = [
                 label: 'Usuarios',
                 path: '/admin/usuarios',
                 icon: <UserCog size={iconSize} />,
+                permiso: 'seguridad.ver',
             },
             {
                 label: 'Roles',
                 path: '/admin/roles',
                 icon: <ShieldCheck size={iconSize} />,
+                permiso: 'seguridad.ver',
             },
             {
                 label: 'Permisos',
                 path: '/admin/permisos',
                 icon: <KeyRound size={iconSize} />,
+                permiso: 'seguridad.ver',
             },
             {
                 label: 'Auditoría',
                 path: '/admin/logs',
                 icon: <ScrollText size={iconSize} />,
+                permiso: 'seguridad.ver',
             },
         ],
     },
@@ -226,6 +256,17 @@ const menuGroups = [
 export default function AdminLayout() {
     const navigate = useNavigate();
     const user = getUser();
+
+    const permisosUsuario = Array.isArray(user?.permisos) ? user.permisos : [];
+
+    const visibleMenuGroups = menuGroups
+        .map((group) => ({
+            ...group,
+            items: group.items.filter(
+                (item) => !item.permiso || permisosUsuario.includes(item.permiso)
+            ),
+        }))
+        .filter((group) => group.items.length > 0);
 
     const handleLogout = async () => {
         try {
@@ -251,7 +292,7 @@ export default function AdminLayout() {
                 </div>
 
                 <nav className="sidebar-nav">
-                    {menuGroups.map((group) => (
+                    {visibleMenuGroups.map((group) => (
                         <section className="menu-group" key={group.title}>
                             <p className="menu-title">{group.title}</p>
 
