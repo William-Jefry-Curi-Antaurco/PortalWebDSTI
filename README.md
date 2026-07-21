@@ -87,6 +87,7 @@ Este repositorio combina un backend Laravel con un frontend React. El backend of
 
 ## Documentación del proyecto
 
+- [`docs/base-de-datos.md`](docs/base-de-datos.md): qué es cada tabla, cómo se relacionan, y cómo funciona la auditoría por triggers.
 - Mantén este `README.md` actualizado con cambios importantes.
 - Añade comentarios en el código donde la lógica sea compleja o haya decisiones de diseño importantes.
 - Usa mensajes de commit claros:
