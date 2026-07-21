@@ -1,0 +1,834 @@
+/* ============================================================
+   NOTICIAS - ESTILOS FORMALES
+   Módulo de contenido DSTI
+   ============================================================ */
+
+:root {
+    --news-primary: #0d3b66;
+    --news-primary-dark: #082a4d;
+    --news-primary-light: #1d5a96;
+    --news-accent: #1976d2;
+    --news-success: #1e7e34;
+    --news-danger: #b02a37;
+    --news-warning: #b58900;
+    --news-info: #0891b2;
+    --news-text: #1f2937;
+    --news-text-muted: #6b7280;
+    --news-text-light: #9ca3af;
+    --news-bg: #f5f7fa;
+    --news-surface: #ffffff;
+    --news-border: #d1d5db;
+    --news-border-light: #e5e7eb;
+    --news-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+    --news-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+    --news-shadow-lg: 0 10px 25px rgba(15, 23, 42, 0.12);
+    --news-radius: 6px;
+    --news-radius-lg: 10px;
+    --news-transition: 160ms ease;
+}
+
+/* ============================================================
+   CONTENEDOR PRINCIPAL
+   ============================================================ */
+
+.noticias-page {
+    padding: 28px 32px;
+    background: var(--news-bg);
+    min-height: 100%;
+    color: var(--news-text);
+    font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* ============================================================
+   ENCABEZADO
+   ============================================================ */
+
+.noticias-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+    padding-bottom: 20px;
+    margin-bottom: 24px;
+    border-bottom: 2px solid var(--news-primary);
+}
+
+.noticias-header > div:first-child {
+    flex: 1;
+}
+
+.noticias-eyebrow {
+    display: inline-block;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--news-primary);
+    background: rgba(13, 59, 102, 0.08);
+    padding: 4px 10px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.noticias-header h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--news-primary-dark);
+    margin: 0 0 6px 0;
+    letter-spacing: -0.01em;
+}
+
+.noticias-header p {
+    color: var(--news-text-muted);
+    margin: 0;
+    font-size: 13.5px;
+    max-width: 680px;
+}
+
+/* ============================================================
+   BOTÓN AGREGAR
+   ============================================================ */
+
+.noticias-add-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: var(--news-primary);
+    color: #fff;
+    border: 1px solid var(--news-primary);
+    border-radius: var(--news-radius);
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--news-transition);
+    box-shadow: var(--news-shadow-sm);
+    white-space: nowrap;
+}
+
+.noticias-add-button:hover {
+    background: var(--news-primary-dark);
+    border-color: var(--news-primary-dark);
+    box-shadow: var(--news-shadow);
+}
+
+/* ============================================================
+   FORMULARIO
+   ============================================================ */
+
+.noticias-form-card {
+    background: var(--news-surface);
+    border: 1px solid var(--news-border-light);
+    border-radius: var(--news-radius-lg);
+    box-shadow: var(--news-shadow);
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+
+.noticias-form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px 24px;
+    background: linear-gradient(180deg, #fafbfc 0%, #f4f6f8 100%);
+    border-bottom: 1px solid var(--news-border-light);
+}
+
+.noticias-form-header h2 {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--news-primary-dark);
+    margin: 0 0 4px 0;
+}
+
+.noticias-form-header p {
+    color: var(--news-text-muted);
+    font-size: 13px;
+    margin: 0;
+    line-height: 1.55;
+}
+
+.noticias-close-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    background: var(--news-surface);
+    color: var(--news-text-muted);
+    border: 1px solid var(--news-border);
+    border-radius: var(--news-radius);
+    cursor: pointer;
+    transition: var(--news-transition);
+    flex-shrink: 0;
+}
+
+.noticias-close-button:hover {
+    background: #f3f4f6;
+    color: var(--news-danger);
+    border-color: var(--news-danger);
+}
+
+.noticias-form {
+    padding: 24px;
+}
+
+.noticias-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    max-width: 860px;
+}
+
+.noticias-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.noticias-field.span-2 {
+    grid-column: span 2;
+}
+
+.noticias-field label {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--news-text);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.noticias-field input,
+.noticias-field textarea,
+.noticias-field select {
+    width: 100%;
+    padding: 9px 12px;
+    background: var(--news-surface);
+    border: 1px solid var(--news-border);
+    border-radius: var(--news-radius);
+    font-size: 13.5px;
+    color: var(--news-text);
+    font-family: inherit;
+    transition: var(--news-transition);
+}
+
+.noticias-field input:focus,
+.noticias-field textarea:focus,
+.noticias-field select:focus {
+    outline: none;
+    border-color: var(--news-primary);
+    box-shadow: 0 0 0 3px rgba(13, 59, 102, 0.12);
+}
+
+.noticias-field textarea {
+    resize: vertical;
+    line-height: 1.55;
+    font-family: inherit;
+}
+
+.noticias-checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--news-text);
+    padding: 8px 0;
+    width: fit-content;
+}
+
+.noticias-checkbox input[type='checkbox'] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--news-primary);
+    cursor: pointer;
+}
+
+/* Upload de imágenes */
+
+.noticias-upload-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 24px;
+    border: 2px dashed var(--news-border);
+    border-radius: var(--news-radius);
+    cursor: pointer;
+    transition: var(--news-transition);
+    background: #fafbfc;
+    text-align: center;
+}
+
+.noticias-upload-box:hover {
+    border-color: var(--news-primary);
+    background: rgba(13, 59, 102, 0.02);
+}
+
+.noticias-upload-box svg {
+    color: var(--news-primary);
+}
+
+.noticias-upload-box span {
+    font-weight: 600;
+    color: var(--news-primary);
+}
+
+.noticias-upload-box small {
+    font-size: 11px;
+    color: var(--news-text-muted);
+}
+
+.noticias-upload-box input {
+    display: none;
+}
+
+.noticias-current-title {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--news-text-muted);
+    margin: 16px 0 8px 0;
+    text-transform: uppercase;
+}
+
+.noticias-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.noticias-preview-item {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    border-radius: var(--news-radius);
+    overflow: hidden;
+    border: 1px solid var(--news-border-light);
+}
+
+.noticias-preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.noticias-preview-delete {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 28px;
+    height: 28px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: none;
+    border-radius: var(--news-radius);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--news-transition);
+}
+
+.noticias-preview-delete:hover {
+    background: var(--news-danger);
+    transform: scale(1.05);
+}
+
+/* Form actions */
+
+.noticias-form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    padding-top: 20px;
+    margin-top: 20px;
+    border-top: 1px solid var(--news-border-light);
+}
+
+.noticias-save-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 22px;
+    background: var(--news-primary);
+    color: #fff;
+    border: 1px solid var(--news-primary);
+    border-radius: var(--news-radius);
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--news-transition);
+    box-shadow: var(--news-shadow-sm);
+}
+
+.noticias-save-button:hover:not(:disabled) {
+    background: var(--news-primary-dark);
+    border-color: var(--news-primary-dark);
+}
+
+.noticias-save-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.noticias-cancel-button {
+    padding: 10px 20px;
+    background: var(--news-surface);
+    color: var(--news-text);
+    border: 1px solid var(--news-border);
+    border-radius: var(--news-radius);
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--news-transition);
+}
+
+.noticias-cancel-button:hover {
+    background: #f3f4f6;
+    border-color: var(--news-text-muted);
+}
+
+/* ============================================================
+   LISTADO DE NOTICIAS - GRID DE TARJETAS
+   ============================================================ */
+
+.noticias-list-card {
+    background: var(--news-surface);
+    border: 1px solid var(--news-border-light);
+    border-radius: var(--news-radius-lg);
+    box-shadow: var(--news-shadow);
+    overflow: hidden;
+}
+
+.noticias-list-header {
+    padding: 20px 24px;
+    background: linear-gradient(180deg, #fafbfc 0%, #f4f6f8 100%);
+    border-bottom: 1px solid var(--news-border-light);
+}
+
+.noticias-list-header h2 {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--news-primary-dark);
+    margin: 0 0 4px 0;
+}
+
+.noticias-list-header p {
+    color: var(--news-text-muted);
+    font-size: 13px;
+    margin: 0;
+}
+
+/* Grid de noticias */
+
+.noticias-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 24px;
+    padding: 24px;
+}
+
+/* Tarjeta de noticia */
+
+.noticia-card {
+    background: var(--news-surface);
+    border: 1px solid var(--news-border-light);
+    border-radius: var(--news-radius-lg);
+    overflow: hidden;
+    transition: var(--news-transition);
+}
+
+.noticia-card:hover {
+    box-shadow: var(--news-shadow-lg);
+    transform: translateY(-2px);
+}
+
+/* Carrusel */
+
+.noticia-carousel {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    background: #1f2937;
+    overflow: hidden;
+}
+
+.noticia-carousel img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.noticia-carousel-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+    color: var(--news-text-light);
+    font-size: 13px;
+}
+
+/* Botones del carrusel */
+
+.carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 34px;
+    height: 34px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--news-transition);
+    z-index: 10;
+}
+
+.carousel-btn:hover {
+    background: rgba(0, 0, 0, 0.8);
+    transform: translateY(-50%) scale(1.05);
+}
+
+.carousel-prev {
+    left: 12px;
+}
+
+.carousel-next {
+    right: 12px;
+}
+
+.carousel-dots {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 10;
+}
+
+.carousel-dots button {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    border: none;
+    cursor: pointer;
+    transition: var(--news-transition);
+}
+
+.carousel-dots button.active {
+    background: white;
+    width: 20px;
+    border-radius: 4px;
+}
+
+.carousel-dots button:hover {
+    background: white;
+}
+
+/* Cuerpo de la tarjeta */
+
+.noticia-body {
+    padding: 20px;
+}
+
+.noticia-tags {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.noticia-tags span {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 4px 10px;
+    background: rgba(13, 59, 102, 0.08);
+    color: var(--news-primary);
+    border-radius: 20px;
+}
+
+.noticia-tags strong {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 4px 10px;
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--news-warning);
+    border-radius: 20px;
+}
+
+.noticia-body h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--news-primary-dark);
+    margin: 0 0 10px 0;
+    line-height: 1.4;
+}
+
+.noticia-body p {
+    font-size: 13px;
+    color: var(--news-text-muted);
+    margin: 0 0 16px 0;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.noticia-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 12px 0;
+    border-top: 1px solid var(--news-border-light);
+    border-bottom: 1px solid var(--news-border-light);
+    margin-bottom: 16px;
+}
+
+.noticia-meta span {
+    font-size: 11px;
+    color: var(--news-text-light);
+}
+
+/* Acciones */
+
+.noticia-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.noticia-actions button {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: var(--news-radius);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--news-transition);
+    border: 1px solid var(--news-border);
+    background: var(--news-surface);
+    color: var(--news-text);
+}
+
+.noticia-actions button:hover {
+    background: #f3f4f6;
+}
+
+.noticia-actions button.danger:hover {
+    background: rgba(176, 42, 55, 0.08);
+    border-color: var(--news-danger);
+    color: var(--news-danger);
+}
+
+/* ============================================================
+   ESTADOS VACÍOS
+   ============================================================ */
+
+.noticias-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--news-text-muted);
+    font-size: 13.5px;
+}
+
+.noticias-empty-box {
+    text-align: center;
+    padding: 60px 24px;
+}
+
+.noticias-empty-box h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--news-primary-dark);
+    margin: 0 0 8px 0;
+}
+
+.noticias-empty-box p {
+    color: var(--news-text-muted);
+    font-size: 13.5px;
+    margin: 0;
+}
+
+
+.noticias-etiquetas-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    padding: 0.85rem;
+    border: 1px solid #dbe3ef;
+    border-radius: 16px;
+    background: #f8fafc;
+}
+
+.noticias-etiqueta-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border: 1px solid color-mix(
+            in srgb,
+            var(--etiqueta-color) 38%,
+            #dbe3ef
+    );
+    background: color-mix(
+            in srgb,
+            var(--etiqueta-color) 9%,
+            white
+    );
+    color: var(--etiqueta-color);
+    border-radius: 999px;
+    padding: 0.48rem 0.78rem;
+    font-size: 0.78rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.18s ease;
+}
+
+.noticias-etiqueta-chip:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.1);
+}
+
+.noticias-etiqueta-chip.is-active {
+    background: var(--etiqueta-color);
+    color: #ffffff;
+    border-color: var(--etiqueta-color);
+}
+
+.noticias-help-text {
+    display: block;
+    margin-top: 0.45rem;
+    color: #64748b;
+    font-size: 0.78rem;
+}
+
+.noticia-etiquetas-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin: 0.55rem 0 0.75rem;
+}
+
+.noticia-etiqueta-badge {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 0.28rem 0.58rem;
+    background: color-mix(
+            in srgb,
+            var(--etiqueta-color) 12%,
+            white
+    );
+    border: 1px solid color-mix(
+            in srgb,
+            var(--etiqueta-color) 35%,
+            transparent
+    );
+    color: var(--etiqueta-color);
+    font-size: 0.7rem;
+    font-weight: 800;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 1024px) {
+    .noticias-grid {
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+        gap: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .noticias-page {
+        padding: 20px 16px;
+    }
+
+    .noticias-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .noticias-header h1 {
+        font-size: 20px;
+    }
+
+    .noticias-add-button {
+        justify-content: center;
+    }
+
+    .noticias-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .noticias-field.span-2 {
+        grid-column: span 1;
+    }
+
+    .noticias-form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .noticias-form-actions button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .noticias-grid {
+        grid-template-columns: 1fr;
+        padding: 16px;
+        gap: 16px;
+    }
+
+    .noticia-body {
+        padding: 16px;
+    }
+
+    .noticia-body h3 {
+        font-size: 15px;
+    }
+
+    .noticia-meta {
+        gap: 8px;
+    }
+
+    .noticia-actions {
+        flex-direction: column;
+    }
+
+    .noticia-actions button {
+        width: 100%;
+    }
+
+    .noticias-preview-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    }
+
+    .carousel-btn {
+        width: 28px;
+        height: 28px;
+    }
+
+    .carousel-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+}

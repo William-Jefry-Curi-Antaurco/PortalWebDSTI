@@ -1,0 +1,601 @@
+/* ============================================================
+   TIPOS DE EVENTO - ESTILOS FORMALES
+   Módulo institucional DSTI
+   ============================================================ */
+
+:root {
+    --te-primary: #0d3b66;
+    --te-primary-dark: #082a4d;
+    --te-primary-light: #1d5a96;
+    --te-accent: #1976d2;
+    --te-success: #1e7e34;
+    --te-danger: #b02a37;
+    --te-warning: #b58900;
+    --te-text: #1f2937;
+    --te-text-muted: #6b7280;
+    --te-text-light: #9ca3af;
+    --te-bg: #f5f7fa;
+    --te-surface: #ffffff;
+    --te-border: #d1d5db;
+    --te-border-light: #e5e7eb;
+    --te-code-bg: #eef2f7;
+    --te-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+    --te-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+    --te-shadow-lg: 0 10px 25px rgba(15, 23, 42, 0.12);
+    --te-radius: 6px;
+    --te-radius-lg: 10px;
+    --te-transition: 160ms ease;
+}
+
+/* ============================================================
+   CONTENEDOR PRINCIPAL
+   ============================================================ */
+
+.tipos-evento-page {
+    padding: 28px 32px;
+    background: var(--te-bg);
+    min-height: 100%;
+    color: var(--te-text);
+    font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* ============================================================
+   ENCABEZADO
+   ============================================================ */
+
+.tipos-evento-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+    padding-bottom: 20px;
+    margin-bottom: 24px;
+    border-bottom: 2px solid var(--te-primary);
+}
+
+.tipos-evento-header > div:first-child {
+    flex: 1;
+}
+
+.tipos-evento-eyebrow {
+    display: inline-block;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--te-primary);
+    background: rgba(13, 59, 102, 0.08);
+    padding: 4px 10px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.tipos-evento-header h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--te-primary-dark);
+    margin: 0 0 6px 0;
+    letter-spacing: -0.01em;
+}
+
+.tipos-evento-header p {
+    color: var(--te-text-muted);
+    margin: 0;
+    font-size: 13.5px;
+    max-width: 680px;
+}
+
+/* ============================================================
+   BOTÓN AGREGAR
+   ============================================================ */
+
+.tipos-evento-add-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: var(--te-primary);
+    color: #fff;
+    border: 1px solid var(--te-primary);
+    border-radius: var(--te-radius);
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--te-transition);
+    box-shadow: var(--te-shadow-sm);
+    white-space: nowrap;
+}
+
+.tipos-evento-add-button:hover {
+    background: var(--te-primary-dark);
+    border-color: var(--te-primary-dark);
+    box-shadow: var(--te-shadow);
+}
+
+/* ============================================================
+   FORMULARIO
+   ============================================================ */
+
+.tipos-evento-form-card {
+    background: var(--te-surface);
+    border: 1px solid var(--te-border-light);
+    border-radius: var(--te-radius-lg);
+    box-shadow: var(--te-shadow);
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+
+.tipos-evento-form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px 24px;
+    background: linear-gradient(180deg, #fafbfc 0%, #f4f6f8 100%);
+    border-bottom: 1px solid var(--te-border-light);
+}
+
+.tipos-evento-form-header h2 {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--te-primary-dark);
+    margin: 0 0 4px 0;
+}
+
+.tipos-evento-form-header p {
+    color: var(--te-text-muted);
+    font-size: 13px;
+    margin: 0;
+    line-height: 1.55;
+}
+
+.tipos-evento-close-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    background: var(--te-surface);
+    color: var(--te-text-muted);
+    border: 1px solid var(--te-border);
+    border-radius: var(--te-radius);
+    cursor: pointer;
+    transition: var(--te-transition);
+    flex-shrink: 0;
+}
+
+.tipos-evento-close-button:hover {
+    background: #f3f4f6;
+    color: var(--te-danger);
+    border-color: var(--te-danger);
+}
+
+.tipos-evento-form {
+    padding: 24px;
+}
+
+.tipos-evento-form-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    max-width: 720px;
+}
+
+.tipos-evento-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.tipos-evento-field label {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--te-text);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.tipos-evento-field input,
+.tipos-evento-field textarea {
+    width: 100%;
+    padding: 9px 12px;
+    background: var(--te-surface);
+    border: 1px solid var(--te-border);
+    border-radius: var(--te-radius);
+    font-size: 13.5px;
+    color: var(--te-text);
+    font-family: inherit;
+    transition: var(--te-transition);
+}
+
+.tipos-evento-field input:focus,
+.tipos-evento-field textarea:focus {
+    outline: none;
+    border-color: var(--te-primary);
+    box-shadow: 0 0 0 3px rgba(13, 59, 102, 0.12);
+}
+
+.tipos-evento-field textarea {
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.55;
+    font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+}
+
+.tipos-evento-checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--te-text);
+    padding: 8px 0;
+    width: fit-content;
+}
+
+.tipos-evento-checkbox input[type='checkbox'] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--te-primary);
+    cursor: pointer;
+}
+
+/* Acciones del formulario */
+
+.tipos-evento-form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    padding-top: 20px;
+    margin-top: 20px;
+    border-top: 1px solid var(--te-border-light);
+}
+
+.tipos-evento-save-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 22px;
+    background: var(--te-primary);
+    color: #fff;
+    border: 1px solid var(--te-primary);
+    border-radius: var(--te-radius);
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--te-transition);
+    box-shadow: var(--te-shadow-sm);
+}
+
+.tipos-evento-save-button:hover:not(:disabled) {
+    background: var(--te-primary-dark);
+    border-color: var(--te-primary-dark);
+}
+
+.tipos-evento-save-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.tipos-evento-cancel-button {
+    padding: 10px 20px;
+    background: var(--te-surface);
+    color: var(--te-text);
+    border: 1px solid var(--te-border);
+    border-radius: var(--te-radius);
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--te-transition);
+}
+
+.tipos-evento-cancel-button:hover {
+    background: #f3f4f6;
+    border-color: var(--te-text-muted);
+}
+
+/* ============================================================
+   LISTADO
+   ============================================================ */
+
+.tipos-evento-list-card {
+    background: var(--te-surface);
+    border: 1px solid var(--te-border-light);
+    border-radius: var(--te-radius-lg);
+    box-shadow: var(--te-shadow);
+    overflow: hidden;
+}
+
+.tipos-evento-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 24px;
+    background: linear-gradient(180deg, #fafbfc 0%, #f4f6f8 100%);
+    border-bottom: 1px solid var(--te-border-light);
+    flex-wrap: wrap;
+}
+
+.tipos-evento-list-header h2 {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--te-primary-dark);
+    margin: 0 0 4px 0;
+}
+
+.tipos-evento-list-header p {
+    color: var(--te-text-muted);
+    font-size: 13px;
+    margin: 0;
+}
+
+/* ============================================================
+   BÚSQUEDA
+   ============================================================ */
+
+.tipos-evento-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.tipos-evento-search svg {
+    position: absolute;
+    left: 11px;
+    color: var(--te-text-muted);
+    pointer-events: none;
+}
+
+.tipos-evento-search input {
+    padding: 8px 12px 8px 36px;
+    background: var(--te-surface);
+    border: 1px solid var(--te-border);
+    border-radius: var(--te-radius);
+    font-size: 13px;
+    color: var(--te-text);
+    min-width: 260px;
+    transition: var(--te-transition);
+}
+
+.tipos-evento-search input:focus {
+    outline: none;
+    border-color: var(--te-primary);
+    box-shadow: 0 0 0 3px rgba(13, 59, 102, 0.12);
+}
+
+/* ============================================================
+   TABLA
+   ============================================================ */
+
+.tipos-evento-table-wrap {
+    overflow-x: auto;
+}
+
+.tipos-evento-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.tipos-evento-table thead {
+    background: #f8fafc;
+    border-bottom: 2px solid var(--te-primary);
+}
+
+.tipos-evento-table th {
+    padding: 12px 14px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--te-primary-dark);
+    white-space: nowrap;
+}
+
+.tipos-evento-table td {
+    padding: 14px;
+    border-bottom: 1px solid var(--te-border-light);
+    color: var(--te-text);
+    vertical-align: middle;
+}
+
+.tipos-evento-table tbody tr {
+    transition: background var(--te-transition);
+}
+
+.tipos-evento-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.tipos-evento-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Nombre del tipo de evento */
+
+.tipos-evento-name {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 180px;
+}
+
+.tipos-evento-name > span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: rgba(13, 59, 102, 0.08);
+    color: var(--te-primary);
+    border-radius: var(--te-radius);
+    flex-shrink: 0;
+}
+
+.tipos-evento-name strong {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--te-primary-dark);
+    line-height: 1.35;
+}
+
+/* Slug (código) */
+
+.tipos-evento-table code {
+    display: inline-block;
+    padding: 3px 8px;
+    background: var(--te-code-bg);
+    color: var(--te-primary-dark);
+    border: 1px solid var(--te-border-light);
+    border-radius: 4px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Estado (activo/inactivo) */
+
+.tipos-evento-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+
+.tipos-evento-status.active {
+    background: rgba(30, 126, 52, 0.1);
+    color: var(--te-success);
+    border: 1px solid rgba(30, 126, 52, 0.25);
+}
+
+.tipos-evento-status.inactive {
+    background: rgba(176, 42, 55, 0.08);
+    color: var(--te-danger);
+    border: 1px solid rgba(176, 42, 55, 0.22);
+}
+
+/* Acciones de fila */
+
+.tipos-evento-actions {
+    display: flex;
+    gap: 4px;
+    justify-content: flex-start;
+}
+
+.tipos-evento-actions button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    background: var(--te-surface);
+    color: var(--te-text-muted);
+    border: 1px solid var(--te-border);
+    border-radius: var(--te-radius);
+    cursor: pointer;
+    transition: var(--te-transition);
+}
+
+.tipos-evento-actions button:hover {
+    background: var(--te-primary);
+    color: #fff;
+    border-color: var(--te-primary);
+}
+
+.tipos-evento-actions button.danger:hover {
+    background: var(--te-danger);
+    border-color: var(--te-danger);
+}
+
+/* ============================================================
+   ESTADOS VACÍOS
+   ============================================================ */
+
+.tipos-evento-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--te-text-muted);
+    font-size: 13.5px;
+}
+
+.tipos-evento-empty-box {
+    text-align: center;
+    padding: 50px 24px;
+}
+
+.tipos-evento-empty-box h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--te-primary-dark);
+    margin: 0 0 6px 0;
+}
+
+.tipos-evento-empty-box p {
+    color: var(--te-text-muted);
+    font-size: 13.5px;
+    margin: 0;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 1024px) {
+    .tipos-evento-list-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .tipos-evento-search input {
+        width: 100%;
+        min-width: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .tipos-evento-page {
+        padding: 20px 16px;
+    }
+
+    .tipos-evento-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .tipos-evento-header h1 {
+        font-size: 20px;
+    }
+
+    .tipos-evento-form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .tipos-evento-form-actions button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .tipos-evento-table th,
+    .tipos-evento-table td {
+        padding: 10px 12px;
+    }
+
+    .tipos-evento-name {
+        min-width: 160px;
+    }
+
+    .tipos-evento-name > span {
+        width: 30px;
+        height: 30px;
+    }
+}

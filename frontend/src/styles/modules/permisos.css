@@ -1,0 +1,651 @@
+/* ============================================================
+   PERMISOS - ESTILOS FORMALES
+   Módulo administrativo DSTI
+   ============================================================ */
+
+:root {
+    --perm-primary: #0d3b66;
+    --perm-primary-dark: #082a4d;
+    --perm-primary-light: #1d5a96;
+    --perm-accent: #1976d2;
+    --perm-success: #1e7e34;
+    --perm-danger: #b02a37;
+    --perm-warning: #b58900;
+    --perm-info: #0891b2;
+    --perm-text: #1f2937;
+    --perm-text-muted: #6b7280;
+    --perm-text-light: #9ca3af;
+    --perm-bg: #f5f7fa;
+    --perm-surface: #ffffff;
+    --perm-border: #d1d5db;
+    --perm-border-light: #e5e7eb;
+    --perm-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+    --perm-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+    --perm-shadow-lg: 0 10px 25px rgba(15, 23, 42, 0.12);
+    --perm-radius: 6px;
+    --perm-radius-lg: 10px;
+    --perm-transition: 160ms ease;
+}
+
+/* ============================================================
+   CONTENEDOR PRINCIPAL
+   ============================================================ */
+
+.permisos-page {
+    padding: 28px 32px;
+    background: var(--perm-bg);
+    min-height: 100%;
+    color: var(--perm-text);
+    font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* ============================================================
+   ENCABEZADO
+   ============================================================ */
+
+.permisos-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+    padding-bottom: 20px;
+    margin-bottom: 24px;
+    border-bottom: 2px solid var(--perm-primary);
+}
+
+.permisos-header > div:first-child {
+    flex: 1;
+}
+
+.permisos-kicker {
+    display: inline-block;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--perm-primary);
+    background: rgba(13, 59, 102, 0.08);
+    padding: 4px 10px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.permisos-header h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--perm-primary-dark);
+    margin: 0 0 6px 0;
+    letter-spacing: -0.01em;
+}
+
+.permisos-header p {
+    color: var(--perm-text-muted);
+    margin: 0;
+    font-size: 13.5px;
+    max-width: 680px;
+}
+
+/* Header actions */
+
+.permisos-header-actions {
+    display: flex;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+/* ============================================================
+   BOTONES
+   ============================================================ */
+
+.permisos-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: var(--perm-radius);
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--perm-transition);
+    border: 1px solid transparent;
+    background: transparent;
+}
+
+.permisos-btn-primary {
+    background: var(--perm-primary);
+    color: #fff;
+    border-color: var(--perm-primary);
+    box-shadow: var(--perm-shadow-sm);
+}
+
+.permisos-btn-primary:hover:not(:disabled) {
+    background: var(--perm-primary-dark);
+    border-color: var(--perm-primary-dark);
+}
+
+.permisos-btn-secondary {
+    background: var(--perm-surface);
+    color: var(--perm-text);
+    border-color: var(--perm-border);
+}
+
+.permisos-btn-secondary:hover:not(:disabled) {
+    background: #f3f4f6;
+    border-color: var(--perm-text-muted);
+}
+
+.permisos-btn-light {
+    background: #f3f4f6;
+    color: var(--perm-text);
+    border-color: var(--perm-border);
+}
+
+.permisos-btn-light:hover:not(:disabled) {
+    background: #e5e7eb;
+}
+
+.permisos-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ============================================================
+   ALERTAS
+   ============================================================ */
+
+.permisos-alert {
+    padding: 12px 16px;
+    border-radius: var(--perm-radius);
+    margin-bottom: 20px;
+    font-size: 13.5px;
+    font-weight: 500;
+}
+
+.permisos-alert-error {
+    background: rgba(176, 42, 55, 0.08);
+    color: var(--perm-danger);
+    border: 1px solid rgba(176, 42, 55, 0.22);
+}
+
+.permisos-alert-success {
+    background: rgba(30, 126, 52, 0.08);
+    color: var(--perm-success);
+    border: 1px solid rgba(30, 126, 52, 0.22);
+}
+
+/* ============================================================
+   TARJETA DE LISTADO
+   ============================================================ */
+
+.permisos-list-card {
+    background: var(--perm-surface);
+    border: 1px solid var(--perm-border-light);
+    border-radius: var(--perm-radius-lg);
+    box-shadow: var(--perm-shadow);
+    overflow: hidden;
+}
+
+/* Toolbar / Filters */
+
+.permisos-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 24px;
+    background: linear-gradient(180deg, #fafbfc 0%, #f4f6f8 100%);
+    border-bottom: 1px solid var(--perm-border-light);
+    flex-wrap: wrap;
+}
+
+.permisos-toolbar h2 {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--perm-primary-dark);
+    margin: 0 0 4px 0;
+}
+
+.permisos-toolbar p {
+    color: var(--perm-text-muted);
+    font-size: 13px;
+    margin: 0;
+}
+
+/* Filtros */
+
+.permisos-filters {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.permisos-filters select,
+.permisos-filters input {
+    padding: 8px 12px;
+    background: var(--perm-surface);
+    border: 1px solid var(--perm-border);
+    border-radius: var(--perm-radius);
+    font-size: 13px;
+    color: var(--perm-text);
+    min-width: 180px;
+    transition: var(--perm-transition);
+}
+
+.permisos-filters select:focus,
+.permisos-filters input:focus {
+    outline: none;
+    border-color: var(--perm-primary);
+    box-shadow: 0 0 0 3px rgba(13, 59, 102, 0.12);
+}
+
+.permisos-filters select:disabled,
+.permisos-filters input:disabled {
+    background: #f3f4f6;
+    cursor: not-allowed;
+}
+
+/* ============================================================
+   TABLA
+   ============================================================ */
+
+.permisos-table-wrapper {
+    overflow-x: auto;
+}
+
+.permisos-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.permisos-table thead {
+    background: #f8fafc;
+    border-bottom: 2px solid var(--perm-primary);
+}
+
+.permisos-table th {
+    padding: 12px 14px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--perm-primary-dark);
+    white-space: nowrap;
+}
+
+.permisos-table td {
+    padding: 14px;
+    border-bottom: 1px solid var(--perm-border-light);
+    color: var(--perm-text);
+    vertical-align: middle;
+}
+
+.permisos-table tbody tr {
+    transition: background var(--perm-transition);
+}
+
+.permisos-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.permisos-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Nombre del permiso */
+
+.permisos-name {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--perm-primary-dark);
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    background: var(--perm-code-bg, #eef2f7);
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+/* Badge de módulo */
+
+.permisos-module-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    background: rgba(13, 59, 102, 0.08);
+    color: var(--perm-primary);
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* Texto muted */
+
+.permisos-muted {
+    color: var(--perm-text-muted);
+    font-style: italic;
+}
+
+/* Contador de roles */
+
+.permisos-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    padding: 4px 8px;
+    background: #f3f4f6;
+    color: var(--perm-text-muted);
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.permisos-count-active {
+    background: rgba(13, 59, 102, 0.08);
+    color: var(--perm-primary);
+}
+
+/* Acciones de fila */
+
+.permisos-actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.permisos-action-btn {
+    padding: 5px 12px;
+    border-radius: var(--perm-radius);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--perm-transition);
+    border: 1px solid var(--perm-border);
+    background: var(--perm-surface);
+    color: var(--perm-text);
+}
+
+.permisos-action-btn:hover:not(:disabled) {
+    background: #f3f4f6;
+}
+
+.permisos-action-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.permisos-action-edit {
+    border-color: var(--perm-primary);
+    color: var(--perm-primary);
+}
+
+.permisos-action-edit:hover:not(:disabled) {
+    background: rgba(13, 59, 102, 0.08);
+}
+
+.permisos-action-delete {
+    border-color: var(--perm-danger);
+    color: var(--perm-danger);
+}
+
+.permisos-action-delete:hover:not(:disabled) {
+    background: rgba(176, 42, 55, 0.08);
+}
+
+/* ============================================================
+   MODAL
+   ============================================================ */
+
+.permisos-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.permisos-modal {
+    background: var(--perm-surface);
+    border-radius: var(--perm-radius-lg);
+    width: 100%;
+    max-width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--perm-shadow-lg);
+}
+
+.permisos-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px 24px;
+    background: linear-gradient(180deg, #fafbfc 0%, #f4f6f8 100%);
+    border-bottom: 1px solid var(--perm-border-light);
+    position: sticky;
+    top: 0;
+    background: var(--perm-surface);
+}
+
+.permisos-modal-header h2 {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--perm-primary-dark);
+    margin: 4px 0 0 0;
+}
+
+.permisos-modal-header .permisos-kicker {
+    margin-bottom: 0;
+}
+
+.permisos-modal-close {
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--perm-surface);
+    color: var(--perm-text-muted);
+    border: 1px solid var(--perm-border);
+    border-radius: var(--perm-radius);
+    cursor: pointer;
+    transition: var(--perm-transition);
+    font-size: 20px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.permisos-modal-close:hover:not(:disabled) {
+    background: #f3f4f6;
+    color: var(--perm-danger);
+    border-color: var(--perm-danger);
+}
+
+.permisos-modal-close:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ============================================================
+   FORMULARIO
+   ============================================================ */
+
+.permisos-form {
+    padding: 24px;
+}
+
+.permisos-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 20px;
+}
+
+.permisos-field label {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--perm-text);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.permisos-field input,
+.permisos-field select,
+.permisos-field textarea {
+    width: 100%;
+    padding: 9px 12px;
+    background: var(--perm-surface);
+    border: 1px solid var(--perm-border);
+    border-radius: var(--perm-radius);
+    font-size: 13.5px;
+    color: var(--perm-text);
+    font-family: inherit;
+    transition: var(--perm-transition);
+}
+
+.permisos-field input:focus,
+.permisos-field select:focus,
+.permisos-field textarea:focus {
+    outline: none;
+    border-color: var(--perm-primary);
+    box-shadow: 0 0 0 3px rgba(13, 59, 102, 0.12);
+}
+
+.permisos-field input:disabled,
+.permisos-field select:disabled,
+.permisos-field textarea:disabled {
+    background: #f3f4f6;
+    color: var(--perm-text-light);
+    cursor: not-allowed;
+}
+
+.permisos-field textarea {
+    resize: vertical;
+    line-height: 1.55;
+    font-family: inherit;
+}
+
+.permisos-field small {
+    font-size: 11px;
+    color: var(--perm-text-muted);
+}
+
+/* Form actions */
+
+.permisos-form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    padding-top: 20px;
+    margin-top: 8px;
+    border-top: 1px solid var(--perm-border-light);
+}
+
+.permisos-form-actions .permisos-btn {
+    min-width: 120px;
+    justify-content: center;
+}
+
+/* ============================================================
+   ESTADOS VACÍOS
+   ============================================================ */
+
+.permisos-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--perm-text-muted);
+    font-size: 13.5px;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 1024px) {
+    .permisos-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .permisos-filters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .permisos-filters select,
+    .permisos-filters input,
+    .permisos-filters button {
+        width: 100%;
+    }
+
+    .permisos-header-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+
+@media (max-width: 768px) {
+    .permisos-page {
+        padding: 20px 16px;
+    }
+
+    .permisos-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .permisos-header h1 {
+        font-size: 20px;
+    }
+
+    .permisos-header-actions {
+        justify-content: stretch;
+    }
+
+    .permisos-header-actions .permisos-btn {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .permisos-form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .permisos-form-actions .permisos-btn {
+        width: 100%;
+    }
+
+    .permisos-table th,
+    .permisos-table td {
+        padding: 10px 12px;
+    }
+
+    .permisos-actions {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .permisos-action-btn {
+        width: 100%;
+        text-align: center;
+    }
+
+    .permisos-modal {
+        max-width: 95%;
+    }
+
+    .permisos-name {
+        font-size: 12px;
+        word-break: break-all;
+    }
+}

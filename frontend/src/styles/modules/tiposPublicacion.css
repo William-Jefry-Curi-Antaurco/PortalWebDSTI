@@ -1,0 +1,604 @@
+/* ============================================================
+   TIPOS DE PUBLICACIÓN - ESTILOS FORMALES
+   Módulo institucional DSTI
+   ============================================================ */
+
+:root {
+    --tp-primary: #0d3b66;
+    --tp-primary-dark: #082a4d;
+    --tp-primary-light: #1d5a96;
+    --tp-accent: #1976d2;
+    --tp-success: #1e7e34;
+    --tp-danger: #b02a37;
+    --tp-warning: #b58900;
+    --tp-text: #1f2937;
+    --tp-text-muted: #6b7280;
+    --tp-text-light: #9ca3af;
+    --tp-bg: #f5f7fa;
+    --tp-surface: #ffffff;
+    --tp-border: #d1d5db;
+    --tp-border-light: #e5e7eb;
+    --tp-code-bg: #eef2f7;
+    --tp-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+    --tp-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+    --tp-shadow-lg: 0 10px 25px rgba(15, 23, 42, 0.12);
+    --tp-radius: 6px;
+    --tp-radius-lg: 10px;
+    --tp-transition: 160ms ease;
+}
+
+/* ============================================================
+   CONTENEDOR PRINCIPAL
+   ============================================================ */
+
+.tipos-publicacion-page {
+    padding: 28px 32px;
+    background: var(--tp-bg);
+    min-height: 100%;
+    color: var(--tp-text);
+    font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* ============================================================
+   ENCABEZADO
+   ============================================================ */
+
+.tipos-publicacion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+    padding-bottom: 20px;
+    margin-bottom: 24px;
+    border-bottom: 2px solid var(--tp-primary);
+}
+
+.tipos-publicacion-header > div:first-child {
+    flex: 1;
+}
+
+.tipos-publicacion-eyebrow {
+    display: inline-block;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--tp-primary);
+    background: rgba(13, 59, 102, 0.08);
+    padding: 4px 10px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.tipos-publicacion-header h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--tp-primary-dark);
+    margin: 0 0 6px 0;
+    letter-spacing: -0.01em;
+}
+
+.tipos-publicacion-header p {
+    color: var(--tp-text-muted);
+    margin: 0;
+    font-size: 13.5px;
+    max-width: 680px;
+}
+
+/* ============================================================
+   BOTÓN AGREGAR
+   ============================================================ */
+
+.tipos-publicacion-add-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: var(--tp-primary);
+    color: #fff;
+    border: 1px solid var(--tp-primary);
+    border-radius: var(--tp-radius);
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--tp-transition);
+    box-shadow: var(--tp-shadow-sm);
+    white-space: nowrap;
+}
+
+.tipos-publicacion-add-button:hover:not(:disabled) {
+    background: var(--tp-primary-dark);
+    border-color: var(--tp-primary-dark);
+    box-shadow: var(--tp-shadow);
+}
+
+.tipos-publicacion-add-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ============================================================
+   FORMULARIO
+   ============================================================ */
+
+.tipos-publicacion-form-card {
+    background: var(--tp-surface);
+    border: 1px solid var(--tp-border-light);
+    border-radius: var(--tp-radius-lg);
+    box-shadow: var(--tp-shadow);
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+
+.tipos-publicacion-form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px 24px;
+    background: linear-gradient(180deg, #fafbfc 0%, #f4f6f8 100%);
+    border-bottom: 1px solid var(--tp-border-light);
+}
+
+.tipos-publicacion-form-header h2 {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--tp-primary-dark);
+    margin: 0 0 4px 0;
+}
+
+.tipos-publicacion-form-header p {
+    color: var(--tp-text-muted);
+    font-size: 13px;
+    margin: 0;
+    line-height: 1.55;
+}
+
+.tipos-publicacion-close-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    background: var(--tp-surface);
+    color: var(--tp-text-muted);
+    border: 1px solid var(--tp-border);
+    border-radius: var(--tp-radius);
+    cursor: pointer;
+    transition: var(--tp-transition);
+    flex-shrink: 0;
+}
+
+.tipos-publicacion-close-button:hover:not(:disabled) {
+    background: #f3f4f6;
+    color: var(--tp-danger);
+    border-color: var(--tp-danger);
+}
+
+.tipos-publicacion-form {
+    padding: 24px;
+}
+
+.tipos-publicacion-form-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    max-width: 720px;
+}
+
+.tipos-publicacion-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.tipos-publicacion-field label {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--tp-text);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.tipos-publicacion-field input,
+.tipos-publicacion-field textarea {
+    width: 100%;
+    padding: 9px 12px;
+    background: var(--tp-surface);
+    border: 1px solid var(--tp-border);
+    border-radius: var(--tp-radius);
+    font-size: 13.5px;
+    color: var(--tp-text);
+    font-family: inherit;
+    transition: var(--tp-transition);
+}
+
+.tipos-publicacion-field input:focus,
+.tipos-publicacion-field textarea:focus {
+    outline: none;
+    border-color: var(--tp-primary);
+    box-shadow: 0 0 0 3px rgba(13, 59, 102, 0.12);
+}
+
+.tipos-publicacion-field input:disabled,
+.tipos-publicacion-field textarea:disabled {
+    background: #f3f4f6;
+    color: var(--tp-text-light);
+    cursor: not-allowed;
+}
+
+.tipos-publicacion-field textarea {
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.55;
+    font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+}
+
+.tipos-publicacion-checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--tp-text);
+    padding: 8px 0;
+    width: fit-content;
+}
+
+.tipos-publicacion-checkbox input[type='checkbox'] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--tp-primary);
+    cursor: pointer;
+}
+
+/* Acciones del formulario */
+
+.tipos-publicacion-form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    padding-top: 20px;
+    margin-top: 20px;
+    border-top: 1px solid var(--tp-border-light);
+}
+
+.tipos-publicacion-save-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 22px;
+    background: var(--tp-primary);
+    color: #fff;
+    border: 1px solid var(--tp-primary);
+    border-radius: var(--tp-radius);
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--tp-transition);
+    box-shadow: var(--tp-shadow-sm);
+}
+
+.tipos-publicacion-save-button:hover:not(:disabled) {
+    background: var(--tp-primary-dark);
+    border-color: var(--tp-primary-dark);
+}
+
+.tipos-publicacion-save-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.tipos-publicacion-cancel-button {
+    padding: 10px 20px;
+    background: var(--tp-surface);
+    color: var(--tp-text);
+    border: 1px solid var(--tp-border);
+    border-radius: var(--tp-radius);
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--tp-transition);
+}
+
+.tipos-publicacion-cancel-button:hover:not(:disabled) {
+    background: #f3f4f6;
+    border-color: var(--tp-text-muted);
+}
+
+.tipos-publicacion-cancel-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ============================================================
+   LISTADO
+   ============================================================ */
+
+.tipos-publicacion-list-card {
+    background: var(--tp-surface);
+    border: 1px solid var(--tp-border-light);
+    border-radius: var(--tp-radius-lg);
+    box-shadow: var(--tp-shadow);
+    overflow: hidden;
+}
+
+.tipos-publicacion-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 24px;
+    background: linear-gradient(180deg, #fafbfc 0%, #f4f6f8 100%);
+    border-bottom: 1px solid var(--tp-border-light);
+    flex-wrap: wrap;
+}
+
+.tipos-publicacion-list-header h2 {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--tp-primary-dark);
+    margin: 0 0 4px 0;
+}
+
+.tipos-publicacion-list-header p {
+    color: var(--tp-text-muted);
+    font-size: 13px;
+    margin: 0;
+}
+
+/* ============================================================
+   BÚSQUEDA
+   ============================================================ */
+
+.tipos-publicacion-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.tipos-publicacion-search svg {
+    position: absolute;
+    left: 11px;
+    color: var(--tp-text-muted);
+    pointer-events: none;
+}
+
+.tipos-publicacion-search input {
+    padding: 8px 12px 8px 36px;
+    background: var(--tp-surface);
+    border: 1px solid var(--tp-border);
+    border-radius: var(--tp-radius);
+    font-size: 13px;
+    color: var(--tp-text);
+    min-width: 260px;
+    transition: var(--tp-transition);
+}
+
+.tipos-publicacion-search input:focus {
+    outline: none;
+    border-color: var(--tp-primary);
+    box-shadow: 0 0 0 3px rgba(13, 59, 102, 0.12);
+}
+
+/* ============================================================
+   TABLA
+   ============================================================ */
+
+.tipos-publicacion-table-wrap {
+    overflow-x: auto;
+}
+
+.tipos-publicacion-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.tipos-publicacion-table thead {
+    background: #f8fafc;
+    border-bottom: 2px solid var(--tp-primary);
+}
+
+.tipos-publicacion-table th {
+    padding: 12px 14px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--tp-primary-dark);
+    white-space: nowrap;
+}
+
+.tipos-publicacion-table td {
+    padding: 14px;
+    border-bottom: 1px solid var(--tp-border-light);
+    color: var(--tp-text);
+    vertical-align: middle;
+}
+
+.tipos-publicacion-table tbody tr {
+    transition: background var(--tp-transition);
+}
+
+.tipos-publicacion-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.tipos-publicacion-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Slug (código) */
+
+.tipos-publicacion-table code {
+    display: inline-block;
+    padding: 3px 8px;
+    background: var(--tp-code-bg);
+    color: var(--tp-primary-dark);
+    border: 1px solid var(--tp-border-light);
+    border-radius: 4px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Nombre del tipo de publicación */
+
+.tipos-publicacion-name {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 200px;
+}
+
+.tipos-publicacion-name > span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: rgba(13, 59, 102, 0.08);
+    color: var(--tp-primary);
+    border-radius: var(--tp-radius);
+    flex-shrink: 0;
+}
+
+.tipos-publicacion-name strong {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--tp-primary-dark);
+    line-height: 1.35;
+}
+
+/* Estado (activo/inactivo) */
+
+.tipos-publicacion-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+
+.tipos-publicacion-status.active {
+    background: rgba(30, 126, 52, 0.1);
+    color: var(--tp-success);
+    border: 1px solid rgba(30, 126, 52, 0.25);
+}
+
+.tipos-publicacion-status.inactive {
+    background: rgba(176, 42, 55, 0.08);
+    color: var(--tp-danger);
+    border: 1px solid rgba(176, 42, 55, 0.22);
+}
+
+/* Acciones de fila */
+
+.tipos-publicacion-actions {
+    display: flex;
+    gap: 4px;
+    justify-content: flex-start;
+}
+
+.tipos-publicacion-actions button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    background: var(--tp-surface);
+    color: var(--tp-text-muted);
+    border: 1px solid var(--tp-border);
+    border-radius: var(--tp-radius);
+    cursor: pointer;
+    transition: var(--tp-transition);
+}
+
+.tipos-publicacion-actions button:hover {
+    background: var(--tp-primary);
+    color: #fff;
+    border-color: var(--tp-primary);
+}
+
+.tipos-publicacion-actions button.danger:hover {
+    background: var(--tp-danger);
+    border-color: var(--tp-danger);
+}
+
+/* ============================================================
+   ESTADOS VACÍOS
+   ============================================================ */
+
+.tipos-publicacion-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--tp-text-muted);
+    font-size: 13.5px;
+}
+
+.tipos-publicacion-empty-box {
+    text-align: center;
+    padding: 50px 24px;
+}
+
+.tipos-publicacion-empty-box h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--tp-primary-dark);
+    margin: 0 0 6px 0;
+}
+
+.tipos-publicacion-empty-box p {
+    color: var(--tp-text-muted);
+    font-size: 13.5px;
+    margin: 0;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 1024px) {
+    .tipos-publicacion-list-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .tipos-publicacion-search input {
+        width: 100%;
+        min-width: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .tipos-publicacion-page {
+        padding: 20px 16px;
+    }
+
+    .tipos-publicacion-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .tipos-publicacion-header h1 {
+        font-size: 20px;
+    }
+
+    .tipos-publicacion-form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .tipos-publicacion-form-actions button {
+        width: 100%;
+        justify-content: center;
+    }
+}

@@ -1,0 +1,604 @@
+/* ============================================================
+   MÓDULOS - ESTILOS FORMALES
+   Módulo institucional DSTI
+   ============================================================ */
+
+:root {
+    --mod-primary: #0d3b66;
+    --mod-primary-dark: #082a4d;
+    --mod-primary-light: #1d5a96;
+    --mod-accent: #1976d2;
+    --mod-success: #1e7e34;
+    --mod-danger: #b02a37;
+    --mod-warning: #b58900;
+    --mod-text: #1f2937;
+    --mod-text-muted: #6b7280;
+    --mod-text-light: #9ca3af;
+    --mod-bg: #f5f7fa;
+    --mod-surface: #ffffff;
+    --mod-border: #d1d5db;
+    --mod-border-light: #e5e7eb;
+    --mod-code-bg: #eef2f7;
+    --mod-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+    --mod-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+    --mod-shadow-lg: 0 10px 25px rgba(15, 23, 42, 0.12);
+    --mod-radius: 6px;
+    --mod-radius-lg: 10px;
+    --mod-transition: 160ms ease;
+}
+
+/* ============================================================
+   CONTENEDOR PRINCIPAL
+   ============================================================ */
+
+.modulos-page {
+    padding: 28px 32px;
+    background: var(--mod-bg);
+    min-height: 100%;
+    color: var(--mod-text);
+    font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* ============================================================
+   ENCABEZADO
+   ============================================================ */
+
+.modulos-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+    padding-bottom: 20px;
+    margin-bottom: 24px;
+    border-bottom: 2px solid var(--mod-primary);
+}
+
+.modulos-header > div:first-child {
+    flex: 1;
+}
+
+.modulos-eyebrow {
+    display: inline-block;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--mod-primary);
+    background: rgba(13, 59, 102, 0.08);
+    padding: 4px 10px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.modulos-header h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--mod-primary-dark);
+    margin: 0 0 6px 0;
+    letter-spacing: -0.01em;
+}
+
+.modulos-header p {
+    color: var(--mod-text-muted);
+    margin: 0;
+    font-size: 13.5px;
+    max-width: 680px;
+}
+
+/* ============================================================
+   BOTÓN AGREGAR
+   ============================================================ */
+
+.modulos-add-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: var(--mod-primary);
+    color: #fff;
+    border: 1px solid var(--mod-primary);
+    border-radius: var(--mod-radius);
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--mod-transition);
+    box-shadow: var(--mod-shadow-sm);
+    white-space: nowrap;
+}
+
+.modulos-add-button:hover:not(:disabled) {
+    background: var(--mod-primary-dark);
+    border-color: var(--mod-primary-dark);
+    box-shadow: var(--mod-shadow);
+}
+
+.modulos-add-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ============================================================
+   FORMULARIO
+   ============================================================ */
+
+.modulos-form-card {
+    background: var(--mod-surface);
+    border: 1px solid var(--mod-border-light);
+    border-radius: var(--mod-radius-lg);
+    box-shadow: var(--mod-shadow);
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+
+.modulos-form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px 24px;
+    background: linear-gradient(180deg, #fafbfc 0%, #f4f6f8 100%);
+    border-bottom: 1px solid var(--mod-border-light);
+}
+
+.modulos-form-header h2 {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--mod-primary-dark);
+    margin: 0 0 4px 0;
+}
+
+.modulos-form-header p {
+    color: var(--mod-text-muted);
+    font-size: 13px;
+    margin: 0;
+    line-height: 1.55;
+}
+
+.modulos-close-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    background: var(--mod-surface);
+    color: var(--mod-text-muted);
+    border: 1px solid var(--mod-border);
+    border-radius: var(--mod-radius);
+    cursor: pointer;
+    transition: var(--mod-transition);
+    flex-shrink: 0;
+}
+
+.modulos-close-button:hover:not(:disabled) {
+    background: #f3f4f6;
+    color: var(--mod-danger);
+    border-color: var(--mod-danger);
+}
+
+.modulos-form {
+    padding: 24px;
+}
+
+.modulos-form-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    max-width: 720px;
+}
+
+.modulos-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.modulos-field label {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--mod-text);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.modulos-field input,
+.modulos-field textarea {
+    width: 100%;
+    padding: 9px 12px;
+    background: var(--mod-surface);
+    border: 1px solid var(--mod-border);
+    border-radius: var(--mod-radius);
+    font-size: 13.5px;
+    color: var(--mod-text);
+    font-family: inherit;
+    transition: var(--mod-transition);
+}
+
+.modulos-field input:focus,
+.modulos-field textarea:focus {
+    outline: none;
+    border-color: var(--mod-primary);
+    box-shadow: 0 0 0 3px rgba(13, 59, 102, 0.12);
+}
+
+.modulos-field input:disabled,
+.modulos-field textarea:disabled {
+    background: #f3f4f6;
+    color: var(--mod-text-light);
+    cursor: not-allowed;
+}
+
+.modulos-field textarea {
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.55;
+    font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+}
+
+.modulos-checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--mod-text);
+    padding: 8px 0;
+    width: fit-content;
+}
+
+.modulos-checkbox input[type='checkbox'] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--mod-primary);
+    cursor: pointer;
+}
+
+/* Acciones del formulario */
+
+.modulos-form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    padding-top: 20px;
+    margin-top: 20px;
+    border-top: 1px solid var(--mod-border-light);
+}
+
+.modulos-save-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 22px;
+    background: var(--mod-primary);
+    color: #fff;
+    border: 1px solid var(--mod-primary);
+    border-radius: var(--mod-radius);
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--mod-transition);
+    box-shadow: var(--mod-shadow-sm);
+}
+
+.modulos-save-button:hover:not(:disabled) {
+    background: var(--mod-primary-dark);
+    border-color: var(--mod-primary-dark);
+}
+
+.modulos-save-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.modulos-cancel-button {
+    padding: 10px 20px;
+    background: var(--mod-surface);
+    color: var(--mod-text);
+    border: 1px solid var(--mod-border);
+    border-radius: var(--mod-radius);
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--mod-transition);
+}
+
+.modulos-cancel-button:hover:not(:disabled) {
+    background: #f3f4f6;
+    border-color: var(--mod-text-muted);
+}
+
+.modulos-cancel-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ============================================================
+   LISTADO
+   ============================================================ */
+
+.modulos-list-card {
+    background: var(--mod-surface);
+    border: 1px solid var(--mod-border-light);
+    border-radius: var(--mod-radius-lg);
+    box-shadow: var(--mod-shadow);
+    overflow: hidden;
+}
+
+.modulos-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 24px;
+    background: linear-gradient(180deg, #fafbfc 0%, #f4f6f8 100%);
+    border-bottom: 1px solid var(--mod-border-light);
+    flex-wrap: wrap;
+}
+
+.modulos-list-header h2 {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--mod-primary-dark);
+    margin: 0 0 4px 0;
+}
+
+.modulos-list-header p {
+    color: var(--mod-text-muted);
+    font-size: 13px;
+    margin: 0;
+}
+
+/* ============================================================
+   BÚSQUEDA
+   ============================================================ */
+
+.modulos-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.modulos-search svg {
+    position: absolute;
+    left: 11px;
+    color: var(--mod-text-muted);
+    pointer-events: none;
+}
+
+.modulos-search input {
+    padding: 8px 12px 8px 36px;
+    background: var(--mod-surface);
+    border: 1px solid var(--mod-border);
+    border-radius: var(--mod-radius);
+    font-size: 13px;
+    color: var(--mod-text);
+    min-width: 260px;
+    transition: var(--mod-transition);
+}
+
+.modulos-search input:focus {
+    outline: none;
+    border-color: var(--mod-primary);
+    box-shadow: 0 0 0 3px rgba(13, 59, 102, 0.12);
+}
+
+/* ============================================================
+   TABLA
+   ============================================================ */
+
+.modulos-table-wrap {
+    overflow-x: auto;
+}
+
+.modulos-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.modulos-table thead {
+    background: #f8fafc;
+    border-bottom: 2px solid var(--mod-primary);
+}
+
+.modulos-table th {
+    padding: 12px 14px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--mod-primary-dark);
+    white-space: nowrap;
+}
+
+.modulos-table td {
+    padding: 14px;
+    border-bottom: 1px solid var(--mod-border-light);
+    color: var(--mod-text);
+    vertical-align: middle;
+}
+
+.modulos-table tbody tr {
+    transition: background var(--mod-transition);
+}
+
+.modulos-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.modulos-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Slug (código) */
+
+.modulos-table code {
+    display: inline-block;
+    padding: 3px 8px;
+    background: var(--mod-code-bg);
+    color: var(--mod-primary-dark);
+    border: 1px solid var(--mod-border-light);
+    border-radius: 4px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Nombre del módulo */
+
+.modulos-name {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 200px;
+}
+
+.modulos-name > span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: rgba(13, 59, 102, 0.08);
+    color: var(--mod-primary);
+    border-radius: var(--mod-radius);
+    flex-shrink: 0;
+}
+
+.modulos-name strong {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--mod-primary-dark);
+    line-height: 1.35;
+}
+
+/* Estado (activo/inactivo) */
+
+.modulos-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+
+.modulos-status.active {
+    background: rgba(30, 126, 52, 0.1);
+    color: var(--mod-success);
+    border: 1px solid rgba(30, 126, 52, 0.25);
+}
+
+.modulos-status.inactive {
+    background: rgba(176, 42, 55, 0.08);
+    color: var(--mod-danger);
+    border: 1px solid rgba(176, 42, 55, 0.22);
+}
+
+/* Acciones de fila */
+
+.modulos-actions {
+    display: flex;
+    gap: 4px;
+    justify-content: flex-start;
+}
+
+.modulos-actions button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    background: var(--mod-surface);
+    color: var(--mod-text-muted);
+    border: 1px solid var(--mod-border);
+    border-radius: var(--mod-radius);
+    cursor: pointer;
+    transition: var(--mod-transition);
+}
+
+.modulos-actions button:hover {
+    background: var(--mod-primary);
+    color: #fff;
+    border-color: var(--mod-primary);
+}
+
+.modulos-actions button.danger:hover {
+    background: var(--mod-danger);
+    border-color: var(--mod-danger);
+}
+
+/* ============================================================
+   ESTADOS VACÍOS
+   ============================================================ */
+
+.modulos-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--mod-text-muted);
+    font-size: 13.5px;
+}
+
+.modulos-empty-box {
+    text-align: center;
+    padding: 50px 24px;
+}
+
+.modulos-empty-box h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--mod-primary-dark);
+    margin: 0 0 6px 0;
+}
+
+.modulos-empty-box p {
+    color: var(--mod-text-muted);
+    font-size: 13.5px;
+    margin: 0;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 1024px) {
+    .modulos-list-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .modulos-search input {
+        width: 100%;
+        min-width: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .modulos-page {
+        padding: 20px 16px;
+    }
+
+    .modulos-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .modulos-header h1 {
+        font-size: 20px;
+    }
+
+    .modulos-form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .modulos-form-actions button {
+        width: 100%;
+        justify-content: center;
+    }
+}

@@ -1,0 +1,121 @@
+/* forms.css - Estilos avanzados para formularios */
+
+/* Grupos de formulario con íconos */
+.input-group {
+    position: relative;
+}
+
+.input-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-500);
+    pointer-events: none;
+}
+
+.input-icon + input,
+.input-icon + select,
+.input-icon + textarea {
+    padding-left: 40px;
+}
+
+/* Checkbox y Radio académicos */
+.checkbox-group,
+.radio-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.checkbox-group input,
+.radio-group input {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--university-primary);
+}
+
+.checkbox-label,
+.radio-label {
+    font-size: 14px;
+    color: var(--gray-700);
+    cursor: pointer;
+}
+
+/* Switch toggle */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 52px;
+    height: 28px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--gray-400);
+    transition: var(--transition-fast);
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: var(--transition-fast);
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: var(--university-primary);
+}
+
+input:checked + .slider:before {
+    transform: translateX(24px);
+}
+
+/* Campos de formulario en grid */
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+/* Mensajes de error */
+.form-error {
+    font-size: 12px;
+    color: var(--university-danger);
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.form-input.error,
+.form-select.error,
+.form-textarea.error {
+    border-color: var(--university-danger);
+}
+
+.form-input.error:focus,
+.form-select.error:focus,
+.form-textarea.error:focus {
+    box-shadow: 0 0 0 3px rgba(198, 40, 40, 0.1);
+}

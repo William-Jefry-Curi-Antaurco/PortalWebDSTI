@@ -1,0 +1,103 @@
+/* alerts.css - Alertas y notificaciones */
+
+.alert {
+    padding: 16px 20px;
+    border-radius: var(--border-radius-md);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-left: 4px solid;
+    animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.alert-success {
+    background: #e8f5e9;
+    border-left-color: var(--university-success);
+    color: #1b5e20;
+}
+
+.alert-info {
+    background: #e3f2fd;
+    border-left-color: var(--university-info);
+    color: #01579b;
+}
+
+.alert-warning {
+    background: #fff3e0;
+    border-left-color: var(--university-warning);
+    color: #e65100;
+}
+
+.alert-danger {
+    background: #ffebee;
+    border-left-color: var(--university-danger);
+    color: #b71c1c;
+}
+
+.alert-icon {
+    font-size: 20px;
+}
+
+.alert-content {
+    flex: 1;
+}
+
+.alert-title {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.alert-message {
+    font-size: 14px;
+}
+
+.alert-close {
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity var(--transition-fast);
+}
+
+.alert-close:hover {
+    opacity: 1;
+}
+
+/* Toast notifications */
+.toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1100;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.toast {
+    min-width: 300px;
+    background: white;
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-lg);
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: slideInRight 0.3s ease-out;
+    border-left: 4px solid;
+}
+
+.toast-success { border-left-color: var(--university-success); }
+.toast-error { border-left-color: var(--university-danger); }
+.toast-info { border-left-color: var(--university-info); }
+.toast-warning { border-left-color: var(--university-warning); }

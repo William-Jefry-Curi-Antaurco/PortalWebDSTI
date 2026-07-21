@@ -1,0 +1,111 @@
+/* tables.css - Estilos para tablas administrativas */
+
+/* Tabla responsive */
+.table-responsive {
+    overflow-x: auto;
+    border-radius: var(--border-radius-lg);
+}
+
+/* Tabla con acciones */
+.table-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.action-btn {
+    padding: 6px;
+    border-radius: var(--border-radius-sm);
+    transition: all var(--transition-fast);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.action-btn.edit {
+    color: var(--university-info);
+}
+
+.action-btn.edit:hover {
+    background: rgba(2, 136, 209, 0.1);
+    transform: scale(1.1);
+}
+
+.action-btn.delete {
+    color: var(--university-danger);
+}
+
+.action-btn.delete:hover {
+    background: rgba(198, 40, 40, 0.1);
+    transform: scale(1.1);
+}
+
+.action-btn.view {
+    color: var(--university-primary);
+}
+
+.action-btn.view:hover {
+    background: rgba(26, 58, 92, 0.1);
+    transform: scale(1.1);
+}
+
+/* Paginación */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+}
+
+.page-btn {
+    padding: 8px 12px;
+    border: 1px solid var(--gray-300);
+    background: white;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-size: 14px;
+}
+
+.page-btn:hover:not(:disabled) {
+    background: var(--university-primary);
+    color: white;
+    border-color: var(--university-primary);
+}
+
+.page-btn.active {
+    background: var(--university-primary);
+    color: white;
+    border-color: var(--university-primary);
+}
+
+.page-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Filtros de tabla */
+.table-filters {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+}
+
+.filter-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.filter-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}

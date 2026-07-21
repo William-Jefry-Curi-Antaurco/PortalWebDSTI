@@ -1,0 +1,30 @@
+# Red de seguridad a nivel raíz (backend/ y frontend/ ya tienen sus propios .gitignore)
+
+# Dependencias
+node_modules/
+vendor/
+
+# Entornos y secretos
+.env
+.env.*
+!.env.example
+
+# Builds
+dist/
+dist-ssr/
+/backend/public/build
+/backend/public/hot
+/backend/public/storage
+
+# Laravel
+/backend/storage/*.key
+/backend/storage/pail
+/backend/bootstrap/cache/*.php
+!/backend/bootstrap/cache/.gitkeep
+
+# IDE / SO
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.log

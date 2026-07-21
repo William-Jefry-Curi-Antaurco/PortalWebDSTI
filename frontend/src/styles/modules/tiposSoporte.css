@@ -1,0 +1,587 @@
+/* ============================================================
+   TIPOS DE SOPORTE - ESTILOS FORMALES
+   Módulo institucional DSTI
+   ============================================================ */
+
+:root {
+    --ts-primary: #0d3b66;
+    --ts-primary-dark: #082a4d;
+    --ts-primary-light: #1d5a96;
+    --ts-accent: #1976d2;
+    --ts-success: #1e7e34;
+    --ts-danger: #b02a37;
+    --ts-warning: #b58900;
+    --ts-text: #1f2937;
+    --ts-text-muted: #6b7280;
+    --ts-text-light: #9ca3af;
+    --ts-bg: #f5f7fa;
+    --ts-surface: #ffffff;
+    --ts-border: #d1d5db;
+    --ts-border-light: #e5e7eb;
+    --ts-code-bg: #eef2f7;
+    --ts-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+    --ts-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+    --ts-shadow-lg: 0 10px 25px rgba(15, 23, 42, 0.12);
+    --ts-radius: 6px;
+    --ts-radius-lg: 10px;
+    --ts-transition: 160ms ease;
+}
+
+/* ============================================================
+   CONTENEDOR PRINCIPAL
+   ============================================================ */
+
+.tipos-soporte-page {
+    padding: 28px 32px;
+    background: var(--ts-bg);
+    min-height: 100%;
+    color: var(--ts-text);
+    font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* ============================================================
+   ENCABEZADO
+   ============================================================ */
+
+.tipos-soporte-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+    padding-bottom: 20px;
+    margin-bottom: 24px;
+    border-bottom: 2px solid var(--ts-primary);
+}
+
+.tipos-soporte-header > div:first-child {
+    flex: 1;
+}
+
+.tipos-soporte-eyebrow {
+    display: inline-block;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ts-primary);
+    background: rgba(13, 59, 102, 0.08);
+    padding: 4px 10px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.tipos-soporte-header h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--ts-primary-dark);
+    margin: 0 0 6px 0;
+    letter-spacing: -0.01em;
+}
+
+.tipos-soporte-header p {
+    color: var(--ts-text-muted);
+    margin: 0;
+    font-size: 13.5px;
+    max-width: 680px;
+}
+
+/* ============================================================
+   BOTÓN AGREGAR
+   ============================================================ */
+
+.tipos-soporte-add-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: var(--ts-primary);
+    color: #fff;
+    border: 1px solid var(--ts-primary);
+    border-radius: var(--ts-radius);
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--ts-transition);
+    box-shadow: var(--ts-shadow-sm);
+    white-space: nowrap;
+}
+
+.tipos-soporte-add-button:hover {
+    background: var(--ts-primary-dark);
+    border-color: var(--ts-primary-dark);
+    box-shadow: var(--ts-shadow);
+}
+
+/* ============================================================
+   FORMULARIO
+   ============================================================ */
+
+.tipos-soporte-form-card {
+    background: var(--ts-surface);
+    border: 1px solid var(--ts-border-light);
+    border-radius: var(--ts-radius-lg);
+    box-shadow: var(--ts-shadow);
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+
+.tipos-soporte-form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px 24px;
+    background: linear-gradient(180deg, #fafbfc 0%, #f4f6f8 100%);
+    border-bottom: 1px solid var(--ts-border-light);
+}
+
+.tipos-soporte-form-header h2 {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--ts-primary-dark);
+    margin: 0 0 4px 0;
+}
+
+.tipos-soporte-form-header p {
+    color: var(--ts-text-muted);
+    font-size: 13px;
+    margin: 0;
+    line-height: 1.55;
+}
+
+.tipos-soporte-close-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    background: var(--ts-surface);
+    color: var(--ts-text-muted);
+    border: 1px solid var(--ts-border);
+    border-radius: var(--ts-radius);
+    cursor: pointer;
+    transition: var(--ts-transition);
+    flex-shrink: 0;
+}
+
+.tipos-soporte-close-button:hover {
+    background: #f3f4f6;
+    color: var(--ts-danger);
+    border-color: var(--ts-danger);
+}
+
+.tipos-soporte-form {
+    padding: 24px;
+}
+
+.tipos-soporte-form-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    max-width: 720px;
+}
+
+.tipos-soporte-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.tipos-soporte-field label {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--ts-text);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.tipos-soporte-field input,
+.tipos-soporte-field textarea {
+    width: 100%;
+    padding: 9px 12px;
+    background: var(--ts-surface);
+    border: 1px solid var(--ts-border);
+    border-radius: var(--ts-radius);
+    font-size: 13.5px;
+    color: var(--ts-text);
+    font-family: inherit;
+    transition: var(--ts-transition);
+}
+
+.tipos-soporte-field input:focus,
+.tipos-soporte-field textarea:focus {
+    outline: none;
+    border-color: var(--ts-primary);
+    box-shadow: 0 0 0 3px rgba(13, 59, 102, 0.12);
+}
+
+.tipos-soporte-field textarea {
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.55;
+    font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+}
+
+.tipos-soporte-checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--ts-text);
+    padding: 8px 0;
+    width: fit-content;
+}
+
+.tipos-soporte-checkbox input[type='checkbox'] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--ts-primary);
+    cursor: pointer;
+}
+
+/* Acciones del formulario */
+
+.tipos-soporte-form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    padding-top: 20px;
+    margin-top: 20px;
+    border-top: 1px solid var(--ts-border-light);
+}
+
+.tipos-soporte-save-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 22px;
+    background: var(--ts-primary);
+    color: #fff;
+    border: 1px solid var(--ts-primary);
+    border-radius: var(--ts-radius);
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--ts-transition);
+    box-shadow: var(--ts-shadow-sm);
+}
+
+.tipos-soporte-save-button:hover:not(:disabled) {
+    background: var(--ts-primary-dark);
+    border-color: var(--ts-primary-dark);
+}
+
+.tipos-soporte-save-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.tipos-soporte-cancel-button {
+    padding: 10px 20px;
+    background: var(--ts-surface);
+    color: var(--ts-text);
+    border: 1px solid var(--ts-border);
+    border-radius: var(--ts-radius);
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--ts-transition);
+}
+
+.tipos-soporte-cancel-button:hover {
+    background: #f3f4f6;
+    border-color: var(--ts-text-muted);
+}
+
+/* ============================================================
+   LISTADO
+   ============================================================ */
+
+.tipos-soporte-list-card {
+    background: var(--ts-surface);
+    border: 1px solid var(--ts-border-light);
+    border-radius: var(--ts-radius-lg);
+    box-shadow: var(--ts-shadow);
+    overflow: hidden;
+}
+
+.tipos-soporte-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 24px;
+    background: linear-gradient(180deg, #fafbfc 0%, #f4f6f8 100%);
+    border-bottom: 1px solid var(--ts-border-light);
+    flex-wrap: wrap;
+}
+
+.tipos-soporte-list-header h2 {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--ts-primary-dark);
+    margin: 0 0 4px 0;
+}
+
+.tipos-soporte-list-header p {
+    color: var(--ts-text-muted);
+    font-size: 13px;
+    margin: 0;
+}
+
+/* ============================================================
+   BÚSQUEDA
+   ============================================================ */
+
+.tipos-soporte-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.tipos-soporte-search svg {
+    position: absolute;
+    left: 11px;
+    color: var(--ts-text-muted);
+    pointer-events: none;
+}
+
+.tipos-soporte-search input {
+    padding: 8px 12px 8px 36px;
+    background: var(--ts-surface);
+    border: 1px solid var(--ts-border);
+    border-radius: var(--ts-radius);
+    font-size: 13px;
+    color: var(--ts-text);
+    min-width: 260px;
+    transition: var(--ts-transition);
+}
+
+.tipos-soporte-search input:focus {
+    outline: none;
+    border-color: var(--ts-primary);
+    box-shadow: 0 0 0 3px rgba(13, 59, 102, 0.12);
+}
+
+/* ============================================================
+   TABLA
+   ============================================================ */
+
+.tipos-soporte-table-wrap {
+    overflow-x: auto;
+}
+
+.tipos-soporte-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.tipos-soporte-table thead {
+    background: #f8fafc;
+    border-bottom: 2px solid var(--ts-primary);
+}
+
+.tipos-soporte-table th {
+    padding: 12px 14px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ts-primary-dark);
+    white-space: nowrap;
+}
+
+.tipos-soporte-table td {
+    padding: 14px;
+    border-bottom: 1px solid var(--ts-border-light);
+    color: var(--ts-text);
+    vertical-align: middle;
+}
+
+.tipos-soporte-table tbody tr {
+    transition: background var(--ts-transition);
+}
+
+.tipos-soporte-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.tipos-soporte-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Nombre del tipo de soporte */
+
+.tipos-soporte-name {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 180px;
+}
+
+.tipos-soporte-name > span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: rgba(13, 59, 102, 0.08);
+    color: var(--ts-primary);
+    border-radius: var(--ts-radius);
+    flex-shrink: 0;
+}
+
+.tipos-soporte-name strong {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--ts-primary-dark);
+    line-height: 1.35;
+}
+
+/* Estado (activo/inactivo) */
+
+.tipos-soporte-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+
+.tipos-soporte-status.active {
+    background: rgba(30, 126, 52, 0.1);
+    color: var(--ts-success);
+    border: 1px solid rgba(30, 126, 52, 0.25);
+}
+
+.tipos-soporte-status.inactive {
+    background: rgba(176, 42, 55, 0.08);
+    color: var(--ts-danger);
+    border: 1px solid rgba(176, 42, 55, 0.22);
+}
+
+/* Acciones de fila */
+
+.tipos-soporte-actions {
+    display: flex;
+    gap: 4px;
+    justify-content: flex-start;
+}
+
+.tipos-soporte-actions button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    background: var(--ts-surface);
+    color: var(--ts-text-muted);
+    border: 1px solid var(--ts-border);
+    border-radius: var(--ts-radius);
+    cursor: pointer;
+    transition: var(--ts-transition);
+}
+
+.tipos-soporte-actions button:hover {
+    background: var(--ts-primary);
+    color: #fff;
+    border-color: var(--ts-primary);
+}
+
+.tipos-soporte-actions button.danger:hover {
+    background: var(--ts-danger);
+    border-color: var(--ts-danger);
+}
+
+/* ============================================================
+   ESTADOS VACÍOS
+   ============================================================ */
+
+.tipos-soporte-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--ts-text-muted);
+    font-size: 13.5px;
+}
+
+.tipos-soporte-empty-box {
+    text-align: center;
+    padding: 50px 24px;
+}
+
+.tipos-soporte-empty-box h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ts-primary-dark);
+    margin: 0 0 6px 0;
+}
+
+.tipos-soporte-empty-box p {
+    color: var(--ts-text-muted);
+    font-size: 13.5px;
+    margin: 0;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 1024px) {
+    .tipos-soporte-list-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .tipos-soporte-search input {
+        width: 100%;
+        min-width: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .tipos-soporte-page {
+        padding: 20px 16px;
+    }
+
+    .tipos-soporte-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .tipos-soporte-header h1 {
+        font-size: 20px;
+    }
+
+    .tipos-soporte-form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .tipos-soporte-form-actions button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .tipos-soporte-table th,
+    .tipos-soporte-table td {
+        padding: 10px 12px;
+    }
+
+    .tipos-soporte-name {
+        min-width: 160px;
+    }
+
+    .tipos-soporte-name > span {
+        width: 30px;
+        height: 30px;
+    }
+}

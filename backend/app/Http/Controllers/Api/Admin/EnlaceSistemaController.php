@@ -1,0 +1,340 @@
+<?php
+
+namespace App\Http\Controllers\Api\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\EnlaceSistema;
+use App\Services\EtiquetaContenidoService;
+use App\Support\EtiquetaEntidad;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
+
+class EnlaceSistemaController extends Controller
+{
+    public function index(
+        Request $request,
+        EtiquetaContenidoService $etiquetaService
+    ) {
+        $query = EnlaceSistema::with(['categoria', 'estadoOperativo'])
+            ->orderBy('orden')
+            ->orderByDesc('created_at');
+
+        if ($request->filled('buscar')) {
+            $buscar = $request->buscar;
+
+            $query->where(function ($q) use ($buscar) {
+                $q->where('nombre_sistema', 'like', "%{$buscar}%")
+                    ->orWhere('descripcion', 'like', "%{$buscar}%")
+                    ->orWhere('url', 'like', "%{$buscar}%");
+            });
+        }
+
+        if ($request->filled('activo')) {
+            $query->where('activo', $request->boolean('activo'));
+        }
+
+        if ($request->filled('idcategoria')) {
+            $query->where('idcategoria', $request->idcategoria);
+        }
+
+        if ($request->filled('idestadooperativo')) {
+            $query->where('idestadooperativo', $request->idestadooperativo);
+        }
+
+        $enlaces = $query->paginate(10);
+
+        $enlaces->getCollection()->transform(function ($enlace) use ($etiquetaService) {
+            $enlace->etiquetas = $etiquetaService->obtener(
+                EtiquetaEntidad::SISTEMAS,
+                $enlace->idenlace
+            );
+
+            return $enlace;
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Listado de sistemas institucionales obtenido correctamente.',
+            'data' => $enlaces,
+        ]);
+    }
+
+    public function store(
+        Request $request,
+        EtiquetaContenidoService $etiquetaService
+    ) {
+        $validator = Validator::make(
+            $request->all(),
+            $this->rules(),
+            $this->messages()
+        );
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Errores de validación.',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $enlace = EnlaceSistema::create([
+            'nombre_sistema' => $request->nombre_sistema,
+            'slug' => $this->generarSlugUnico($request->nombre_sistema),
+            'descripcion' => $request->descripcion,
+            'url' => $request->url,
+            'icono' => $request->icono,
+            'idcategoria' => $request->idcategoria,
+            'idestadooperativo' => $request->idestadooperativo,
+            'orden' => $request->orden ?? 0,
+            'activo' => $request->has('activo')
+                ? $request->boolean('activo')
+                : true,
+        ]);
+
+        $etiquetaService->sincronizar(
+            EtiquetaEntidad::SISTEMAS,
+            $enlace->idenlace,
+            $request->input('etiquetas', [])
+        );
+
+        $this->limpiarCachePublico();
+
+        $enlace->load(['categoria', 'estadoOperativo']);
+
+        $enlace->etiquetas = $etiquetaService->obtener(
+            EtiquetaEntidad::SISTEMAS,
+            $enlace->idenlace
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Sistema institucional registrado correctamente.',
+            'data' => $enlace,
+        ], 201);
+    }
+
+    public function show(
+        $id,
+        EtiquetaContenidoService $etiquetaService
+    ) {
+        $enlace = EnlaceSistema::with(['categoria', 'estadoOperativo'])->find($id);
+
+        if (!$enlace) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Sistema institucional no encontrado.',
+            ], 404);
+        }
+
+        $enlace->etiquetas = $etiquetaService->obtener(
+            EtiquetaEntidad::SISTEMAS,
+            $enlace->idenlace
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Sistema institucional obtenido correctamente.',
+            'data' => $enlace,
+        ]);
+    }
+
+    public function update(
+        Request $request,
+                $id,
+        EtiquetaContenidoService $etiquetaService
+    ) {
+        $enlace = EnlaceSistema::find($id);
+
+        if (!$enlace) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Sistema institucional no encontrado.',
+            ], 404);
+        }
+
+        $validator = Validator::make(
+            $request->all(),
+            $this->rules($enlace->idenlace),
+            $this->messages()
+        );
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Errores de validación.',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $slug = $enlace->nombre_sistema !== $request->nombre_sistema
+            ? $this->generarSlugUnico($request->nombre_sistema, $enlace->idenlace)
+            : $enlace->slug;
+
+        $enlace->update([
+            'nombre_sistema' => $request->nombre_sistema,
+            'slug' => $slug,
+            'descripcion' => $request->descripcion,
+            'url' => $request->url,
+            'icono' => $request->icono,
+            'idcategoria' => $request->idcategoria,
+            'idestadooperativo' => $request->idestadooperativo,
+            'orden' => $request->orden ?? 0,
+            'activo' => $request->has('activo')
+                ? $request->boolean('activo')
+                : true,
+        ]);
+
+        $etiquetaService->sincronizar(
+            EtiquetaEntidad::SISTEMAS,
+            $enlace->idenlace,
+            $request->input('etiquetas', [])
+        );
+
+        $this->limpiarCachePublico();
+
+        $enlace->load(['categoria', 'estadoOperativo']);
+
+        $enlace->etiquetas = $etiquetaService->obtener(
+            EtiquetaEntidad::SISTEMAS,
+            $enlace->idenlace
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Sistema institucional actualizado correctamente.',
+            'data' => $enlace,
+        ]);
+    }
+
+    public function destroy(
+        $id,
+        EtiquetaContenidoService $etiquetaService
+    ) {
+        $enlace = EnlaceSistema::find($id);
+
+        if (!$enlace) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Sistema institucional no encontrado.',
+            ], 404);
+        }
+
+        $etiquetaService->eliminarRelaciones(
+            EtiquetaEntidad::SISTEMAS,
+            $enlace->idenlace
+        );
+
+        $enlace->delete();
+
+        $this->limpiarCachePublico();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Sistema institucional eliminado correctamente.',
+        ]);
+    }
+
+    private function rules(?int $idIgnorar = null): array
+    {
+        return [
+            'nombre_sistema' => [
+                'required',
+                'string',
+                'max:100',
+                $idIgnorar
+                    ? Rule::unique('enlaces_sistemas', 'nombre_sistema')
+                    ->ignore($idIgnorar, 'idenlace')
+                    : 'unique:enlaces_sistemas,nombre_sistema',
+            ],
+            'descripcion' => [
+                'nullable',
+                'string',
+            ],
+            'url' => [
+                'required',
+                'url',
+                'max:255',
+            ],
+            'icono' => [
+                'nullable',
+                'string',
+                'max:100',
+            ],
+            'idcategoria' => [
+                'required',
+                'integer',
+                'exists:categorias,idcategoria',
+            ],
+            'idestadooperativo' => [
+                'required',
+                'integer',
+                'exists:estados_operativos,idestadooperativo',
+            ],
+            'orden' => [
+                'nullable',
+                'integer',
+                'min:0',
+                'max:255',
+            ],
+            'activo' => [
+                'nullable',
+                'boolean',
+            ],
+            'etiquetas' => [
+                'nullable',
+                'array',
+            ],
+            'etiquetas.*' => [
+                'integer',
+                'exists:etiquetas,idetiqueta',
+            ],
+        ];
+    }
+
+    private function messages(): array
+    {
+        return [
+            'nombre_sistema.required' => 'El nombre del sistema es obligatorio.',
+            'nombre_sistema.unique' => 'Ya existe un sistema institucional con ese nombre.',
+            'nombre_sistema.max' => 'El nombre del sistema no debe superar los 100 caracteres.',
+            'url.required' => 'La URL del sistema es obligatoria.',
+            'url.url' => 'La URL del sistema no tiene un formato válido.',
+            'url.max' => 'La URL del sistema no debe superar los 255 caracteres.',
+            'idcategoria.required' => 'La categoría es obligatoria.',
+            'idcategoria.exists' => 'La categoría seleccionada no existe.',
+            'idestadooperativo.required' => 'El estado operativo es obligatorio.',
+            'idestadooperativo.exists' => 'El estado operativo seleccionado no existe.',
+            'etiquetas.array' => 'Las etiquetas deben enviarse como una lista.',
+            'etiquetas.*.exists' => 'Una de las etiquetas seleccionadas no existe.',
+        ];
+    }
+
+    private function generarSlugUnico(string $nombre, ?int $idIgnorar = null): string
+    {
+        $slugBase = Str::slug($nombre);
+        $slug = $slugBase;
+        $contador = 1;
+
+        while (
+        EnlaceSistema::where('slug', $slug)
+            ->when($idIgnorar, function ($query) use ($idIgnorar) {
+                $query->where('idenlace', '!=', $idIgnorar);
+            })
+            ->exists()
+        ) {
+            $slug = $slugBase . '-' . $contador;
+            $contador++;
+        }
+
+        return $slug;
+    }
+
+    private function limpiarCachePublico(): void
+    {
+        Cache::increment('public:cache_version');
+        Cache::forget('public:inicio');
+    }
+}

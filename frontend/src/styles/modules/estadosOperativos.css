@@ -1,0 +1,604 @@
+/* ============================================================
+   ESTADOS OPERATIVOS - ESTILOS FORMALES
+   Módulo institucional DSTI
+   ============================================================ */
+
+:root {
+    --eo-primary: #0d3b66;
+    --eo-primary-dark: #082a4d;
+    --eo-primary-light: #1d5a96;
+    --eo-accent: #1976d2;
+    --eo-success: #1e7e34;
+    --eo-danger: #b02a37;
+    --eo-warning: #b58900;
+    --eo-text: #1f2937;
+    --eo-text-muted: #6b7280;
+    --eo-text-light: #9ca3af;
+    --eo-bg: #f5f7fa;
+    --eo-surface: #ffffff;
+    --eo-border: #d1d5db;
+    --eo-border-light: #e5e7eb;
+    --eo-code-bg: #eef2f7;
+    --eo-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+    --eo-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+    --eo-shadow-lg: 0 10px 25px rgba(15, 23, 42, 0.12);
+    --eo-radius: 6px;
+    --eo-radius-lg: 10px;
+    --eo-transition: 160ms ease;
+}
+
+/* ============================================================
+   CONTENEDOR PRINCIPAL
+   ============================================================ */
+
+.estados-operativos-page {
+    padding: 28px 32px;
+    background: var(--eo-bg);
+    min-height: 100%;
+    color: var(--eo-text);
+    font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* ============================================================
+   ENCABEZADO
+   ============================================================ */
+
+.estados-operativos-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+    padding-bottom: 20px;
+    margin-bottom: 24px;
+    border-bottom: 2px solid var(--eo-primary);
+}
+
+.estados-operativos-header > div:first-child {
+    flex: 1;
+}
+
+.estados-operativos-eyebrow {
+    display: inline-block;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--eo-primary);
+    background: rgba(13, 59, 102, 0.08);
+    padding: 4px 10px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.estados-operativos-header h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--eo-primary-dark);
+    margin: 0 0 6px 0;
+    letter-spacing: -0.01em;
+}
+
+.estados-operativos-header p {
+    color: var(--eo-text-muted);
+    margin: 0;
+    font-size: 13.5px;
+    max-width: 680px;
+}
+
+/* ============================================================
+   BOTÓN AGREGAR
+   ============================================================ */
+
+.estados-operativos-add-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: var(--eo-primary);
+    color: #fff;
+    border: 1px solid var(--eo-primary);
+    border-radius: var(--eo-radius);
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--eo-transition);
+    box-shadow: var(--eo-shadow-sm);
+    white-space: nowrap;
+}
+
+.estados-operativos-add-button:hover:not(:disabled) {
+    background: var(--eo-primary-dark);
+    border-color: var(--eo-primary-dark);
+    box-shadow: var(--eo-shadow);
+}
+
+.estados-operativos-add-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ============================================================
+   FORMULARIO
+   ============================================================ */
+
+.estados-operativos-form-card {
+    background: var(--eo-surface);
+    border: 1px solid var(--eo-border-light);
+    border-radius: var(--eo-radius-lg);
+    box-shadow: var(--eo-shadow);
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+
+.estados-operativos-form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px 24px;
+    background: linear-gradient(180deg, #fafbfc 0%, #f4f6f8 100%);
+    border-bottom: 1px solid var(--eo-border-light);
+}
+
+.estados-operativos-form-header h2 {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--eo-primary-dark);
+    margin: 0 0 4px 0;
+}
+
+.estados-operativos-form-header p {
+    color: var(--eo-text-muted);
+    font-size: 13px;
+    margin: 0;
+    line-height: 1.55;
+}
+
+.estados-operativos-close-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    background: var(--eo-surface);
+    color: var(--eo-text-muted);
+    border: 1px solid var(--eo-border);
+    border-radius: var(--eo-radius);
+    cursor: pointer;
+    transition: var(--eo-transition);
+    flex-shrink: 0;
+}
+
+.estados-operativos-close-button:hover:not(:disabled) {
+    background: #f3f4f6;
+    color: var(--eo-danger);
+    border-color: var(--eo-danger);
+}
+
+.estados-operativos-form {
+    padding: 24px;
+}
+
+.estados-operativos-form-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    max-width: 720px;
+}
+
+.estados-operativos-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.estados-operativos-field label {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--eo-text);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.estados-operativos-field input,
+.estados-operativos-field textarea {
+    width: 100%;
+    padding: 9px 12px;
+    background: var(--eo-surface);
+    border: 1px solid var(--eo-border);
+    border-radius: var(--eo-radius);
+    font-size: 13.5px;
+    color: var(--eo-text);
+    font-family: inherit;
+    transition: var(--eo-transition);
+}
+
+.estados-operativos-field input:focus,
+.estados-operativos-field textarea:focus {
+    outline: none;
+    border-color: var(--eo-primary);
+    box-shadow: 0 0 0 3px rgba(13, 59, 102, 0.12);
+}
+
+.estados-operativos-field input:disabled,
+.estados-operativos-field textarea:disabled {
+    background: #f3f4f6;
+    color: var(--eo-text-light);
+    cursor: not-allowed;
+}
+
+.estados-operativos-field textarea {
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.55;
+    font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+}
+
+.estados-operativos-checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--eo-text);
+    padding: 8px 0;
+    width: fit-content;
+}
+
+.estados-operativos-checkbox input[type='checkbox'] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--eo-primary);
+    cursor: pointer;
+}
+
+/* Acciones del formulario */
+
+.estados-operativos-form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    padding-top: 20px;
+    margin-top: 20px;
+    border-top: 1px solid var(--eo-border-light);
+}
+
+.estados-operativos-save-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 22px;
+    background: var(--eo-primary);
+    color: #fff;
+    border: 1px solid var(--eo-primary);
+    border-radius: var(--eo-radius);
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--eo-transition);
+    box-shadow: var(--eo-shadow-sm);
+}
+
+.estados-operativos-save-button:hover:not(:disabled) {
+    background: var(--eo-primary-dark);
+    border-color: var(--eo-primary-dark);
+}
+
+.estados-operativos-save-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.estados-operativos-cancel-button {
+    padding: 10px 20px;
+    background: var(--eo-surface);
+    color: var(--eo-text);
+    border: 1px solid var(--eo-border);
+    border-radius: var(--eo-radius);
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--eo-transition);
+}
+
+.estados-operativos-cancel-button:hover:not(:disabled) {
+    background: #f3f4f6;
+    border-color: var(--eo-text-muted);
+}
+
+.estados-operativos-cancel-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ============================================================
+   LISTADO
+   ============================================================ */
+
+.estados-operativos-list-card {
+    background: var(--eo-surface);
+    border: 1px solid var(--eo-border-light);
+    border-radius: var(--eo-radius-lg);
+    box-shadow: var(--eo-shadow);
+    overflow: hidden;
+}
+
+.estados-operativos-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 24px;
+    background: linear-gradient(180deg, #fafbfc 0%, #f4f6f8 100%);
+    border-bottom: 1px solid var(--eo-border-light);
+    flex-wrap: wrap;
+}
+
+.estados-operativos-list-header h2 {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--eo-primary-dark);
+    margin: 0 0 4px 0;
+}
+
+.estados-operativos-list-header p {
+    color: var(--eo-text-muted);
+    font-size: 13px;
+    margin: 0;
+}
+
+/* ============================================================
+   BÚSQUEDA
+   ============================================================ */
+
+.estados-operativos-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.estados-operativos-search svg {
+    position: absolute;
+    left: 11px;
+    color: var(--eo-text-muted);
+    pointer-events: none;
+}
+
+.estados-operativos-search input {
+    padding: 8px 12px 8px 36px;
+    background: var(--eo-surface);
+    border: 1px solid var(--eo-border);
+    border-radius: var(--eo-radius);
+    font-size: 13px;
+    color: var(--eo-text);
+    min-width: 260px;
+    transition: var(--eo-transition);
+}
+
+.estados-operativos-search input:focus {
+    outline: none;
+    border-color: var(--eo-primary);
+    box-shadow: 0 0 0 3px rgba(13, 59, 102, 0.12);
+}
+
+/* ============================================================
+   TABLA
+   ============================================================ */
+
+.estados-operativos-table-wrap {
+    overflow-x: auto;
+}
+
+.estados-operativos-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.estados-operativos-table thead {
+    background: #f8fafc;
+    border-bottom: 2px solid var(--eo-primary);
+}
+
+.estados-operativos-table th {
+    padding: 12px 14px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--eo-primary-dark);
+    white-space: nowrap;
+}
+
+.estados-operativos-table td {
+    padding: 14px;
+    border-bottom: 1px solid var(--eo-border-light);
+    color: var(--eo-text);
+    vertical-align: middle;
+}
+
+.estados-operativos-table tbody tr {
+    transition: background var(--eo-transition);
+}
+
+.estados-operativos-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.estados-operativos-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Slug (código) */
+
+.estados-operativos-table code {
+    display: inline-block;
+    padding: 3px 8px;
+    background: var(--eo-code-bg);
+    color: var(--eo-primary-dark);
+    border: 1px solid var(--eo-border-light);
+    border-radius: 4px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Nombre del estado operativo */
+
+.estados-operativos-name {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 200px;
+}
+
+.estados-operativos-name > span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: rgba(13, 59, 102, 0.08);
+    color: var(--eo-primary);
+    border-radius: var(--eo-radius);
+    flex-shrink: 0;
+}
+
+.estados-operativos-name strong {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--eo-primary-dark);
+    line-height: 1.35;
+}
+
+/* Estado (activo/inactivo) */
+
+.estados-operativos-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+
+.estados-operativos-status.active {
+    background: rgba(30, 126, 52, 0.1);
+    color: var(--eo-success);
+    border: 1px solid rgba(30, 126, 52, 0.25);
+}
+
+.estados-operativos-status.inactive {
+    background: rgba(176, 42, 55, 0.08);
+    color: var(--eo-danger);
+    border: 1px solid rgba(176, 42, 55, 0.22);
+}
+
+/* Acciones de fila */
+
+.estados-operativos-actions {
+    display: flex;
+    gap: 4px;
+    justify-content: flex-start;
+}
+
+.estados-operativos-actions button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    background: var(--eo-surface);
+    color: var(--eo-text-muted);
+    border: 1px solid var(--eo-border);
+    border-radius: var(--eo-radius);
+    cursor: pointer;
+    transition: var(--eo-transition);
+}
+
+.estados-operativos-actions button:hover {
+    background: var(--eo-primary);
+    color: #fff;
+    border-color: var(--eo-primary);
+}
+
+.estados-operativos-actions button.danger:hover {
+    background: var(--eo-danger);
+    border-color: var(--eo-danger);
+}
+
+/* ============================================================
+   ESTADOS VACÍOS
+   ============================================================ */
+
+.estados-operativos-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--eo-text-muted);
+    font-size: 13.5px;
+}
+
+.estados-operativos-empty-box {
+    text-align: center;
+    padding: 50px 24px;
+}
+
+.estados-operativos-empty-box h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--eo-primary-dark);
+    margin: 0 0 6px 0;
+}
+
+.estados-operativos-empty-box p {
+    color: var(--eo-text-muted);
+    font-size: 13.5px;
+    margin: 0;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 1024px) {
+    .estados-operativos-list-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .estados-operativos-search input {
+        width: 100%;
+        min-width: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .estados-operativos-page {
+        padding: 20px 16px;
+    }
+
+    .estados-operativos-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .estados-operativos-header h1 {
+        font-size: 20px;
+    }
+
+    .estados-operativos-form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .estados-operativos-form-actions button {
+        width: 100%;
+        justify-content: center;
+    }
+}
