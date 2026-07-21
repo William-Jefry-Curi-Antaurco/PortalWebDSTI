@@ -131,7 +131,10 @@
     --img-default-card: url("../../assets/icons/icon_requisitos.svg");
     --img-hero-pattern: url("../../assets/icons/icon_requisitos.svg");
     --img-default-avatar: url("../../assets/icons/icon_requisitos.svg");
-    --img-textura-fondo: url("../../assets/images/fondo_textura.svg");
+    /* Sin textura por defecto (el archivo original pesaba 13MB y se
+       descargaba en cada visita). Configuración → Apariencia puede
+       sobrescribir esta variable si se sube una textura propia liviana. */
+    --img-textura-fondo: none;
 
 
 
@@ -142,29 +145,24 @@
     --textura-fija: fixed;
 
     /* ÍCONOS */
-    --icon-default-noticia: url("../../assets/icons/icon_requisitos.svg");
-    --icon-default-servicio: url("../../assets/icons/icon_requisitos.svg");
-    --icon-default-sistema: url("../../assets/icons/icon_requisitos.svg");
-    --icon-default-documento: url("../../assets/icons/icon_requisitos.svg");
-    --icon-default-evento: url("../../assets/icons/icon_requisitos.svg");
-    --icon-default-tutorial: url("../../assets/icons/icon_requisitos.svg");
-    --icon-default-proyecto: url("../../assets/icons/icon_requisitos.svg");
-    --icon-default-institucional: url("../../assets/icons/icon_requisitos.svg");
-
-    --icon-phone: url("../../assets/icons/icon_requisitos.svg");
-    --icon-email: url("../../assets/icons/icon_requisitos.svg");
-    --icon-folder: url("../../assets/icons/icon_requisitos.svg");
-    --icon-search: url("../../assets/icons/icon_requisitos.svg");
-    --icon-close: url("../../assets/icons/icon_requisitos.svg");
-    --icon-success: url("../../assets/icons/icon_requisitos.svg");
-    --icon-warning: url("../../assets/icons/icon_requisitos.svg");
-    --icon-arrow: url("../../assets/icons/icon_requisitos.svg");
-    --icon-faq-open: url("../../assets/icons/icon_requisitos.svg");
-    --icon-faq-close: url("../../assets/icons/icon_requisitos.svg");
-    --icon-mail-card: url("../../assets/icons/icon_requisitos.svg");
-    --icon-location: url("../../assets/icons/icon_requisitos.svg");
-    --icon-clock: url("../../assets/icons/icon_requisitos.svg");
-    --icon-extension: url("../../assets/icons/icon_requisitos.svg");
+    /* Íconos decorativos en línea (reemplazan el SVG genérico anterior).
+       Se usan con mask-image + background-color: currentColor, así que
+       el trazo del SVG (stroke='%23000') es solo la forma, no el color final. */
+    --icon-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14'/%3E%3Cpath d='m12 5 7 7-7 7'/%3E%3C/svg%3E");
+    --icon-chevron-down: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    --icon-search: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+    --icon-close: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 6 6 18'/%3E%3Cpath d='m6 6 12 12'/%3E%3C/svg%3E");
+    --icon-folder: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.91 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z'/%3E%3C/svg%3E");
+    --icon-mail-card: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect width='20' height='16' x='2' y='4' rx='2'/%3E%3Cpath d='m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7'/%3E%3C/svg%3E");
+    --icon-success: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21.801 10A10 10 0 1 1 17 3.335'/%3E%3Cpath d='m9 11 3 3L22 4'/%3E%3C/svg%3E");
+    --icon-warning: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z'/%3E%3Cpath d='M12 9v4'/%3E%3Cpath d='M12 17h.01'/%3E%3C/svg%3E");
+    --icon-clock: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M12 6v6l4 2'/%3E%3C/svg%3E");
+    --icon-location: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0'/%3E%3Ccircle cx='12' cy='10' r='3'/%3E%3C/svg%3E");
+    --icon-phone: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384'/%3E%3C/svg%3E");
+    --icon-email: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect width='20' height='16' x='2' y='4' rx='2'/%3E%3Cpath d='m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7'/%3E%3C/svg%3E");
+    --icon-extension: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384'/%3E%3C/svg%3E");
+    --icon-wifi: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 20h.01'/%3E%3Cpath d='M2 8.82a15 15 0 0 1 20 0'/%3E%3Cpath d='M5 12.859a10 10 0 0 1 14 0'/%3E%3Cpath d='M8.5 16.429a5 5 0 0 1 7 0'/%3E%3C/svg%3E");
+    --icon-users: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='9' cy='7' r='4'/%3E%3Cpath d='M22 21v-2a4 4 0 0 0-3-3.87'/%3E%3Cpath d='M16 3.13a4 4 0 0 1 0 7.75'/%3E%3C/svg%3E");
 
 }
 
@@ -480,10 +478,15 @@ a { color: inherit; }
 .portal-nav-arrow {
     width: 11px; height: 11px;
     display: inline-block;
-    background-image: var(--icon-arrow);
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
+    background-color: currentColor;
+    -webkit-mask-image: var(--icon-chevron-down);
+    mask-image: var(--icon-chevron-down);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
     opacity: 0.6;
     transition: transform 0.22s ease;
 }
@@ -577,10 +580,15 @@ a { color: inherit; }
 .portal-dropdown-all::before {
     content: "";
     width: 14px; height: 14px;
-    background-image: var(--icon-folder);
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
+    background-color: currentColor;
+    -webkit-mask-image: var(--icon-folder);
+    mask-image: var(--icon-folder);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
     flex-shrink: 0;
     opacity: 0.7;
 }
@@ -596,10 +604,15 @@ a { color: inherit; }
     content: "";
     width: 13px; height: 13px;
     flex: 0 0 auto;
-    background-image: var(--icon-folder);
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
+    background-color: currentColor;
+    -webkit-mask-image: var(--icon-folder);
+    mask-image: var(--icon-folder);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
     opacity: 0.65;
 }
 
@@ -878,10 +891,15 @@ a { color: inherit; }
 .portal-hero-btn-primary::after {
     content: "";
     width: 14px; height: 14px;
-    background-image: var(--icon-arrow);
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
+    background-color: currentColor;
+    -webkit-mask-image: var(--icon-arrow);
+    mask-image: var(--icon-arrow);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
     transition: transform 0.22s ease;
 }
 
@@ -949,9 +967,6 @@ a { color: inherit; }
     color: #ffffff;
     flex-shrink: 0;
 }
-.portal-hero-card-cvr[data-clave*="anexo"]    .portal-hero-card-icon { background-image: var(--icon-extension); }
-.portal-hero-card-cvr[data-clave*="horario"]  .portal-hero-card-icon { background-image: var(--icon-clock); }
-
 .portal-hero-card-content { min-width: 0; width: 100%; }
 
 .portal-hero-card-content strong {
@@ -1118,11 +1133,15 @@ a { color: inherit; }
 .portal-filter-active button::before {
     content: "";
     width: 10px; height: 10px;
-    background-image: var(--icon-close);
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    filter: brightness(0) invert(1);
+    background-color: currentColor;
+    -webkit-mask-image: var(--icon-close);
+    mask-image: var(--icon-close);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
 }
 
 .portal-filter-active button:hover { background: var(--institutional-primary-dark); }
@@ -1137,10 +1156,14 @@ a { color: inherit; }
     left: 16px; top: 50%;
     width: 16px; height: 16px;
     transform: translateY(-50%);
-    background-image: var(--icon-search);
-    background-repeat: no-repeat;
-    background-size: contain;
-    opacity: 0.45;
+    background-color: var(--text-soft, var(--text));
+    -webkit-mask-image: var(--icon-search);
+    mask-image: var(--icon-search);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    opacity: 0.55;
     pointer-events: none;
 }
 
@@ -1387,10 +1410,15 @@ a { color: inherit; }
     content: "";
     width: 13px; height: 13px;
     flex-shrink: 0;
-    background-image: var(--icon-mail-card);
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
+    background-color: currentColor;
+    -webkit-mask-image: var(--icon-mail-card);
+    mask-image: var(--icon-mail-card);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
 }
 
 .portal-card-link:hover { color: var(--institutional-primary-dark); text-decoration: underline; }
@@ -1417,11 +1445,15 @@ a { color: inherit; }
 .portal-card-button::after {
     content: "";
     width: 13px; height: 13px;
-    background-image: var(--icon-arrow);
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    filter: brightness(0) invert(1);
+    background-color: currentColor;
+    -webkit-mask-image: var(--icon-arrow);
+    mask-image: var(--icon-arrow);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
     transition: transform 0.22s ease;
 }
 
@@ -3357,10 +3389,15 @@ body:has(.psv-overlay) {
 .portal-project-result-link::after {
     content: "";
     width: 13px; height: 13px;
-    background-image: var(--icon-arrow);
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
+    background-color: currentColor;
+    -webkit-mask-image: var(--icon-arrow);
+    mask-image: var(--icon-arrow);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
     transition: transform 0.22s ease;
 }
 
@@ -3683,16 +3720,20 @@ body:has(.psv-overlay) {
     height: 15px;
     flex: 0 0 15px;
     margin-top: 2px;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
+    background-color: currentColor;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
     opacity: 0.72;
 }
 
-.portal-event-info-fecha::before { background-image: var(--icon-clock); }
-.portal-event-info-lugar::before { background-image: var(--icon-location); }
-.portal-event-info-virtual::before { background-image: var(--icon-default-evento); }
-.portal-event-info-cupos::before { background-image: var(--icon-default-institucional); }
+.portal-event-info-fecha::before   { -webkit-mask-image: var(--icon-clock);    mask-image: var(--icon-clock); }
+.portal-event-info-lugar::before   { -webkit-mask-image: var(--icon-location); mask-image: var(--icon-location); }
+.portal-event-info-virtual::before { -webkit-mask-image: var(--icon-wifi);     mask-image: var(--icon-wifi); }
+.portal-event-info-cupos::before   { -webkit-mask-image: var(--icon-users);    mask-image: var(--icon-users); }
 .portal-event-info-cupos span { color: var(--muted); font-weight: 700; }
 
 .portal-event-actions {
@@ -4874,17 +4915,28 @@ body:has(.psv-overlay) {
     border: 1px solid #fecaca;
 }
 
-.portal-message-success::before { background-image: var(--icon-success); }
-.portal-message-error::before   { background-image: var(--icon-warning); }
-
 .portal-message-success::before,
 .portal-message-error::before {
     content: "";
     width: 17px; height: 17px;
     flex-shrink: 0;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
+    background-color: currentColor;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+}
+
+.portal-message-success::before {
+    -webkit-mask-image: var(--icon-success);
+    mask-image: var(--icon-success);
+}
+
+.portal-message-error::before {
+    -webkit-mask-image: var(--icon-warning);
+    mask-image: var(--icon-warning);
 }
 
 /* =========================================================
@@ -5154,16 +5206,67 @@ body:has(.psv-overlay) {
     color: var(--institutional-primary-dark);
 }
 
-.portal-system-feature .portal-card-button::after { filter: none; }
-
 .portal-system-feature .portal-card-button:hover {
     background: var(--primary-soft);
     color: var(--institutional-primary-dark);
     box-shadow: 0 14px 30px rgba(0, 0, 0, 0.22);
 }
 
+.portal-system-feature-actions {
+    margin-top: auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.portal-system-feature-actions .portal-card-button { margin-top: 0; }
+
+.portal-system-feature .portal-card-button-ghost {
+    background: rgba(255, 255, 255, 0.12);
+    color: var(--white);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.portal-system-feature .portal-card-button-ghost:hover {
+    background: rgba(255, 255, 255, 0.22);
+    box-shadow: none;
+}
+
 /* -- Lista lateral -- */
 .portal-systems-list { display: grid; gap: 10px; align-content: start; }
+
+.portal-system-row-wrap { display: flex; flex-direction: column; gap: 6px; }
+
+.portal-system-row-files {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding-left: 76px;
+}
+
+.portal-system-row-file-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border-primary, var(--border));
+    background: var(--surface-primary, var(--white));
+    color: var(--institutional-primary);
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.portal-system-row-file-btn:hover {
+    background: var(--primary-soft);
+    transform: translateY(-1px);
+}
+
+@media (max-width: 640px) {
+    .portal-system-row-files { padding-left: 0; }
+}
 
 .portal-system-row {
     display: grid;
@@ -5614,11 +5717,6 @@ button.portal-system-row { border: 0; font: inherit; width: 100%; text-align: le
     padding: 11px 22px;
     border-radius: 999px;
     font-size: 0.92rem;
-}
-
-/* Corrección del selector de dirección del hero */
-.portal-hero-card-cvr[data-clave*="direccion"] .portal-hero-card-icon {
-    background-image: var(--icon-location);
 }
 
 /* =========================================================

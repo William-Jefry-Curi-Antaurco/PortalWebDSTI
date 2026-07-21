@@ -416,11 +416,6 @@ export default function Soporte() {
             return false;
         }
 
-        if (!form.idprioridad) {
-            notifyError('Debe seleccionar una prioridad.');
-            return false;
-        }
-
         if (!form.idestado) {
             notifyError('Debe seleccionar un estado.');
             return false;
@@ -457,7 +452,11 @@ export default function Soporte() {
         data.append('descripcion', form.descripcion.trim());
         data.append('consentimiento_privacidad', form.consentimiento_privacidad ? '1' : '0');
         data.append('idtiposoporte', form.idtiposoporte);
-        data.append('idprioridad', form.idprioridad);
+
+        if (form.idprioridad) {
+            data.append('idprioridad', form.idprioridad);
+        }
+
         data.append('idestado', form.idestado);
 
         if (form.adjunto) {
@@ -854,15 +853,14 @@ export default function Soporte() {
                             </div>
 
                             <div className="soporte-field">
-                                <label>Prioridad</label>
+                                <label>Prioridad <span className="soporte-field-opcional">(opcional)</span></label>
                                 <select
                                     name="idprioridad"
                                     value={form.idprioridad}
                                     onChange={handleChange}
-                                    required
                                     disabled={saving || loadingCatalogs}
                                 >
-                                    <option value="">Seleccione una prioridad</option>
+                                    <option value="">Sin especificar</option>
                                     {prioridades.map((prioridad) => (
                                         <option key={prioridad.idprioridad} value={prioridad.idprioridad}>
                                             {prioridad.nombre}

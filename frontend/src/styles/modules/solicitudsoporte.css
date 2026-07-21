@@ -216,6 +216,13 @@
     letter-spacing: 0.03em;
 }
 
+.soporte-field-opcional {
+    text-transform: none;
+    font-weight: 500;
+    color: var(--sop-text-muted);
+    letter-spacing: 0;
+}
+
 .soporte-field input,
 .soporte-field textarea,
 .soporte-field select {

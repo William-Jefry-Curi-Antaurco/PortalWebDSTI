@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import DOMPurify from 'dompurify';
 import {
     BookOpen,
     Plus,
@@ -1501,7 +1502,7 @@ export default function Tutoriales() {
                                         <div
                                             className="tutoriales-html-preview"
                                             dangerouslySetInnerHTML={{
-                                                __html: selectedTutorial.contenido_html,
+                                                __html: DOMPurify.sanitize(selectedTutorial.contenido_html),
                                             }}
                                         />
                                     </div>

@@ -929,6 +929,7 @@ const SoporteForm = memo(function SoporteForm({ catalogos, cfg, textos }) {
         try {
             const response = await registrarPublicSoporte({
                 ...form,
+                idprioridad: form.idprioridad || null,
                 consentimiento_privacidad: form.consentimiento_privacidad ? 1 : 0,
             });
             setEstado({ loading: false, message: response?.data?.message || response?.message || textos.soporteExito, error: false });
@@ -957,8 +958,8 @@ const SoporteForm = memo(function SoporteForm({ catalogos, cfg, textos }) {
                         <option key={t.idtiposoporte} value={t.idtiposoporte}>{t.nombre}</option>
                     ))}
                 </select>
-                <select name="idprioridad" value={form.idprioridad} onChange={handleChange} required>
-                    <option value="">Seleccione prioridad</option>
+                <select name="idprioridad" value={form.idprioridad} onChange={handleChange}>
+                    <option value="">Prioridad (opcional)</option>
                     {(catalogos.prioridades || []).map((p) => (
                         <option key={p.idprioridad} value={p.idprioridad}>{p.nombre}</option>
                     ))}
@@ -1096,9 +1097,6 @@ export default function InicioPublico() {
         gcTime:    GC_MEDIO,
     });
 
-    // Queries de secciones — habilitadas solo cuando los catálogos cargaron
-    const catalogosLoaded = Boolean(catalogosQuery.data);
-
     const cfgModulos = configuracionQuery.data?.modulos || {};
     const perPage = useMemo(() => ({
         noticias:   cfgNumber(cfgModulos.paginacion_noticias,   SECTION_PER_PAGE_DEFAULT.noticias),
@@ -1111,7 +1109,7 @@ export default function InicioPublico() {
         faqs:       cfgNumber(cfgModulos.paginacion_faqs,       SECTION_PER_PAGE_DEFAULT.faqs),
     }), [cfgModulos]);
 
-    const serviciosQuery  = useQuery({ queryKey: ["servicios",  perPage.servicios],  queryFn: () => getPublicServicios(buildParams({ perPage: perPage.servicios })).then(getList),    staleTime: 0, gcTime: GC_MEDIO, enabled: catalogosLoaded });
+    const serviciosQuery  = useQuery({ queryKey: ["servicios",  perPage.servicios],  queryFn: () => getPublicServicios(buildParams({ perPage: perPage.servicios })).then(getList),    staleTime: 0, gcTime: GC_MEDIO });
     const sistemasQuery = useQuery({
         queryKey: ["sistemas"],
         queryFn: () => getPublicSistemas().then(getList),
@@ -1119,14 +1117,13 @@ export default function InicioPublico() {
         gcTime: 0,
         refetchOnMount: "always",
         refetchOnWindowFocus: true,
-        enabled: catalogosLoaded,
     });
-    const noticiasQuery   = useQuery({ queryKey: ["noticias",   busquedaNoticias, perPage.noticias], queryFn: () => getPublicNoticias(buildParams({ search: busquedaNoticias, perPage: perPage.noticias })).then(getList), staleTime: 0, gcTime: GC_MEDIO, enabled: catalogosLoaded });
-    const proyectosQuery  = useQuery({ queryKey: ["proyectos",  perPage.proyectos],  queryFn: () => getPublicProyectos(buildParams({ perPage: perPage.proyectos })).then(getList),   staleTime: 0, gcTime: GC_MEDIO, enabled: catalogosLoaded });
+    const noticiasQuery   = useQuery({ queryKey: ["noticias",   busquedaNoticias, perPage.noticias], queryFn: () => getPublicNoticias(buildParams({ search: busquedaNoticias, perPage: perPage.noticias })).then(getList), staleTime: 0, gcTime: GC_MEDIO });
+    const proyectosQuery  = useQuery({ queryKey: ["proyectos",  perPage.proyectos],  queryFn: () => getPublicProyectos(buildParams({ perPage: perPage.proyectos })).then(getList),   staleTime: 0, gcTime: GC_MEDIO });
     const documentosQuery = useQuery({ queryKey: ["documentos", perPage.documentos], queryFn: () => getPublicDocumentos(buildParams({ perPage: perPage.documentos })).then(getList), staleTime: 0, gcTime: GC_MEDIO });
-    const eventosQuery    = useQuery({ queryKey: ["eventos",    perPage.eventos],    queryFn: () => getPublicEventos(buildParams({ perPage: perPage.eventos })).then(getList),       staleTime: 0, gcTime: GC_MEDIO, enabled: catalogosLoaded });
-    const tutorialesQuery = useQuery({ queryKey: ["tutoriales", perPage.tutoriales], queryFn: () => getPublicTutoriales(buildParams({ perPage: perPage.tutoriales })).then(getList), staleTime: 0, gcTime: GC_MEDIO, enabled: catalogosLoaded });
-    const faqsQuery       = useQuery({ queryKey: ["faqs",       perPage.faqs],       queryFn: () => getPublicFaqs(buildParams({ perPage: perPage.faqs })).then(getList),             staleTime: 0, gcTime: GC_MEDIO, enabled: catalogosLoaded });
+    const eventosQuery    = useQuery({ queryKey: ["eventos",    perPage.eventos],    queryFn: () => getPublicEventos(buildParams({ perPage: perPage.eventos })).then(getList),       staleTime: 0, gcTime: GC_MEDIO });
+    const tutorialesQuery = useQuery({ queryKey: ["tutoriales", perPage.tutoriales], queryFn: () => getPublicTutoriales(buildParams({ perPage: perPage.tutoriales })).then(getList), staleTime: 0, gcTime: GC_MEDIO });
+    const faqsQuery       = useQuery({ queryKey: ["faqs",       perPage.faqs],       queryFn: () => getPublicFaqs(buildParams({ perPage: perPage.faqs })).then(getList),             staleTime: 0, gcTime: GC_MEDIO });
 
     // ── Configuración dinámica ────────────────────────────────────────────────
     const cfg = configuracionQuery.data || {};
@@ -1713,9 +1710,13 @@ export default function InicioPublico() {
                                             ? "correo"
                                             : clave.includes("telefono")
                                                 ? "telefono"
-                                                : clave.includes("direccion")
-                                                    ? "direccion"
-                                                    : "institucional";
+                                                : clave.includes("anexo")
+                                                    ? "anexo"
+                                                    : clave.includes("direccion")
+                                                        ? "direccion"
+                                                        : clave.includes("horario")
+                                                            ? "horario"
+                                                            : "institucional";
                                         return (
                                             <article key={item.idinfo || item.id || index} className="portal-hero-card-cvr" data-clave={item.clave || ""}>
                                                 <span className="portal-hero-card-icon">

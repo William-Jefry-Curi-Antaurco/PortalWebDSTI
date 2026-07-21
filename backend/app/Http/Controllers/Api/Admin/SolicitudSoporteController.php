@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Archivo;
+use App\Models\Prioridad;
 use App\Models\SolicitudRespuesta;
 use App\Models\SolicitudSoporte;
 use Illuminate\Http\JsonResponse;
@@ -106,7 +107,7 @@ class SolicitudSoporteController extends Controller
                 'exists:tipos_soporte,idtiposoporte',
             ],
             'idprioridad' => [
-                'required',
+                'nullable',
                 'integer',
                 'exists:prioridades,idprioridad',
             ],
@@ -137,7 +138,6 @@ class SolicitudSoporteController extends Controller
             'consentimiento_privacidad.accepted' => 'Debe aceptar la política de privacidad.',
             'idtiposoporte.required' => 'El tipo de soporte es obligatorio.',
             'idtiposoporte.exists' => 'El tipo de soporte seleccionado no existe.',
-            'idprioridad.required' => 'La prioridad es obligatoria.',
             'idprioridad.exists' => 'La prioridad seleccionada no existe.',
             'idestado.required' => 'El estado es obligatorio.',
             'idestado.exists' => 'El estado seleccionado no existe.',
@@ -192,7 +192,7 @@ class SolicitudSoporteController extends Controller
             'consentimiento_privacidad' => $request->boolean('consentimiento_privacidad'),
             'codigo_ticket' => $this->generarCodigoTicket(),
             'idtiposoporte' => $request->idtiposoporte,
-            'idprioridad' => $request->idprioridad,
+            'idprioridad' => $request->idprioridad ?? $this->prioridadPorDefecto(),
             'idestado' => $request->idestado,
             'idusuario_atendio' => $request->idusuario_atendio,
         ]);
@@ -289,7 +289,7 @@ class SolicitudSoporteController extends Controller
                 'exists:tipos_soporte,idtiposoporte',
             ],
             'idprioridad' => [
-                'required',
+                'nullable',
                 'integer',
                 'exists:prioridades,idprioridad',
             ],
@@ -372,7 +372,7 @@ class SolicitudSoporteController extends Controller
             'idarchivo' => $solicitud->idarchivo,
             'consentimiento_privacidad' => $request->boolean('consentimiento_privacidad'),
             'idtiposoporte' => $request->idtiposoporte,
-            'idprioridad' => $request->idprioridad,
+            'idprioridad' => $request->idprioridad ?? $solicitud->idprioridad,
             'idestado' => $request->idestado,
             'idusuario_atendio' => $request->idusuario_atendio,
         ]);
@@ -526,5 +526,14 @@ class SolicitudSoporteController extends Controller
         } while (SolicitudSoporte::where('codigo_ticket', $codigo)->exists());
 
         return $codigo;
+    }
+
+    /**
+     * La prioridad ya no es obligatoria en el formulario; si no se envía,
+     * se asigna la de menor nivel (la columna en BD sigue siendo NOT NULL).
+     */
+    private function prioridadPorDefecto(): int
+    {
+        return (int) (Prioridad::orderBy('nivel')->value('idprioridad') ?? 1);
     }
 }

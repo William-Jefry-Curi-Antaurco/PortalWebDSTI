@@ -13,6 +13,7 @@ import {
     Video,
     BookOpen,
     Link2,
+    Clock,
 } from "lucide-react";
 
 const ICONOS_POR_TIPO = {
@@ -29,7 +30,9 @@ const ICONOS_POR_TIPO = {
     autoridades: User,
     correo: Mail,
     telefono: Phone,
+    anexo: Phone,
     direccion: MapPin,
+    horario: Clock,
     ayuda: HelpCircle,
 };
 

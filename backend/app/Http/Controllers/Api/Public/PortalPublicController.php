@@ -691,6 +691,8 @@ class PortalPublicController extends Controller
         $query = EnlaceSistema::with([
             'categoria:idcategoria,nombre,slug',
             'estadoOperativo:idestadooperativo,nombre',
+            'archivoManual:idarchivo,nombre_original,ruta,extension,mime_type',
+            'archivoDocumentacion:idarchivo,nombre_original,ruta,extension,mime_type',
         ])
             ->where('activo', 1)
             ->select(
@@ -702,7 +704,9 @@ class PortalPublicController extends Controller
                 'icono',
                 'orden',
                 'idcategoria',
-                'idestadooperativo'
+                'idestadooperativo',
+                'idarchivo_manual',
+                'idarchivo_documentacion'
             );
 
         $this->aplicarFiltrosPublicos(
@@ -1261,7 +1265,7 @@ class PortalPublicController extends Controller
             'asunto' => ['required', 'string', 'max:200'],
             'descripcion' => ['required', 'string'],
             'idtiposoporte' => ['required', 'integer', 'exists:tipos_soporte,idtiposoporte'],
-            'idprioridad' => ['required', 'integer', 'exists:prioridades,idprioridad'],
+            'idprioridad' => ['nullable', 'integer', 'exists:prioridades,idprioridad'],
             'consentimiento_privacidad' => ['required', Rule::in([1, true, '1'])],
         ]);
 
@@ -1276,7 +1280,7 @@ class PortalPublicController extends Controller
             'consentimiento_privacidad' => 1,
             'codigo_ticket' => 'DSTI-' . now()->format('Ymd') . '-' . strtoupper(Str::random(6)),
             'idtiposoporte' => $validated['idtiposoporte'],
-            'idprioridad' => $validated['idprioridad'],
+            'idprioridad' => $validated['idprioridad'] ?? (int) (Prioridad::orderBy('nivel')->value('idprioridad') ?? 1),
             'idestado' => 1,
         ]);
 

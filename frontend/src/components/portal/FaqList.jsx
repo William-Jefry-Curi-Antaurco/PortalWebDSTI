@@ -295,7 +295,7 @@ export default function FaqList({
                                     className="portal-faq-answer"
                                     hidden={!isOpen}
                                 >
-                                    <div>
+                                    <div className="portal-faq-answer-content">
                                         <p>{getAnswer(item)}</p>
 
                                         <div className="portal-faq-helpful">

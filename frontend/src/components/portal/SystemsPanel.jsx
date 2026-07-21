@@ -6,6 +6,7 @@ import {
     getFileUrl,
     formatDate,
 } from "../../utils/portalUtils";
+import EtiquetaBadges from "./EtiquetaBadges";
 import {
     GraduationCap,
     BookOpen,
@@ -156,6 +157,21 @@ function abrirSistema(item, onOpenResource) {
     }
 }
 
+// -- Manual / documentación: siempre son archivos propios (PDF, Word, etc.),
+// se abren directo en el visor modal, sin pasar por la lógica de enlace externo --
+function abrirArchivoSistema(item, campoArchivo, etiqueta, onOpenResource) {
+    if (!onOpenResource) return;
+
+    onOpenResource(
+        {
+            archivo: item[campoArchivo],
+            titulo: `${getTitle(item)} — ${etiqueta}`,
+            categoria: item.categoria,
+        },
+        "sistemas"
+    );
+}
+
 export default function SystemsPanel({ items, emptyAction, onOpenResource = null }) {
     if (!items || items.length === 0) {
         return (
@@ -198,24 +214,50 @@ export default function SystemsPanel({ items, emptyAction, onOpenResource = null
 
                 {getDescription(principal) && <p>{getDescription(principal)}</p>}
 
+                <EtiquetaBadges item={principal} />
+
                 {formatDate(getDateValue(principal)) && (
                     <div className="portal-system-meta">
                         <span>{formatDate(getDateValue(principal))}</span>
                     </div>
                 )}
 
-                {getFileUrl(principal) && (
-                    <button
-                        type="button"
-                        className="portal-card-button"
-                        onClick={() => abrirSistema(principal, onOpenResource)}
-                    >
-                        {principalEsArchivo ? "Ver detalle" : "Ir al sistema"}
-                        {principalEsArchivo
-                            ? <ArrowUpRight size={16} aria-hidden="true" />
-                            : <ExternalLink size={16} aria-hidden="true" />}
-                    </button>
-                )}
+                <div className="portal-system-feature-actions">
+                    {getFileUrl(principal) && (
+                        <button
+                            type="button"
+                            className="portal-card-button"
+                            onClick={() => abrirSistema(principal, onOpenResource)}
+                        >
+                            {principalEsArchivo ? "Ver detalle" : "Ir al sistema"}
+                            {principalEsArchivo
+                                ? <ArrowUpRight size={16} aria-hidden="true" />
+                                : <ExternalLink size={16} aria-hidden="true" />}
+                        </button>
+                    )}
+
+                    {principal.archivo_manual && (
+                        <button
+                            type="button"
+                            className="portal-card-button portal-card-button-ghost"
+                            onClick={() => abrirArchivoSistema(principal, "archivo_manual", "Manual", onOpenResource)}
+                        >
+                            <FileText size={15} aria-hidden="true" />
+                            Ver manual
+                        </button>
+                    )}
+
+                    {principal.archivo_documentacion && (
+                        <button
+                            type="button"
+                            className="portal-card-button portal-card-button-ghost"
+                            onClick={() => abrirArchivoSistema(principal, "archivo_documentacion", "Documentación", onOpenResource)}
+                        >
+                            <BookOpen size={15} aria-hidden="true" />
+                            Ver documentación
+                        </button>
+                    )}
+                </div>
             </article>
 
             {/* -- Lista de sistemas -- */}
@@ -228,43 +270,74 @@ export default function SystemsPanel({ items, emptyAction, onOpenResource = null
                     const tono = getEstadoTono(item);
                     const tieneUrl = Boolean(getFileUrl(item));
                     const esArchivo = esArchivoVisualizable(item);
+                    const tieneManual = Boolean(item.archivo_manual);
+                    const tieneDocumentacion = Boolean(item.archivo_documentacion);
+                    const key =
+                        item.idenlace ||
+                        item.id_enlace_sistema ||
+                        item.id_sistema ||
+                        item.id ||
+                        `sistema-${index}`;
 
                     return (
-                        <button
-                            type="button"
-                            className="portal-system-row"
-                            data-estado={tono}
-                            disabled={!tieneUrl}
-                            onClick={() => abrirSistema(item, onOpenResource)}
-                            title={tieneUrl ? (esArchivo ? "Ver detalle" : getFileUrl(item)) : getTitle(item)}
-                            key={
-                                item.idenlace ||
-                                item.id_enlace_sistema ||
-                                item.id_sistema ||
-                                item.id ||
-                                `sistema-${index}`
-                            }
-                        >
-                            <span className="portal-system-row-icon" aria-hidden="true">
-                                <SystemIcon item={item} size={20} />
-                            </span>
-
-                            <span className="portal-system-row-body">
-                                <strong>{getTitle(item)}</strong>
-                                <small className="portal-system-row-meta">
-                                    {getCategory(item) && (
-                                        <span className="portal-system-row-cat">{getCategory(item)}</span>
-                                    )}
-                                    <EstadoBadge item={item} compact />
-                                </small>
-                            </span>
-
-                            {tieneUrl && (
-                                <span className="portal-system-row-go" aria-hidden="true">
-                                    {esArchivo ? "Ver" : "Abrir"}
+                        <div className="portal-system-row-wrap" key={key}>
+                            <button
+                                type="button"
+                                className="portal-system-row"
+                                data-estado={tono}
+                                disabled={!tieneUrl}
+                                onClick={() => abrirSistema(item, onOpenResource)}
+                                title={tieneUrl ? (esArchivo ? "Ver detalle" : getFileUrl(item)) : getTitle(item)}
+                            >
+                                <span className="portal-system-row-icon" aria-hidden="true">
+                                    <SystemIcon item={item} size={20} />
                                 </span>
+
+                                <span className="portal-system-row-body">
+                                    <strong>{getTitle(item)}</strong>
+                                    <small className="portal-system-row-meta">
+                                        {getCategory(item) && (
+                                            <span className="portal-system-row-cat">{getCategory(item)}</span>
+                                        )}
+                                        <EstadoBadge item={item} compact />
+                                    </small>
+                                </span>
+
+                                {tieneUrl && (
+                                    <span className="portal-system-row-go" aria-hidden="true">
+                                        {esArchivo ? "Ver" : "Abrir"}
+                                    </span>
+                                )}
+                            </button>
+
+                            {(tieneManual || tieneDocumentacion) && (
+                                <div className="portal-system-row-files">
+                                    {tieneManual && (
+                                        <button
+                                            type="button"
+                                            className="portal-system-row-file-btn"
+                                            onClick={() => abrirArchivoSistema(item, "archivo_manual", "Manual", onOpenResource)}
+                                            title="Ver manual"
+                                        >
+                                            <FileText size={13} aria-hidden="true" />
+                                            Manual
+                                        </button>
+                                    )}
+
+                                    {tieneDocumentacion && (
+                                        <button
+                                            type="button"
+                                            className="portal-system-row-file-btn"
+                                            onClick={() => abrirArchivoSistema(item, "archivo_documentacion", "Documentación", onOpenResource)}
+                                            title="Ver documentación"
+                                        >
+                                            <BookOpen size={13} aria-hidden="true" />
+                                            Documentación
+                                        </button>
+                                    )}
+                                </div>
                             )}
-                        </button>
+                        </div>
                     );
                 })}
             </div>

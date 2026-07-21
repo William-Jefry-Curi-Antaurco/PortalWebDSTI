@@ -28,3 +28,6 @@ dist-ssr/
 .DS_Store
 Thumbs.db
 *.log
+
+# Claude Code (config local de sesión, no compartir)
+.claude/settings.local.json
