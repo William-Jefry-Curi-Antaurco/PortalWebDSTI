@@ -92,7 +92,7 @@ class ProyectoController extends Controller
                 'max:100',
             ],
             'fecha_inicio' => [
-                'nullable',
+                'required',
                 'date',
             ],
             'fecha_fin' => [
@@ -150,6 +150,7 @@ class ProyectoController extends Controller
             'titulo.max' => 'El título no debe superar los 200 caracteres.',
             'porcentaje_avance.min' => 'El porcentaje de avance no puede ser menor que 0.',
             'porcentaje_avance.max' => 'El porcentaje de avance no puede ser mayor que 100.',
+            'fecha_inicio.required' => 'La fecha de inicio es obligatoria.',
             'fecha_fin.after_or_equal' => 'La fecha de fin debe ser igual o posterior a la fecha de inicio.',
             'url_resultado.url' => 'La URL del resultado no tiene un formato válido.',
             'url_resultado.max' => 'La URL del resultado no debe superar los 255 caracteres.',
@@ -306,7 +307,7 @@ class ProyectoController extends Controller
                 'max:100',
             ],
             'fecha_inicio' => [
-                'nullable',
+                'required',
                 'date',
             ],
             'fecha_fin' => [
@@ -365,6 +366,7 @@ class ProyectoController extends Controller
             'porcentaje_avance.max' => 'El porcentaje de avance no puede ser mayor que 100.',
             'url_resultado.url' => 'La URL del resultado no tiene un formato válido.',
             'url_resultado.max' => 'La URL del resultado no debe superar los 255 caracteres.',
+            'fecha_inicio.required' => 'La fecha de inicio es obligatoria.',
             'fecha_fin.after_or_equal' => 'La fecha de fin debe ser igual o posterior a la fecha de inicio.',
             'idcategoria.exists' => 'La categoría seleccionada no existe.',
             'idestado.exists' => 'El estado seleccionado no existe.',

@@ -362,7 +362,7 @@ CREATE TABLE `categorias` (
   `activo` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `idmodulo` tinyint unsigned NOT NULL,
+  `idmodulo` smallint unsigned NOT NULL,
   PRIMARY KEY (`idcategoria`),
   UNIQUE KEY `idx_categorias_modulo_slug` (`idmodulo`,`slug`),
   KEY `idx_categorias_activo` (`activo`),
@@ -2508,7 +2508,7 @@ DROP TABLE IF EXISTS `modulos`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `modulos` (
-  `idmodulo` tinyint unsigned NOT NULL AUTO_INCREMENT,
+  `idmodulo` smallint unsigned NOT NULL AUTO_INCREMENT,
   `nombre` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
   `slug` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
   `descripcion` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -2979,7 +2979,7 @@ CREATE TABLE `permisos` (
   `idpermiso` int unsigned NOT NULL AUTO_INCREMENT,
   `nombre` varchar(105) COLLATE utf8mb4_unicode_ci NOT NULL,
   `descripcion` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `idmodulo` tinyint unsigned NOT NULL,
+  `idmodulo` smallint unsigned NOT NULL,
   PRIMARY KEY (`idpermiso`),
   UNIQUE KEY `nombre_UNIQUE` (`nombre`),
   KEY `fk_permisos_modulos1_idx` (`idmodulo`),
@@ -3450,7 +3450,7 @@ DROP TABLE IF EXISTS `roles`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `roles` (
-  `idrol` tinyint unsigned NOT NULL AUTO_INCREMENT,
+  `idrol` smallint unsigned NOT NULL AUTO_INCREMENT,
   `nombre` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
   `descripcion` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -3581,7 +3581,7 @@ DROP TABLE IF EXISTS `roles_permisos`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `roles_permisos` (
-  `idrol` tinyint unsigned NOT NULL,
+  `idrol` smallint unsigned NOT NULL,
   `idpermiso` int unsigned NOT NULL,
   PRIMARY KEY (`idrol`,`idpermiso`),
   KEY `fk_roles_has_permisos_permisos1_idx` (`idpermiso`),
@@ -5273,7 +5273,7 @@ CREATE TABLE `usuarios` (
   `email_verified_at` timestamp NULL DEFAULT NULL,
   `password_hash` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `remember_token` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `idrol` tinyint unsigned NOT NULL DEFAULT '2' COMMENT '1:admin, 2:editor, 3:lector',
+  `idrol` smallint unsigned NOT NULL,
   `activo` tinyint(1) NOT NULL DEFAULT '1',
   `ultimo_acceso` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -5432,3 +5432,4 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (2,'0001_01_01_0000
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (3,'2026_05_05_152905_create_personal_access_tokens_table',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (4,'2026_05_13_030016_create_sessions_table',2);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (5,'2026_07_21_000000_add_archivos_to_enlaces_sistemas_table',3);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (6,'2026_07_21_010000_widen_roles_and_modulos_id_columns',4);
