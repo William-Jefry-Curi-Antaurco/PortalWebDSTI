@@ -1,5 +1,6 @@
 // src/components/portal/EventAgenda.jsx
 import { useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import {
     getCategory,
     getTitle,
@@ -188,7 +189,7 @@ function EventoDetalleModal({ evento, onClose }) {
         if (e.target === e.currentTarget) onClose();
     }
 
-    return (
+    return createPortal(
         <div className="portal-event-modal-overlay" role="dialog" aria-modal="true" onClick={cerrarConFondo}>
             <div className="portal-event-modal">
                 <div className="portal-event-modal-header">
@@ -260,7 +261,8 @@ function EventoDetalleModal({ evento, onClose }) {
                     </div>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }
 

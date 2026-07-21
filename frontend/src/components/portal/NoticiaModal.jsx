@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { useQuery } from '@tanstack/react-query';
 import { getPublicNoticiaDetalle } from '../../api/publicApi';
 import { getStorageUrl, formatDate } from '../../utils/portalUtils';
@@ -109,7 +110,7 @@ export default function NoticiaModal({ slug, onClose, onOpenNoticia }) {
         if (e.target === e.currentTarget) onClose();
     }
 
-    return (
+    return createPortal(
         <div
             className="portal-noticia-modal-overlay"
             role="dialog"
@@ -287,6 +288,7 @@ export default function NoticiaModal({ slug, onClose, onOpenNoticia }) {
                     </article>
                 )}
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }

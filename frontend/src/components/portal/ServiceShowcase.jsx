@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import {
     Headset,
     Mail,
@@ -383,7 +384,7 @@ function ServiceModal({
         scrollToSection(seccionRel);
     }
 
-    return (
+    return createPortal(
         <div className="psv-overlay" onClick={handleBackdrop} role="dialog" aria-modal="true" aria-label={name}>
             <div className="psv-dialog">
 
@@ -489,6 +490,7 @@ function ServiceModal({
                     )}
                 </main>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }

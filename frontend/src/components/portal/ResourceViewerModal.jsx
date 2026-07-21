@@ -1,3 +1,4 @@
+import { createPortal } from "react-dom";
 import { getTitle, getDescription, getViewerUrl, getFileUrl, getResourceKind, getFileExtension, getFileSize, getCategory, getResourceActionText } from "../../utils/portalUtils";
 
 export default function ResourceViewerModal({ resource, onClose }) {
@@ -16,7 +17,7 @@ export default function ResourceViewerModal({ resource, onClose }) {
         if (e.target === e.currentTarget) onClose();
     }
 
-    return (
+    return createPortal(
         <div
             className="portal-resource-modal"
             role="dialog"
@@ -149,6 +150,7 @@ export default function ResourceViewerModal({ resource, onClose }) {
                     </div>
                 )}
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }
