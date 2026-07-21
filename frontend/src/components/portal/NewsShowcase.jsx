@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import {
     getCategory,
     getTitle,
@@ -9,12 +9,14 @@ import {
 } from "../../utils/portalUtils";
 import { ResourceButton } from "./ResourceButton.jsx";
 import EtiquetaBadges from "./EtiquetaBadges.jsx";
+import PortalPlaceholderIcon from "./PortalPlaceholderIcon.jsx";
 
 export default function NewsShowcase({
                                          items,
                                          emptyAction,
                                          onOpenResource = null,
                                          onOpenNoticia = null,
+                                         imgDefaultCard = null,
                                      }) {
     const trackRef = useRef(null);
 
@@ -88,6 +90,7 @@ export default function NewsShowcase({
                             index={index}
                             onOpenResource={onOpenResource}
                             onOpenNoticia={onOpenNoticia}
+                            imgDefaultCard={imgDefaultCard}
                         />
                     ))}
                 </div>
@@ -96,14 +99,15 @@ export default function NewsShowcase({
     );
 }
 
-function NewsCarouselCard({ item, index, onOpenResource, onOpenNoticia }) {
+function NewsCarouselCard({ item, index, onOpenResource, onOpenNoticia, imgDefaultCard }) {
     const title = getTitle(item);
     const description = getDescription(item);
     const category = getCategory(item);
     const image = getImageUrl(item);
     const fileUrl = getFileUrl(item);
     const date = formatDate(getDateValue(item));
-    const firstLetter = (title || "N").trim().charAt(0).toUpperCase();
+    const [imageFailed, setImageFailed] = useState(false);
+    const mostrarImagen = image && !imageFailed;
 
     return (
         <article
@@ -114,28 +118,24 @@ function NewsCarouselCard({ item, index, onOpenResource, onOpenNoticia }) {
         >
             <div
                 className={`portal-news-carousel-image ${
-                    !image ? "has-default-image" : ""
+                    !mostrarImagen ? "has-default-image" : ""
                 }`}
                 data-type="noticias"
-                data-letter={firstLetter}
             >
-                {image && (
+                {mostrarImagen ? (
                     <img
                         src={image}
                         alt={title || "Noticia"}
                         loading="lazy"
                         decoding="async"
-                        onError={(e) => {
-                            const img = e.currentTarget;
-                            const wrapper = img.parentElement;
-
-                            img.remove();
-
-                            if (wrapper) {
-                                wrapper.classList.add("has-default-image");
-                                wrapper.setAttribute("data-letter", firstLetter);
-                            }
-                        }}
+                        onError={() => setImageFailed(true)}
+                    />
+                ) : (
+                    <PortalPlaceholderIcon
+                        type="noticias"
+                        size={34}
+                        imagenUrl={imgDefaultCard}
+                        alt={title}
                     />
                 )}
 

@@ -8,6 +8,7 @@ import {
     getFileUrl,
 } from "../../utils/portalUtils";
 import { ResourceButton } from "./ResourceButton";
+import PortalPlaceholderIcon from "./PortalPlaceholderIcon";
 
 function normalizeText(value) {
     return String(value || "")
@@ -66,6 +67,7 @@ export default function TutorialRail({
                                          items,
                                          emptyAction,
                                          onOpenResource = null,
+                                         imgDefaultCard = null,
                                      }) {
     const [search, setSearch] = useState("");
 
@@ -146,6 +148,7 @@ export default function TutorialRail({
                             key={item.idtutorial || item.id || index}
                             item={item}
                             onOpenResource={onOpenResource}
+                            imgDefaultCard={imgDefaultCard}
                         />
                     ))}
                 </div>
@@ -154,7 +157,7 @@ export default function TutorialRail({
     );
 }
 
-function TutorialCard({ item, onOpenResource }) {
+function TutorialCard({ item, onOpenResource, imgDefaultCard }) {
     const title = getTitle(item) || "Tutorial";
     const description = getDescription(item);
     const category = getCategory(item);
@@ -168,7 +171,13 @@ function TutorialCard({ item, onOpenResource }) {
             className="portal-tutorial-card"
             data-resource-type={resourceType.key}
         >
-            <div className="portal-tutorial-icon" aria-hidden="true" />
+            <div className="portal-tutorial-icon">
+                <PortalPlaceholderIcon
+                    type={`tutoriales-${resourceType.key}`}
+                    size={22}
+                    imagenUrl={imgDefaultCard}
+                />
+            </div>
 
             <div className="portal-tutorial-content">
                 <div className="portal-card-meta">

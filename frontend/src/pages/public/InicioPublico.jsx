@@ -31,6 +31,8 @@ import {
 
 import { obtenerConfiguracionPublica } from "../../api/configuracionApi";
 import PortalErrorBoundary from "../../components/portal/PortalErrorBoundary";
+import PortalPlaceholderIcon from "../../components/portal/PortalPlaceholderIcon";
+import { Mail, Phone } from "lucide-react";
 
 // ── Lazy components ───────────────────────────────────────────────────────────
 const ResourceViewerModal = lazy(() => import("../../components/portal/ResourceViewerModal"));
@@ -825,7 +827,7 @@ const ResourceButton = memo(function ResourceButton({ item, type, className = "p
     );
 });
 
-const Card = memo(function Card({ item, type, variant = "default", compact = false, onOpenResource = null }) {
+const Card = memo(function Card({ item, type, variant = "default", compact = false, onOpenResource = null, imgDefaultAvatar = null }) {
     const title       = getTitle(item);
     const description = getDescription(item);
     const category    = getCategory(item);
@@ -837,18 +839,21 @@ const Card = memo(function Card({ item, type, variant = "default", compact = fal
     const size        = getFileSize(item);
     const isAutoridad = variant === "autoridad";
     const cardType    = isAutoridad ? "autoridad" : type || "generico";
-    const firstLetter = (title || "P").trim().charAt(0).toUpperCase();
-
-    function handleImageError(e) {
-        const wrap = e.currentTarget.parentElement;
-        e.currentTarget.remove();
-        if (wrap) { wrap.classList.add("has-default-image"); wrap.setAttribute("data-type", cardType); wrap.setAttribute("data-letter", firstLetter); }
-    }
+    const [imageFailed, setImageFailed] = useState(false);
 
     return (
         <article className={`portal-card ${isAutoridad ? "portal-card-autoridad" : ""} ${compact ? "portal-card-compact" : ""}`} data-type={cardType}>
-            <div className={`portal-card-image-wrap ${!image ? "has-default-image" : ""}`} data-type={cardType} data-letter={firstLetter}>
-                {image && <img src={image} alt={title || "Imagen"} className="portal-card-image" loading="lazy" decoding="async" onError={handleImageError} />}
+            <div className={`portal-card-image-wrap ${!image || imageFailed ? "has-default-image" : ""}`} data-type={cardType}>
+                {image && !imageFailed ? (
+                    <img src={image} alt={title || "Imagen"} className="portal-card-image" loading="lazy" decoding="async" onError={() => setImageFailed(true)} />
+                ) : (
+                    <PortalPlaceholderIcon
+                        type={isAutoridad ? "autoridades" : "institucional"}
+                        size={isAutoridad ? 34 : 26}
+                        imagenUrl={isAutoridad ? imgDefaultAvatar : null}
+                        alt={title}
+                    />
+                )}
             </div>
             <div className="portal-card-body">
                 <div className="portal-card-meta">
@@ -871,7 +876,7 @@ const Card = memo(function Card({ item, type, variant = "default", compact = fal
     );
 });
 
-function GridList({ items, type, variant = "default", compact = false, onOpenResource = null }) {
+function GridList({ items, type, variant = "default", compact = false, onOpenResource = null, imgDefaultAvatar = null }) {
     if (!items || items.length === 0) return <EmptyState />;
     return (
         <div className="portal-grid">
@@ -882,7 +887,7 @@ function GridList({ items, type, variant = "default", compact = false, onOpenRes
                         || item.iddocumento || item.idevento || item.idtutorial
                         || item.idfaq || item.idautoridad || item.idproyecto || index
                     }
-                    item={item} type={type} variant={variant} compact={compact} onOpenResource={onOpenResource}
+                    item={item} type={type} variant={variant} compact={compact} onOpenResource={onOpenResource} imgDefaultAvatar={imgDefaultAvatar}
                 />
             ))}
         </div>
@@ -1133,6 +1138,11 @@ export default function InicioPublico() {
     const cfgSecciones  = cfg.secciones   || {};
     const cfgTextosUI   = cfg.textos_ui   || {};
     const cfgAvanzado   = cfg.avanzado    || {};
+
+    // Imágenes de respaldo configurables: si el admin las sube, reemplazan
+    // el ícono lucide predeterminado en tarjetas/avatares sin imagen propia.
+    const imgDefaultCard   = useMemo(() => getStorageUrl(cfgApariencia.img_default_card),   [cfgApariencia.img_default_card]);
+    const imgDefaultAvatar = useMemo(() => getStorageUrl(cfgApariencia.img_default_avatar), [cfgApariencia.img_default_avatar]);
 
     // Aplicar colores CSS cuando llegan de BD
     // Aplicar apariencia dinámica desde portal_configuracion
@@ -1562,8 +1572,18 @@ export default function InicioPublico() {
                 <div className="portal-topbar">
                     <div className="portal-container portal-topbar-content">
                         <div className="portal-topbar-info">
-                            <span className="portal-topbar-phone">{topbarTelefono}</span>
-                            <span className="portal-topbar-email">{topbarCorreo}</span>
+                            {topbarTelefono && (
+                                <span className="portal-topbar-phone">
+                                    <Phone size={14} aria-hidden="true" />
+                                    {topbarTelefono}
+                                </span>
+                            )}
+                            {topbarCorreo && (
+                                <span className="portal-topbar-email">
+                                    <Mail size={14} aria-hidden="true" />
+                                    {topbarCorreo}
+                                </span>
+                            )}
                         </div>
                         <div className="portal-topbar-actions">
                             {topbarLinks.map((enlace, index) => {
@@ -1688,9 +1708,19 @@ export default function InicioPublico() {
                                 <div className="portal-hero-contactos-cvr">
                                     {contactoInstitucional.map((item, index) => {
                                         const href = getContactoHref(item);
+                                        const clave = String(item.clave || "").toLowerCase();
+                                        const tipoIcono = clave.includes("correo")
+                                            ? "correo"
+                                            : clave.includes("telefono")
+                                                ? "telefono"
+                                                : clave.includes("direccion")
+                                                    ? "direccion"
+                                                    : "institucional";
                                         return (
                                             <article key={item.idinfo || item.id || index} className="portal-hero-card-cvr" data-clave={item.clave || ""}>
-                                                <span className="portal-hero-card-icon" aria-hidden="true" />
+                                                <span className="portal-hero-card-icon">
+                                                    <PortalPlaceholderIcon type={tipoIcono} size={18} />
+                                                </span>
                                                 <div className="portal-hero-card-content">
                                                     <strong>{item.titulo}</strong>
                                                     {href ? (
@@ -1731,7 +1761,7 @@ export default function InicioPublico() {
 
                 {/* ── Autoridades ── */}
                 <ModuleSection id="autoridades" catalogos={catalogos} title={secTitulos.autoridades} subtitle={secTitulos.autoridadesSub} className="portal-section-alt">
-                    <GridList items={autoridades} type="autoridades" variant="autoridad" onOpenResource={openResourceViewer} />
+                    <GridList items={autoridades} type="autoridades" variant="autoridad" onOpenResource={openResourceViewer} imgDefaultAvatar={imgDefaultAvatar} />
                 </ModuleSection>
 
                 {/* ── Servicios ── */}
@@ -1764,6 +1794,7 @@ export default function InicioPublico() {
                                     emptyAction={categoriaNoticias || busquedaNoticias ? () => { setBusquedaNoticias(""); limpiarCategoriaNav("noticias"); } : null}
                                     onOpenResource={openResourceViewer}
                                     onOpenNoticia={openNoticiaModal}
+                                    imgDefaultCard={imgDefaultCard}
                                 />
                             </Suspense>
                         </PortalErrorBoundary>
@@ -1771,16 +1802,16 @@ export default function InicioPublico() {
                 </ModuleSection>
 
                 {/* ── Proyectos ── */}
-                {renderSection("proyectos", proyectosQuery, ProjectTimeline, seccionData.proyectos, categoriaProyectos, secTitulos.proyectos, secTitulos.proyectosSub, "portal-section-alt")}
+                {renderSection("proyectos", proyectosQuery, ProjectTimeline, seccionData.proyectos, categoriaProyectos, secTitulos.proyectos, secTitulos.proyectosSub, "portal-section-alt", { imgDefaultCard })}
 
                 {/* ── Documentos ── */}
-                {renderSection("documentos", documentosQuery, DocumentList, seccionData.documentos, categoriaDocumentos, secTitulos.documentos, secTitulos.documentosSub)}
+                {renderSection("documentos", documentosQuery, DocumentList, seccionData.documentos, categoriaDocumentos, secTitulos.documentos, secTitulos.documentosSub, "", { imgDefaultCard })}
 
                 {/* ── Eventos ── */}
-                {renderSection("eventos", eventosQuery, EventAgenda, seccionData.eventos, categoriaEventos, secTitulos.eventos, secTitulos.eventosSub, "portal-section-alt")}
+                {renderSection("eventos", eventosQuery, EventAgenda, seccionData.eventos, categoriaEventos, secTitulos.eventos, secTitulos.eventosSub, "portal-section-alt", { imgDefaultCard })}
 
                 {/* ── Tutoriales ── */}
-                {renderSection("tutoriales", tutorialesQuery, TutorialRail, seccionData.tutoriales, categoriaTutoriales, secTitulos.tutoriales, secTitulos.tutorialesSub)}
+                {renderSection("tutoriales", tutorialesQuery, TutorialRail, seccionData.tutoriales, categoriaTutoriales, secTitulos.tutoriales, secTitulos.tutorialesSub, "", { imgDefaultCard })}
 
                 {/* ── FAQs ── */}
                 <ModuleSection id="faqs" catalogos={catalogos} title={secTitulos.faqs} subtitle={secTitulos.faqsSub} className="portal-section-alt">

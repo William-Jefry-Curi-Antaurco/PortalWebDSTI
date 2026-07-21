@@ -296,19 +296,10 @@ a { color: inherit; }
     gap: 7px;
 }
 
-.portal-topbar-info span::before {
-    content: "";
-    width: 14px; height: 14px;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    filter: brightness(0) invert(1);
-    opacity: 0.8;
+.portal-topbar-info span svg {
     flex-shrink: 0;
+    opacity: 0.85;
 }
-
-.portal-topbar-phone::before { background-image: var(--icon-phone); }
-.portal-topbar-email::before  { background-image: var(--icon-email); }
 
 .portal-topbar-actions {
     display: flex;
@@ -952,16 +943,12 @@ a { color: inherit; }
     width: 42px; height: 42px;
     border-radius: 11px;
     background-color: rgba(0,180,216,0.16);
-    background-image: var(--icon-default-institucional);
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
     flex-shrink: 0;
 }
-
-.portal-hero-card-cvr[data-clave*="correo"]   .portal-hero-card-icon { background-image: var(--icon-email); }
-.portal-hero-card-cvr[data-clave*="telefono"] .portal-hero-card-icon { background-image: var(--icon-phone); }
-.portal-hero-card-cvr[data-clave*="direccion"] .portal-hero-card-icon { background-image: var(--icon-location); }
 .portal-hero-card-cvr[data-clave*="anexo"]    .portal-hero-card-icon { background-image: var(--icon-extension); }
 .portal-hero-card-cvr[data-clave*="horario"]  .portal-hero-card-icon { background-image: var(--icon-clock); }
 
@@ -1247,45 +1234,20 @@ a { color: inherit; }
     justify-content: center;
 }
 
-.portal-card-image-wrap.has-default-image::before {
-    content: "";
-    width: 60px; height: 60px;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    filter: brightness(0) invert(1);
-    opacity: 0.9;
+.portal-card-image-wrap.has-default-image .portal-placeholder-icon {
+    color: rgba(255, 255, 255, 0.92);
     z-index: 2;
+    transition: transform 0.3s ease;
 }
 
-.portal-card-image-wrap.has-default-image::after {
-    content: attr(data-letter);
+.portal-card:hover .portal-card-image-wrap.has-default-image .portal-placeholder-icon {
+    transform: scale(1.08);
+}
+
+.portal-card-image-wrap.has-default-image .portal-placeholder-image {
     position: absolute;
-    font-family: var(--font-heading);
-    font-size: 3.2rem;
-    font-weight: 900;
-    color: rgba(255,255,255,0.14);
-    letter-spacing: -0.05em;
-    z-index: 1;
+    inset: 0;
 }
-
-.portal-card-image-wrap.has-default-image[data-type="noticia"]::before,
-.portal-card-image-wrap.has-default-image[data-type="noticias"]::before      { background-image: var(--icon-default-noticia); }
-.portal-card-image-wrap.has-default-image[data-type="servicio"]::before,
-.portal-card-image-wrap.has-default-image[data-type="servicios"]::before     { background-image: var(--icon-default-servicio); }
-.portal-card-image-wrap.has-default-image[data-type="sistema"]::before,
-.portal-card-image-wrap.has-default-image[data-type="sistemas"]::before      { background-image: var(--icon-default-sistema); }
-.portal-card-image-wrap.has-default-image[data-type="documento"]::before,
-.portal-card-image-wrap.has-default-image[data-type="documentos"]::before    { background-image: var(--icon-default-documento); }
-.portal-card-image-wrap.has-default-image[data-type="evento"]::before,
-.portal-card-image-wrap.has-default-image[data-type="eventos"]::before       { background-image: var(--icon-default-evento); }
-.portal-card-image-wrap.has-default-image[data-type="tutorial"]::before,
-.portal-card-image-wrap.has-default-image[data-type="tutoriales"]::before    { background-image: var(--icon-default-tutorial); }
-.portal-card-image-wrap.has-default-image[data-type="proyecto"]::before,
-.portal-card-image-wrap.has-default-image[data-type="proyectos"]::before     { background-image: var(--icon-default-proyecto); }
-.portal-card-image-wrap.has-default-image[data-type="institucional"]::before { background-image: var(--icon-default-institucional); }
-.portal-card-image-wrap.has-default-image[data-type="autoridad"]::before,
-.portal-card-image-wrap.has-default-image[data-type="autoridades"]::before   { background-image: var(--img-default-avatar); }
 
 .portal-card-image-wrap::after {
     content: "";
@@ -1331,6 +1293,18 @@ a { color: inherit; }
     width: 4px; height: 4px;
     border-radius: 50%;
     background: var(--institutional-primary);
+}
+
+.portal-placeholder-icon {
+    color: currentColor;
+    flex-shrink: 0;
+}
+
+.portal-placeholder-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 
 .portal-etiquetas {
@@ -1728,11 +1702,6 @@ a { color: inherit; }
     font-family: var(--font-heading);
     font-size: 3rem;
     font-weight: 800;
-}
-
-.portal-card-autoridad .portal-card-image-wrap.has-default-image::before {
-    content: attr(data-letter);
-    line-height: 1;
 }
 
 .portal-card-autoridad .portal-card-body {
@@ -3150,25 +3119,21 @@ body:has(.psv-overlay) {
 
 .portal-news-carousel-image.has-default-image { display: grid; place-items: center; }
 
-.portal-news-carousel-image.has-default-image::before {
-    content: "";
-    width: 68px; height: 68px;
-    background-image: var(--icon-default-noticia);
-    background-repeat: no-repeat;
-    background-size: contain;
-    background-position: center;
-    filter: brightness(0) invert(1);
-    opacity: 0.9; z-index: 2;
+.portal-news-carousel-image.has-default-image .portal-placeholder-icon {
+    color: rgba(255, 255, 255, 0.92);
+    opacity: 0.9;
+    z-index: 2;
+    transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
-.portal-news-carousel-image.has-default-image::after {
-    content: attr(data-letter);
+.portal-news-carousel-card:hover .portal-news-carousel-image.has-default-image .portal-placeholder-icon {
+    transform: scale(1.08);
+    opacity: 1;
+}
+
+.portal-news-carousel-image.has-default-image .portal-placeholder-image {
     position: absolute;
-    color: rgba(255,255,255,0.14);
-    font-family: var(--font-heading);
-    font-size: 4.8rem;
-    font-weight: 900;
-    letter-spacing: -0.06em; z-index: 1;
+    inset: 0;
 }
 
 .portal-news-carousel-gradient {
@@ -3257,11 +3222,17 @@ body:has(.psv-overlay) {
     width: 46px; height: 46px;
     border-radius: 14px;
     background-color: var(--primary-soft);
-    background-image: var(--icon-default-proyecto);
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--institutional-primary);
+    overflow: hidden;
     box-shadow: 0 0 0 7px var(--bg-alt);
+    transition: transform 0.2s ease;
+}
+
+.portal-project-item:hover .portal-project-marker {
+    transform: scale(1.08);
 }
 
 .portal-project-content {
@@ -3430,10 +3401,18 @@ body:has(.psv-overlay) {
     width: 46px; height: 46px;
     border-radius: 14px;
     background-color: var(--primary-soft);
-    background-image: var(--icon-default-documento);
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--institutional-primary);
+    flex-shrink: 0;
+    overflow: hidden;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.portal-document-row:hover .portal-document-icon {
+    transform: scale(1.06);
+    background-color: color-mix(in srgb, var(--institutional-primary) 18%, var(--primary-soft));
 }
 
 .portal-document-main h3 {
@@ -3554,24 +3533,24 @@ body:has(.psv-overlay) {
     place-items: center;
     background-image:
             radial-gradient(circle at 76% 16%, color-mix(in srgb, var(--accent-600) 35%, transparent), transparent 34%),
-            var(--icon-default-evento),
             linear-gradient(135deg, var(--primary-950), var(--secondary-700), var(--accent-700));
     background-repeat: no-repeat;
-    background-position: center, center, center;
-    background-size: cover, 56px, cover;
+    background-position: center, center;
+    background-size: cover, cover;
 }
 
-.portal-event-media.is-fallback::before {
-    content: attr(data-letter);
+.portal-event-media.is-fallback .portal-placeholder-icon {
+    color: rgba(255, 255, 255, 0.92);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.portal-event-card:hover .portal-event-media.is-fallback .portal-placeholder-icon {
+    transform: scale(1.08);
+}
+
+.portal-event-media.is-fallback .portal-placeholder-image {
     position: absolute;
     inset: 0;
-    display: grid;
-    place-items: center;
-    color: color-mix(in srgb, var(--on-dark) 15%, transparent);
-    font-family: var(--font-heading);
-    font-size: clamp(4rem, 10vw, 8rem);
-    font-weight: 950;
-    letter-spacing: -0.08em;
 }
 
 .portal-event-fecha-chip {
@@ -4129,11 +4108,18 @@ body:has(.psv-overlay) {
     margin-bottom: 0;
     border-radius: var(--radius-sm);
     background-color: var(--surface-primary);
-    background-image: var(--icon-default-tutorial);
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 23px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--institutional-primary);
+    overflow: hidden;
     border: 1px solid var(--border-primary);
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.portal-tutorial-card:hover .portal-tutorial-icon {
+    transform: scale(1.06);
+    background-color: color-mix(in srgb, var(--institutional-primary) 14%, var(--surface-primary));
 }
 
 .portal-tutorial-card[data-resource-type="video"]
@@ -4616,10 +4602,10 @@ body:has(.psv-overlay) {
     height: 54px;
     border-radius: var(--radius-md);
     background-color: var(--surface);
-    background-image: var(--icon-default-institucional);
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--institutional-primary);
     box-shadow: var(--shadow-sm);
 }
 

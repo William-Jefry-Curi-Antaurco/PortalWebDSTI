@@ -1,6 +1,7 @@
 // src/components/portal/ProjectTimeline.jsx
 import { getCategory, getTitle, getDescription, getStatus, getFileExtension, getFileUrl } from "../../utils/portalUtils";
 import { ResourceButton } from "./ResourceButton";
+import PortalPlaceholderIcon from "./PortalPlaceholderIcon";
 
 function getAvance(item) {
     const valor = Number(item?.porcentaje_avance);
@@ -17,7 +18,7 @@ function getUrlResultado(item) {
     return typeof url === "string" && url.trim() ? url.trim() : null;
 }
 
-export default function ProjectTimeline({ items, emptyAction, onOpenResource = null }) {
+export default function ProjectTimeline({ items, emptyAction, onOpenResource = null, imgDefaultCard = null }) {
     if (!items || items.length === 0) {
         return (
             <div className="portal-empty-state">
@@ -43,7 +44,9 @@ export default function ProjectTimeline({ items, emptyAction, onOpenResource = n
                         className="portal-project-item"
                         key={item.idproyecto || item.id || index}
                     >
-                        <span className="portal-project-marker" aria-hidden="true" />
+                        <span className="portal-project-marker">
+                            <PortalPlaceholderIcon type="proyectos" size={20} imagenUrl={imgDefaultCard} />
+                        </span>
 
                         <div className="portal-project-content">
                             <div className="portal-card-meta">

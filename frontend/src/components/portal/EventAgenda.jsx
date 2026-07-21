@@ -10,6 +10,7 @@ import {
     getStorageUrl,
 } from "../../utils/portalUtils";
 import { ResourceButton } from "./ResourceButton";
+import PortalPlaceholderIcon from "./PortalPlaceholderIcon";
 
 function esImagen(meta) {
     const ext = String(meta?.extension || "").toLowerCase();
@@ -263,7 +264,7 @@ function EventoDetalleModal({ evento, onClose }) {
     );
 }
 
-export default function EventAgenda({ items, emptyAction, onOpenResource = null }) {
+export default function EventAgenda({ items, emptyAction, onOpenResource = null, imgDefaultCard = null }) {
     const [eventoDetalle, setEventoDetalle] = useState(null);
 
     if (!items || items.length === 0) {
@@ -288,13 +289,16 @@ export default function EventAgenda({ items, emptyAction, onOpenResource = null 
                     const enlaceVirtual = getEnlaceVirtual(item);
                     const cupos = getCupos(item);
                     const estadoClave = getEstadoClave(item);
-                    const tituloLetra = (getTitle(item) || "E").trim().charAt(0).toUpperCase();
                     const tipoEvento = getTipoEvento(item);
 
                     return (
                         <article className="portal-event-card" data-estado={estadoClave} data-con-imagen={imagen ? "si" : "no"} key={item.idevento || item.id || index}>
-                            <div className={`portal-event-media ${imagen ? "" : "is-fallback"}`} data-letter={tituloLetra}>
-                                {imagen && <img src={imagen} alt={getTitle(item) || "Evento"} loading="lazy" decoding="async" />}
+                            <div className={`portal-event-media ${imagen ? "" : "is-fallback"}`}>
+                                {imagen ? (
+                                    <img src={imagen} alt={getTitle(item) || "Evento"} loading="lazy" decoding="async" />
+                                ) : (
+                                    <PortalPlaceholderIcon type="eventos" size={30} imagenUrl={imgDefaultCard} alt={getTitle(item)} />
+                                )}
 
                                 {imagenes.length > 1 && (
                                     <span className="portal-event-image-count">+{imagenes.length - 1} imágenes</span>

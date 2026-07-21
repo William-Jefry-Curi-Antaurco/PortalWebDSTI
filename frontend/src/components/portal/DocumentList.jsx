@@ -1,8 +1,9 @@
 // src/components/portal/DocumentList.jsx
 import { getCategory, getTitle, getDescription, getFileExtension, getFileSize, getFileUrl, formatDate } from "../../utils/portalUtils";
 import { ResourceButton } from "./ResourceButton";
+import PortalPlaceholderIcon from "./PortalPlaceholderIcon";
 
-export default function DocumentList({ items, emptyAction, onOpenResource = null }) {
+export default function DocumentList({ items, emptyAction, onOpenResource = null, imgDefaultCard = null }) {
     if (!items || items.length === 0) {
         return (
             <div className="portal-empty-state">
@@ -23,7 +24,9 @@ export default function DocumentList({ items, emptyAction, onOpenResource = null
                     className="portal-document-row"
                     key={item.iddocumento || item.id || index}
                 >
-                    <span className="portal-document-icon" aria-hidden="true" />
+                    <span className="portal-document-icon">
+                        <PortalPlaceholderIcon type="documentos" size={22} imagenUrl={imgDefaultCard} />
+                    </span>
 
                     <div className="portal-document-main">
                         <div className="portal-card-meta">

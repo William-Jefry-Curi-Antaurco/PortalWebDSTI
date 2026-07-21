@@ -1,4 +1,5 @@
 import { useId, useMemo, useState } from "react";
+import { HelpCircle } from "lucide-react";
 import {
     getCategory,
     getTitle,
@@ -316,7 +317,9 @@ export default function FaqList({
             )}
 
             <aside className="portal-faq-support-card">
-                <div className="portal-faq-support-icon" aria-hidden="true" />
+                <div className="portal-faq-support-icon">
+                    <HelpCircle size={24} aria-hidden="true" />
+                </div>
 
                 <div>
                     <span>Atención personalizada</span>
