@@ -267,6 +267,12 @@ export function getEtiquetas(item) {
     return Array.isArray(item?.etiquetas) ? item.etiquetas : [];
 }
 
+export function getEtiquetasTexto(item) {
+    return getEtiquetas(item)
+        .map((etiqueta) => etiqueta?.nombre || "")
+        .join(" ");
+}
+
 export function getStatus(item) {
     return (
         item?.estadoOperativo?.nombre ||

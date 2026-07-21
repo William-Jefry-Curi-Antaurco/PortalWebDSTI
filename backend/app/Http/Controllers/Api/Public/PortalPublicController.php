@@ -23,6 +23,7 @@ use App\Models\ModalidadEvento;
 use App\Models\TipoTutorial;
 use App\Models\SolicitudSoporte;
 use App\Models\PortalConfiguracion;
+use App\Support\EtiquetaEntidad;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -785,7 +786,16 @@ class PortalPublicController extends Controller
                 $q->where(function ($subQuery) use ($search) {
                     $subQuery->where('titulo', 'like', "%{$search}%")
                         ->orWhere('resumen', 'like', "%{$search}%")
-                        ->orWhere('contenido', 'like', "%{$search}%");
+                        ->orWhere('contenido', 'like', "%{$search}%")
+                        ->orWhereExists(function ($etiquetaQuery) use ($search) {
+                            $etiquetaQuery->select(DB::raw(1))
+                                ->from('etiquetas_contenido as ec')
+                                ->join('etiquetas as e', 'e.idetiqueta', '=', 'ec.idetiqueta')
+                                ->whereColumn('ec.identidad', 'noticias.idnoticia')
+                                ->where('ec.entidad', EtiquetaEntidad::NOTICIAS)
+                                ->where('e.activo', 1)
+                                ->where('e.nombre', 'like', "%{$search}%");
+                        });
                 });
             });
 

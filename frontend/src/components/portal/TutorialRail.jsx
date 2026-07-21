@@ -6,6 +6,7 @@ import {
     getStatus,
     getFileExtension,
     getFileUrl,
+    getEtiquetasTexto,
 } from "../../utils/portalUtils";
 import { ResourceButton } from "./ResourceButton";
 import PortalPlaceholderIcon from "./PortalPlaceholderIcon";
@@ -83,6 +84,7 @@ export default function TutorialRail({
                     getDescription(item),
                     getCategory(item),
                     getFileExtension(item),
+                    getEtiquetasTexto(item),
                 ].join(" ")
             );
 

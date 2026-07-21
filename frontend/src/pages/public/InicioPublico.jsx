@@ -32,6 +32,7 @@ import {
 import { obtenerConfiguracionPublica } from "../../api/configuracionApi";
 import PortalErrorBoundary from "../../components/portal/PortalErrorBoundary";
 import PortalPlaceholderIcon from "../../components/portal/PortalPlaceholderIcon";
+import { getEtiquetasTexto } from "../../utils/portalUtils";
 import { Mail, Phone } from "lucide-react";
 
 // ── Lazy components ───────────────────────────────────────────────────────────
@@ -1381,7 +1382,7 @@ export default function InicioPublico() {
         const q = normalize(busquedaNoticias);
         if (!q) return seccionData.noticias;
         return seccionData.noticias.filter((item) =>
-            normalize(`${getTitle(item)} ${getDescription(item)} ${getCategory(item)}`).includes(q)
+            normalize(`${getTitle(item)} ${getDescription(item)} ${getCategory(item)} ${getEtiquetasTexto(item)}`).includes(q)
         );
     }, [seccionData.noticias, busquedaNoticias]);
 

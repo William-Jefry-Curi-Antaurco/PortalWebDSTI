@@ -34,11 +34,21 @@ Este repositorio combina un backend Laravel con un frontend React. El backend of
    cp .env.example .env
    php artisan key:generate
    ```
-4. Instalar dependencias JS para Laravel/Vite:
+4. Crear el esquema de base de datos (tablas, triggers de auditoría, llaves foráneas):
+   ```bash
+   php artisan migrate
+   ```
+   > El esquema completo vive en `database/schema/mysql-schema.sql` (generado con
+   > `php artisan schema:dump`). Laravel lo carga automáticamente antes de correr
+   > cualquier migración nueva — así una base de datos vacía queda idéntica a la
+   > actual sin depender de un dump externo. Si cambias el esquema directamente en
+   > la BD (fuera de una migración), vuelve a correr `php artisan schema:dump`
+   > para mantener este archivo al día.
+5. Instalar dependencias JS para Laravel/Vite:
    ```bash
    npm install
    ```
-5. Ejecutar en modo desarrollo:
+6. Ejecutar en modo desarrollo:
    ```bash
    npm run dev
    ```
