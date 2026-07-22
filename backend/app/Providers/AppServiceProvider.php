@@ -31,5 +31,9 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('soporte-publico', function (Request $request) {
             return Limit::perMinute(5)->by($request->ip());
         });
+
+        RateLimiter::for('login', function (Request $request) {
+            return Limit::perMinute(5)->by($request->ip() . '|' . $request->input('email'));
+        });
     }
 }

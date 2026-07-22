@@ -60,6 +60,33 @@ class AuthController extends Controller
         ]);
     }
 
+    public function refresh(Request $request): JsonResponse
+    {
+        $resultado = $this->authService->refrescarToken(
+            $request->user(),
+            $request->user()->currentAccessToken()
+        );
+
+        $usuario = $resultado['usuario'];
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Sesión renovada correctamente.',
+            'data' => [
+                'token' => $resultado['token'],
+                'token_type' => 'Bearer',
+                'usuario' => [
+                    'idusuario' => $usuario->idusuario,
+                    'nombre_completo' => $usuario->nombre_completo,
+                    'email' => $usuario->email,
+                    'idrol' => $usuario->idrol,
+                    'rol' => $usuario->rol?->nombre,
+                    'permisos' => $usuario->rol?->permisos->pluck('nombre')->values() ?? [],
+                ],
+            ],
+        ]);
+    }
+
     public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()->delete();

@@ -42,6 +42,8 @@ import {
     notifySuccess,
 } from '../utils/notify';
 
+import ConPermiso from '../components/ConPermiso';
+
 import '../styles/modules/eventosCapacitaciones.css';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || '';
@@ -938,15 +940,17 @@ export default function EventosCapacitaciones() {
                 </div>
 
                 {!showForm && (
-                    <button
-                        type="button"
-                        className="eventos-add-button"
-                        onClick={abrirFormularioCrear}
-                        disabled={loading || loadingCatalogs}
-                    >
-                        <Plus size={18} />
-                        Agregar evento
-                    </button>
+                    <ConPermiso permiso="eventos.crear">
+                        <button
+                            type="button"
+                            className="eventos-add-button"
+                            onClick={abrirFormularioCrear}
+                            disabled={loading || loadingCatalogs}
+                        >
+                            <Plus size={18} />
+                            Agregar evento
+                        </button>
+                    </ConPermiso>
                 )}
             </div>
 
@@ -1472,21 +1476,25 @@ export default function EventosCapacitaciones() {
                                             <Eye size={16} />
                                         </button>
 
-                                        <button
-                                            type="button"
-                                            onClick={() => handleEdit(evento)}
-                                            title="Editar"
-                                        >
-                                            <Pencil size={16} />
-                                        </button>
+                                        <ConPermiso permiso="eventos.editar">
+                                            <button
+                                                type="button"
+                                                onClick={() => handleEdit(evento)}
+                                                title="Editar"
+                                            >
+                                                <Pencil size={16} />
+                                            </button>
+                                        </ConPermiso>
 
-                                        <button
-                                            type="button"
-                                            onClick={() => handleDelete(evento)}
-                                            title="Eliminar"
-                                        >
-                                            <Trash2 size={16} />
-                                        </button>
+                                        <ConPermiso permiso="eventos.eliminar">
+                                            <button
+                                                type="button"
+                                                onClick={() => handleDelete(evento)}
+                                                title="Eliminar"
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </ConPermiso>
                                     </div>
                                 </div>
                             </article>

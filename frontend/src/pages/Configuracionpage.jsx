@@ -36,6 +36,8 @@ import {
     notifySuccess,
 } from '../utils/notify';
 
+import ConPermiso from '../components/ConPermiso';
+
 import '../styles/modules/configuracion.css';
 
 const BACKEND_URL =
@@ -1455,6 +1457,7 @@ export default function Configuracion() {
                     </p>
                 </div>
 
+                <ConPermiso permiso="catalogos.editar">
                 <div className="configuracion-header-actions">
                     {dirty && (
                         <button
@@ -1494,6 +1497,7 @@ export default function Configuracion() {
                             : 'Guardar cambios'}
                     </button>
                 </div>
+                </ConPermiso>
             </div>
 
             <div className="configuracion-layout">

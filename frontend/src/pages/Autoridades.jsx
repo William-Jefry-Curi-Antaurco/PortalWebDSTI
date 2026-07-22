@@ -34,6 +34,8 @@ import {
     notifySuccess,
 } from '../utils/notify';
 
+import ConPermiso from '../components/ConPermiso';
+
 import '../styles/modules/autoridades.css';
 
 const initialForm = {
@@ -628,15 +630,17 @@ export default function Autoridades() {
                 </div>
 
                 {!showForm && (
-                    <button
-                        type="button"
-                        className="autoridades-add-button"
-                        onClick={abrirFormularioCrear}
-                        disabled={loading}
-                    >
-                        <Plus size={18} />
-                        Agregar autoridad
-                    </button>
+                    <ConPermiso permiso="institucional.crear">
+                        <button
+                            type="button"
+                            className="autoridades-add-button"
+                            onClick={abrirFormularioCrear}
+                            disabled={loading}
+                        >
+                            <Plus size={18} />
+                            Agregar autoridad
+                        </button>
+                    </ConPermiso>
                 )}
             </div>
 
@@ -1008,32 +1012,38 @@ export default function Autoridades() {
                                                 <Eye size={16} />
                                             </button>
 
-                                            <button
-                                                type="button"
-                                                onClick={() => handleToggleActivo(autoridad)}
-                                                className={`card-btn ${activo ? 'toggle-off' : 'toggle-on'}`}
-                                                title={activo ? 'Desactivar' : 'Activar'}
-                                            >
-                                                {activo ? <PowerOff size={16} /> : <Power size={16} />}
-                                            </button>
+                                            <ConPermiso permiso="institucional.editar">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleToggleActivo(autoridad)}
+                                                    className={`card-btn ${activo ? 'toggle-off' : 'toggle-on'}`}
+                                                    title={activo ? 'Desactivar' : 'Activar'}
+                                                >
+                                                    {activo ? <PowerOff size={16} /> : <Power size={16} />}
+                                                </button>
+                                            </ConPermiso>
 
-                                            <button
-                                                type="button"
-                                                onClick={() => handleEdit(autoridad)}
-                                                className="card-btn edit"
-                                                title="Editar"
-                                            >
-                                                <Pencil size={16} />
-                                            </button>
+                                            <ConPermiso permiso="institucional.editar">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleEdit(autoridad)}
+                                                    className="card-btn edit"
+                                                    title="Editar"
+                                                >
+                                                    <Pencil size={16} />
+                                                </button>
+                                            </ConPermiso>
 
-                                            <button
-                                                type="button"
-                                                onClick={() => handleDelete(autoridad)}
-                                                className="card-btn delete"
-                                                title="Eliminar"
-                                            >
-                                                <Trash2 size={16} />
-                                            </button>
+                                            <ConPermiso permiso="institucional.eliminar">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleDelete(autoridad)}
+                                                    className="card-btn delete"
+                                                    title="Eliminar"
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </ConPermiso>
                                         </div>
                                     </div>
                                 );

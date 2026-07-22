@@ -38,6 +38,8 @@ import {
     notifySuccess,
 } from '../utils/notify';
 
+import ConPermiso from '../components/ConPermiso';
+
 import '../styles/modules/documentosManuales.css';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://127.0.0.1:8000';
@@ -775,15 +777,17 @@ export default function DocumentosManuales() {
                 </div>
 
                 {!showForm && (
-                    <button
-                        type="button"
-                        className="documentos-add-button"
-                        onClick={abrirFormularioCrear}
-                        disabled={loading || loadingCatalogs}
-                    >
-                        <Plus size={18} />
-                        Agregar documento
-                    </button>
+                    <ConPermiso permiso="documentos.crear">
+                        <button
+                            type="button"
+                            className="documentos-add-button"
+                            onClick={abrirFormularioCrear}
+                            disabled={loading || loadingCatalogs}
+                        >
+                            <Plus size={18} />
+                            Agregar documento
+                        </button>
+                    </ConPermiso>
                 )}
             </div>
 
@@ -1248,22 +1252,26 @@ export default function DocumentosManuales() {
                                                 <Eye size={16} />
                                             </button>
 
-                                            <button
-                                                type="button"
-                                                onClick={() => handleEdit(documento)}
-                                                title="Editar"
-                                            >
-                                                <Pencil size={16} />
-                                            </button>
+                                            <ConPermiso permiso="documentos.editar">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleEdit(documento)}
+                                                    title="Editar"
+                                                >
+                                                    <Pencil size={16} />
+                                                </button>
+                                            </ConPermiso>
 
-                                            <button
-                                                type="button"
-                                                className="danger"
-                                                onClick={() => handleDelete(documento)}
-                                                title="Eliminar"
-                                            >
-                                                <Trash2 size={16} />
-                                            </button>
+                                            <ConPermiso permiso="documentos.eliminar">
+                                                <button
+                                                    type="button"
+                                                    className="danger"
+                                                    onClick={() => handleDelete(documento)}
+                                                    title="Eliminar"
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </ConPermiso>
                                         </div>
                                     </td>
                                 </tr>

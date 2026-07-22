@@ -10,6 +10,11 @@ export const meRequest = async () => {
     return response.data;
 };
 
+export const refreshRequest = async () => {
+    const response = await api.post('/auth/refresh');
+    return response.data;
+};
+
 export const logoutRequest = async () => {
     const response = await api.post('/auth/logout');
     return response.data;

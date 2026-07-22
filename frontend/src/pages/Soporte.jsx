@@ -43,6 +43,8 @@ import {
     notifySuccess,
 } from '../utils/notify';
 
+import ConPermiso from '../components/ConPermiso';
+
 import '../styles/modules/solicitudsoporte.css';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
@@ -1144,22 +1146,26 @@ export default function Soporte() {
                                                 <Eye size={16} />
                                             </button>
 
-                                            <button
-                                                type="button"
-                                                onClick={() => handleEdit(solicitud)}
-                                                title="Editar"
-                                            >
-                                                <Pencil size={16} />
-                                            </button>
+                                            <ConPermiso permiso="soporte.editar_estado">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleEdit(solicitud)}
+                                                    title="Editar"
+                                                >
+                                                    <Pencil size={16} />
+                                                </button>
+                                            </ConPermiso>
 
-                                            <button
-                                                type="button"
-                                                className="danger"
-                                                onClick={() => handleDelete(solicitud)}
-                                                title="Eliminar"
-                                            >
-                                                <Trash2 size={16} />
-                                            </button>
+                                            <ConPermiso permiso="soporte.eliminar">
+                                                <button
+                                                    type="button"
+                                                    className="danger"
+                                                    onClick={() => handleDelete(solicitud)}
+                                                    title="Eliminar"
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </ConPermiso>
                                         </div>
                                     </td>
                                 </tr>
@@ -1307,13 +1313,15 @@ export default function Soporte() {
                                 </div>
 
                                 <div className="soporte-detail-actions">
-                                    <button
-                                        type="button"
-                                        onClick={() => handleEdit(selectedSolicitud)}
-                                    >
-                                        <Pencil size={16} />
-                                        Editar solicitud
-                                    </button>
+                                    <ConPermiso permiso="soporte.editar_estado">
+                                        <button
+                                            type="button"
+                                            onClick={() => handleEdit(selectedSolicitud)}
+                                        >
+                                            <Pencil size={16} />
+                                            Editar solicitud
+                                        </button>
+                                    </ConPermiso>
 
                                     {getAdjuntoUrl(selectedSolicitud) !== '#' && (
                                         <a
@@ -1370,13 +1378,15 @@ export default function Soporte() {
                                                             </small>
                                                         </div>
 
-                                                        <button
-                                                            type="button"
-                                                            className="danger"
-                                                            onClick={() => handleDeleteRespuesta(respuesta)}
-                                                        >
-                                                            <Trash2 size={14} />
-                                                        </button>
+                                                        <ConPermiso permiso="soporte.eliminar">
+                                                            <button
+                                                                type="button"
+                                                                className="danger"
+                                                                onClick={() => handleDeleteRespuesta(respuesta)}
+                                                            >
+                                                                <Trash2 size={14} />
+                                                            </button>
+                                                        </ConPermiso>
                                                     </div>
 
                                                     <p>{respuesta.mensaje}</p>
@@ -1385,37 +1395,39 @@ export default function Soporte() {
                                         })
                                     )}
 
-                                    <form className="soporte-reply-form" onSubmit={handleResponder}>
-                                        <label>Registrar respuesta</label>
-                                        <textarea
-                                            name="mensaje"
-                                            value={replyForm.mensaje}
-                                            onChange={handleReplyChange}
-                                            rows={5}
-                                            placeholder="Escribe la respuesta o seguimiento del caso."
-                                            disabled={replying}
-                                        />
-
-                                        <label className="soporte-checkbox">
-                                            <input
-                                                type="checkbox"
-                                                name="es_interno"
-                                                checked={replyForm.es_interno}
+                                    <ConPermiso permiso="soporte.responder">
+                                        <form className="soporte-reply-form" onSubmit={handleResponder}>
+                                            <label>Registrar respuesta</label>
+                                            <textarea
+                                                name="mensaje"
+                                                value={replyForm.mensaje}
                                                 onChange={handleReplyChange}
+                                                rows={5}
+                                                placeholder="Escribe la respuesta o seguimiento del caso."
                                                 disabled={replying}
                                             />
-                                            Marcar como respuesta interna
-                                        </label>
 
-                                        <button
-                                            type="submit"
-                                            className="soporte-send-button"
-                                            disabled={replying}
-                                        >
-                                            <Send size={16} />
-                                            {replying ? 'Enviando...' : 'Registrar respuesta'}
-                                        </button>
-                                    </form>
+                                            <label className="soporte-checkbox">
+                                                <input
+                                                    type="checkbox"
+                                                    name="es_interno"
+                                                    checked={replyForm.es_interno}
+                                                    onChange={handleReplyChange}
+                                                    disabled={replying}
+                                                />
+                                                Marcar como respuesta interna
+                                            </label>
+
+                                            <button
+                                                type="submit"
+                                                className="soporte-send-button"
+                                                disabled={replying}
+                                            >
+                                                <Send size={16} />
+                                                {replying ? 'Enviando...' : 'Registrar respuesta'}
+                                            </button>
+                                        </form>
+                                    </ConPermiso>
                                 </div>
                             </div>
                         ) : (

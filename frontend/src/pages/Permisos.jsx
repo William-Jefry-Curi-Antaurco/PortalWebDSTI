@@ -6,6 +6,7 @@ import {
     eliminarPermiso,
 } from '../api/permisosApi';
 import { listarModulos } from '../api/modulosApi';
+import ConPermiso from '../components/ConPermiso';
 import '../styles/modules/permisos.css';
 
 const INITIAL_FORM = {
@@ -314,13 +315,15 @@ const Permisos = () => {
                         {isLoading ? 'Actualizando...' : 'Actualizar'}
                     </button>
 
-                    <button
-                        type="button"
-                        className="permisos-btn permisos-btn-primary"
-                        onClick={openCreateModal}
-                    >
-                        Agregar permiso
-                    </button>
+                    <ConPermiso permiso="seguridad.crear">
+                        <button
+                            type="button"
+                            className="permisos-btn permisos-btn-primary"
+                            onClick={openCreateModal}
+                        >
+                            Agregar permiso
+                        </button>
+                    </ConPermiso>
                 </div>
             </header>
 
@@ -450,27 +453,31 @@ const Permisos = () => {
 
                                         <td>
                                             <div className="permisos-actions">
-                                                <button
-                                                    type="button"
-                                                    className="permisos-action-btn permisos-action-edit"
-                                                    onClick={() => openEditModal(permiso)}
-                                                >
-                                                    Editar
-                                                </button>
+                                                <ConPermiso permiso="seguridad.editar">
+                                                    <button
+                                                        type="button"
+                                                        className="permisos-action-btn permisos-action-edit"
+                                                        onClick={() => openEditModal(permiso)}
+                                                    >
+                                                        Editar
+                                                    </button>
+                                                </ConPermiso>
 
-                                                <button
-                                                    type="button"
-                                                    className="permisos-action-btn permisos-action-delete"
-                                                    onClick={() => handleDelete(permiso)}
-                                                    disabled={rolesCount > 0}
-                                                    title={
-                                                        rolesCount > 0
-                                                            ? 'No se puede eliminar porque está asignado a roles'
-                                                            : 'Eliminar permiso'
-                                                    }
-                                                >
-                                                    Eliminar
-                                                </button>
+                                                <ConPermiso permiso="seguridad.eliminar">
+                                                    <button
+                                                        type="button"
+                                                        className="permisos-action-btn permisos-action-delete"
+                                                        onClick={() => handleDelete(permiso)}
+                                                        disabled={rolesCount > 0}
+                                                        title={
+                                                            rolesCount > 0
+                                                                ? 'No se puede eliminar porque está asignado a roles'
+                                                                : 'Eliminar permiso'
+                                                        }
+                                                    >
+                                                        Eliminar
+                                                    </button>
+                                                </ConPermiso>
                                             </div>
                                         </td>
                                     </tr>

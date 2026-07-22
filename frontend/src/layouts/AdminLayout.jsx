@@ -31,9 +31,16 @@ import {
     LogOut,
 } from 'lucide-react';
 
+import { useEffect } from 'react';
 import { Outlet, useNavigate, NavLink } from 'react-router-dom';
-import { logoutRequest } from '../api/authApi';
-import { clearAuth, getUser } from '../services/authService';
+import { logoutRequest, refreshRequest } from '../api/authApi';
+import { clearAuth, getUser, actualizarToken } from '../services/authService';
+
+// El token del backend expira a los 120 min (SANCTUM_TOKEN_EXPIRATION). Se
+// renueva en segundo plano a los 90 (75%) mientras el panel siga abierto,
+// para no interrumpir a un usuario activo; si la pestaña se cierra o queda
+// inactiva, el token simplemente expira dentro de esa ventana.
+const INTERVALO_REFRESCO_MS = 90 * 60 * 1000;
 
 const iconSize = 18;
 
@@ -258,6 +265,20 @@ export default function AdminLayout() {
     const user = getUser();
 
     const permisosUsuario = Array.isArray(user?.permisos) ? user.permisos : [];
+
+    useEffect(() => {
+        const intervalo = setInterval(async () => {
+            try {
+                const respuesta = await refreshRequest();
+                actualizarToken(respuesta.data.token);
+            } catch {
+                // Si falla (token ya vencido/revocado), el interceptor de
+                // axios se encarga de cerrar la sesión y redirigir.
+            }
+        }, INTERVALO_REFRESCO_MS);
+
+        return () => clearInterval(intervalo);
+    }, []);
 
     const visibleMenuGroups = menuGroups
         .map((group) => ({

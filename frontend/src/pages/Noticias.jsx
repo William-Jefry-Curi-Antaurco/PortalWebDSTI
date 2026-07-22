@@ -38,6 +38,8 @@ import {
     notifySuccess,
 } from '../utils/notify';
 
+import ConPermiso from '../components/ConPermiso';
+
 import '../styles/modules/noticias.css';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://127.0.0.1:8000';
@@ -629,8 +631,6 @@ export default function Noticias() {
                 const idnoticia = getIdNoticiaFromResponse(response);
 
                 if (!idnoticia) {
-                    console.log('Respuesta de crear noticia:', response);
-
                     throw new Error(
                         'La noticia se registró, pero el backend no devolvió el idnoticia.'
                     );
@@ -698,14 +698,16 @@ export default function Noticias() {
                 </div>
 
                 {!showForm && (
-                    <button
-                        type="button"
-                        className="noticias-add-button"
-                        onClick={abrirFormularioCrear}
-                    >
-                        <Plus size={18} />
-                        Agregar noticia
-                    </button>
+                    <ConPermiso permiso="noticias.crear">
+                        <button
+                            type="button"
+                            className="noticias-add-button"
+                            onClick={abrirFormularioCrear}
+                        >
+                            <Plus size={18} />
+                            Agregar noticia
+                        </button>
+                    </ConPermiso>
                 )}
             </div>
 
@@ -1076,22 +1078,26 @@ export default function Noticias() {
                                     </div>
 
                                     <div className="noticia-actions">
-                                        <button
-                                            type="button"
-                                            onClick={() => handleEdit(noticia)}
-                                        >
-                                            <Pencil size={16} />
-                                            Editar
-                                        </button>
+                                        <ConPermiso permiso="noticias.editar">
+                                            <button
+                                                type="button"
+                                                onClick={() => handleEdit(noticia)}
+                                            >
+                                                <Pencil size={16} />
+                                                Editar
+                                            </button>
+                                        </ConPermiso>
 
-                                        <button
-                                            type="button"
-                                            className="danger"
-                                            onClick={() => handleDelete(noticia)}
-                                        >
-                                            <Trash2 size={16} />
-                                            Eliminar
-                                        </button>
+                                        <ConPermiso permiso="noticias.eliminar">
+                                            <button
+                                                type="button"
+                                                className="danger"
+                                                onClick={() => handleDelete(noticia)}
+                                            >
+                                                <Trash2 size={16} />
+                                                Eliminar
+                                            </button>
+                                        </ConPermiso>
                                     </div>
                                 </div>
                             </article>

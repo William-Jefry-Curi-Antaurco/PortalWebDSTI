@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { rolesApi } from '../api/rolesApi';
+import ConPermiso from '../components/ConPermiso';
 import '../styles/modules/roles.css';
 
 const initialForm = {
@@ -246,6 +247,7 @@ const Roles = () => {
             </div>
 
             <div className="roles-grid">
+                <ConPermiso permiso="seguridad.crear">
                 <form className="roles-card roles-form" onSubmit={handleSubmit}>
                     <div className="roles-card-header">
                         <h2>{rolEditando ? 'Editar rol' : 'Nuevo rol'}</h2>
@@ -315,6 +317,7 @@ const Roles = () => {
                         )}
                     </div>
                 </form>
+                </ConPermiso>
 
                 <div className="roles-card roles-list-card">
                     <div className="roles-toolbar">
@@ -393,27 +396,31 @@ const Roles = () => {
                                             </td>
                                             <td>
                                                 <div className="roles-actions">
-                                                    <button
-                                                        type="button"
-                                                        className="roles-action-btn roles-action-edit"
-                                                        onClick={() => handleEditar(rol)}
-                                                    >
-                                                        Editar
-                                                    </button>
+                                                    <ConPermiso permiso="seguridad.editar">
+                                                        <button
+                                                            type="button"
+                                                            className="roles-action-btn roles-action-edit"
+                                                            onClick={() => handleEditar(rol)}
+                                                        >
+                                                            Editar
+                                                        </button>
+                                                    </ConPermiso>
 
-                                                    <button
-                                                        type="button"
-                                                        className="roles-action-btn roles-action-delete"
-                                                        onClick={() => handleEliminar(rol)}
-                                                        disabled={totalUsuarios > 0}
-                                                        title={
-                                                            totalUsuarios > 0
-                                                                ? 'No se puede eliminar porque tiene usuarios asociados'
-                                                                : 'Eliminar rol'
-                                                        }
-                                                    >
-                                                        Eliminar
-                                                    </button>
+                                                    <ConPermiso permiso="seguridad.eliminar">
+                                                        <button
+                                                            type="button"
+                                                            className="roles-action-btn roles-action-delete"
+                                                            onClick={() => handleEliminar(rol)}
+                                                            disabled={totalUsuarios > 0}
+                                                            title={
+                                                                totalUsuarios > 0
+                                                                    ? 'No se puede eliminar porque tiene usuarios asociados'
+                                                                    : 'Eliminar rol'
+                                                            }
+                                                        >
+                                                            Eliminar
+                                                        </button>
+                                                    </ConPermiso>
                                                 </div>
                                             </td>
                                         </tr>

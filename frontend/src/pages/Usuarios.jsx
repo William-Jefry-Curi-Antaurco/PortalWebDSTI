@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { usuariosApi } from '../api/usuariosApi';
 import { rolesApi } from '../api/rolesApi';
+import ConPermiso from '../components/ConPermiso';
 import '../styles/modules/usuarios.css';
 
 const INITIAL_FORM = {
@@ -365,13 +366,15 @@ const Usuarios = () => {
                         {isLoading ? 'Actualizando...' : 'Actualizar'}
                     </button>
 
-                    <button
-                        type="button"
-                        className="usuarios-btn usuarios-btn-primary"
-                        onClick={openCreateModal}
-                    >
-                        Agregar usuario
-                    </button>
+                    <ConPermiso permiso="seguridad.crear">
+                        <button
+                            type="button"
+                            className="usuarios-btn usuarios-btn-primary"
+                            onClick={openCreateModal}
+                        >
+                            Agregar usuario
+                        </button>
+                    </ConPermiso>
                 </div>
             </header>
 
@@ -466,33 +469,39 @@ const Usuarios = () => {
 
                                     <td>
                                         <div className="usuarios-actions">
-                                            <button
-                                                type="button"
-                                                className="usuarios-action-btn usuarios-action-edit"
-                                                onClick={() => openEditModal(usuario)}
-                                            >
-                                                Editar
-                                            </button>
+                                            <ConPermiso permiso="seguridad.editar">
+                                                <button
+                                                    type="button"
+                                                    className="usuarios-action-btn usuarios-action-edit"
+                                                    onClick={() => openEditModal(usuario)}
+                                                >
+                                                    Editar
+                                                </button>
+                                            </ConPermiso>
 
-                                            <button
-                                                type="button"
-                                                className={
-                                                    usuario.activo
-                                                        ? 'usuarios-action-btn usuarios-action-warning'
-                                                        : 'usuarios-action-btn usuarios-action-success'
-                                                }
-                                                onClick={() => handleToggleStatus(usuario)}
-                                            >
-                                                {usuario.activo ? 'Desactivar' : 'Activar'}
-                                            </button>
+                                            <ConPermiso permiso="seguridad.editar">
+                                                <button
+                                                    type="button"
+                                                    className={
+                                                        usuario.activo
+                                                            ? 'usuarios-action-btn usuarios-action-warning'
+                                                            : 'usuarios-action-btn usuarios-action-success'
+                                                    }
+                                                    onClick={() => handleToggleStatus(usuario)}
+                                                >
+                                                    {usuario.activo ? 'Desactivar' : 'Activar'}
+                                                </button>
+                                            </ConPermiso>
 
-                                            <button
-                                                type="button"
-                                                className="usuarios-action-btn usuarios-action-delete"
-                                                onClick={() => handleDelete(usuario)}
-                                            >
-                                                Eliminar
-                                            </button>
+                                            <ConPermiso permiso="seguridad.eliminar">
+                                                <button
+                                                    type="button"
+                                                    className="usuarios-action-btn usuarios-action-delete"
+                                                    onClick={() => handleDelete(usuario)}
+                                                >
+                                                    Eliminar
+                                                </button>
+                                            </ConPermiso>
                                         </div>
                                     </td>
                                 </tr>

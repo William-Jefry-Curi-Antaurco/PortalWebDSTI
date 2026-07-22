@@ -26,6 +26,8 @@ import {
     notifySuccess,
 } from '../utils/notify';
 
+import ConPermiso from '../components/ConPermiso';
+
 import '../styles/modules/estados.css';
 
 const initialForm = {
@@ -251,14 +253,16 @@ export default function Estados() {
                 </div>
 
                 {!showForm && (
-                    <button
-                        type="button"
-                        className="estados-add-button"
-                        onClick={abrirFormularioCrear}
-                    >
-                        <Plus size={18} />
-                        Agregar estado
-                    </button>
+                    <ConPermiso permiso="catalogos.crear">
+                        <button
+                            type="button"
+                            className="estados-add-button"
+                            onClick={abrirFormularioCrear}
+                        >
+                            <Plus size={18} />
+                            Agregar estado
+                        </button>
+                    </ConPermiso>
                 )}
             </div>
 
@@ -466,26 +470,30 @@ export default function Estados() {
 
                                         <td>
                                             <div className="estados-actions">
-                                                <button
-                                                    type="button"
-                                                    onClick={() =>
-                                                        handleEdit(estado)
-                                                    }
-                                                    title="Editar"
-                                                >
-                                                    <Pencil size={16} />
-                                                </button>
+                                                <ConPermiso permiso="catalogos.editar">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            handleEdit(estado)
+                                                        }
+                                                        title="Editar"
+                                                    >
+                                                        <Pencil size={16} />
+                                                    </button>
+                                                </ConPermiso>
 
-                                                <button
-                                                    type="button"
-                                                    className="danger"
-                                                    onClick={() =>
-                                                        handleDelete(estado)
-                                                    }
-                                                    title="Eliminar"
-                                                >
-                                                    <Trash2 size={16} />
-                                                </button>
+                                                <ConPermiso permiso="catalogos.eliminar">
+                                                    <button
+                                                        type="button"
+                                                        className="danger"
+                                                        onClick={() =>
+                                                            handleDelete(estado)
+                                                        }
+                                                        title="Eliminar"
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
+                                                </ConPermiso>
                                             </div>
                                         </td>
                                     </tr>

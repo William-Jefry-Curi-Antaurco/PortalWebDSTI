@@ -5,6 +5,7 @@ import {
     eliminarLogActividad,
     limpiarLogsActividad,
 } from '../api/auditoriaApi';
+import ConPermiso from '../components/ConPermiso';
 import '../styles/modules/auditoria.css';
 
 const ACTION_OPTIONS = [
@@ -557,14 +558,16 @@ const Auditoria = () => {
                         {isLoading ? 'Actualizando...' : 'Actualizar'}
                     </button>
 
-                    <button
-                        type="button"
-                        className="auditoria-btn auditoria-btn-danger"
-                        onClick={handleOpenClean}
-                        disabled={isLoading}
-                    >
-                        Limpiar logs
-                    </button>
+                    <ConPermiso permiso="seguridad.eliminar">
+                        <button
+                            type="button"
+                            className="auditoria-btn auditoria-btn-danger"
+                            onClick={handleOpenClean}
+                            disabled={isLoading}
+                        >
+                            Limpiar logs
+                        </button>
+                    </ConPermiso>
                 </div>
             </header>
 
@@ -836,13 +839,15 @@ const Auditoria = () => {
                                                 Ver detalle
                                             </button>
 
-                                            <button
-                                                type="button"
-                                                className="auditoria-action-btn auditoria-action-delete"
-                                                onClick={() => handleDelete(log)}
-                                            >
-                                                Eliminar
-                                            </button>
+                                            <ConPermiso permiso="seguridad.eliminar">
+                                                <button
+                                                    type="button"
+                                                    className="auditoria-action-btn auditoria-action-delete"
+                                                    onClick={() => handleDelete(log)}
+                                                >
+                                                    Eliminar
+                                                </button>
+                                            </ConPermiso>
                                         </div>
                                     </td>
                                 </tr>

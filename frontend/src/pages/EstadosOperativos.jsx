@@ -26,6 +26,8 @@ import {
     notifySuccess,
 } from '../utils/notify';
 
+import ConPermiso from '../components/ConPermiso';
+
 import '../styles/modules/estadosOperativos.css';
 
 const initialForm = {
@@ -269,14 +271,16 @@ export default function EstadosOperativos() {
                 </div>
 
                 {!showForm && (
-                    <button
-                        type="button"
-                        className="estados-operativos-add-button"
-                        onClick={abrirFormularioCrear}
-                    >
-                        <Plus size={18} />
-                        Agregar estado
-                    </button>
+                    <ConPermiso permiso="catalogos.crear">
+                        <button
+                            type="button"
+                            className="estados-operativos-add-button"
+                            onClick={abrirFormularioCrear}
+                        >
+                            <Plus size={18} />
+                            Agregar estado
+                        </button>
+                    </ConPermiso>
                 )}
             </div>
 
@@ -464,44 +468,50 @@ export default function EstadosOperativos() {
 
                                         <td>
                                             <div className="estados-operativos-actions">
-                                                <button
-                                                    type="button"
-                                                    onClick={() =>
-                                                        handleToggleActivo(estado)
-                                                    }
-                                                    title={
-                                                        activo
-                                                            ? 'Desactivar'
-                                                            : 'Activar'
-                                                    }
-                                                >
-                                                    {activo ? (
-                                                        <PowerOff size={16} />
-                                                    ) : (
-                                                        <Power size={16} />
-                                                    )}
-                                                </button>
+                                                <ConPermiso permiso="catalogos.editar">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            handleToggleActivo(estado)
+                                                        }
+                                                        title={
+                                                            activo
+                                                                ? 'Desactivar'
+                                                                : 'Activar'
+                                                        }
+                                                    >
+                                                        {activo ? (
+                                                            <PowerOff size={16} />
+                                                        ) : (
+                                                            <Power size={16} />
+                                                        )}
+                                                    </button>
+                                                </ConPermiso>
 
-                                                <button
-                                                    type="button"
-                                                    onClick={() =>
-                                                        handleEdit(estado)
-                                                    }
-                                                    title="Editar"
-                                                >
-                                                    <Pencil size={16} />
-                                                </button>
+                                                <ConPermiso permiso="catalogos.editar">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            handleEdit(estado)
+                                                        }
+                                                        title="Editar"
+                                                    >
+                                                        <Pencil size={16} />
+                                                    </button>
+                                                </ConPermiso>
 
-                                                <button
-                                                    type="button"
-                                                    className="danger"
-                                                    onClick={() =>
-                                                        handleDelete(estado)
-                                                    }
-                                                    title="Eliminar"
-                                                >
-                                                    <Trash2 size={16} />
-                                                </button>
+                                                <ConPermiso permiso="catalogos.eliminar">
+                                                    <button
+                                                        type="button"
+                                                        className="danger"
+                                                        onClick={() =>
+                                                            handleDelete(estado)
+                                                        }
+                                                        title="Eliminar"
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
+                                                </ConPermiso>
                                             </div>
                                         </td>
                                     </tr>

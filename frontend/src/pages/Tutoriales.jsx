@@ -43,6 +43,8 @@ import {
     notifySuccess,
 } from '../utils/notify';
 
+import ConPermiso from '../components/ConPermiso';
+
 import '../styles/modules/tutoriales.css';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://127.0.0.1:8000';
@@ -834,15 +836,17 @@ export default function Tutoriales() {
                 </div>
 
                 {!showForm && (
-                    <button
-                        type="button"
-                        className="tutoriales-add-button"
-                        onClick={abrirFormularioCrear}
-                        disabled={loading || loadingCatalogs}
-                    >
-                        <Plus size={18} />
-                        Agregar tutorial
-                    </button>
+                    <ConPermiso permiso="tutoriales.crear">
+                        <button
+                            type="button"
+                            className="tutoriales-add-button"
+                            onClick={abrirFormularioCrear}
+                            disabled={loading || loadingCatalogs}
+                        >
+                            <Plus size={18} />
+                            Agregar tutorial
+                        </button>
+                    </ConPermiso>
                 )}
             </div>
 
@@ -1346,22 +1350,26 @@ export default function Tutoriales() {
                                                 <Eye size={16} />
                                             </button>
 
-                                            <button
-                                                type="button"
-                                                onClick={() => handleEdit(tutorial)}
-                                                title="Editar"
-                                            >
-                                                <Pencil size={16} />
-                                            </button>
+                                            <ConPermiso permiso="tutoriales.editar">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleEdit(tutorial)}
+                                                    title="Editar"
+                                                >
+                                                    <Pencil size={16} />
+                                                </button>
+                                            </ConPermiso>
 
-                                            <button
-                                                type="button"
-                                                className="danger"
-                                                onClick={() => handleDelete(tutorial)}
-                                                title="Eliminar"
-                                            >
-                                                <Trash2 size={16} />
-                                            </button>
+                                            <ConPermiso permiso="tutoriales.eliminar">
+                                                <button
+                                                    type="button"
+                                                    className="danger"
+                                                    onClick={() => handleDelete(tutorial)}
+                                                    title="Eliminar"
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </ConPermiso>
                                         </div>
                                     </td>
                                 </tr>

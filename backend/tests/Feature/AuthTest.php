@@ -117,6 +117,45 @@ class AuthTest extends TestCase
         $this->assertNotContains('noticias.crear', $permisos);
     }
 
+    public function test_refresh_emite_un_token_nuevo_y_revoca_el_anterior(): void
+    {
+        $usuario = User::factory()->conRol('editor')->create([
+            'email' => 'refresh@dsti.test',
+            'password_hash' => Hash::make('clave-segura'),
+        ]);
+
+        $login = $this->postJson('/api/auth/login', [
+            'email' => 'refresh@dsti.test',
+            'password' => 'clave-segura',
+        ]);
+
+        $tokenAnterior = $login->json('data.token');
+
+        $response = $this->withHeader('Authorization', "Bearer {$tokenAnterior}")
+            ->postJson('/api/auth/refresh');
+
+        $response->assertOk()
+            ->assertJsonPath('success', true)
+            ->assertJsonStructure(['data' => ['token', 'token_type', 'usuario' => ['permisos']]]);
+
+        $tokenNuevo = $response->json('data.token');
+
+        $this->assertNotSame($tokenAnterior, $tokenNuevo);
+
+        // Solo queda un token en BD: el anterior se borró al refrescar. No
+        // repetimos una llamada autenticada con el token viejo aquí porque
+        // el guard de Laravel cachea al usuario resuelto durante el mismo
+        // test (mismo motivo documentado en test_logout_revoca_el_token_actual).
+        $this->assertSame(1, $usuario->fresh()->tokens()->count());
+    }
+
+    public function test_refresh_requiere_autenticacion(): void
+    {
+        $response = $this->postJson('/api/auth/refresh');
+
+        $response->assertStatus(401);
+    }
+
     public function test_logout_revoca_el_token_actual(): void
     {
         $usuario = User::factory()->conRol('admin')->create([
