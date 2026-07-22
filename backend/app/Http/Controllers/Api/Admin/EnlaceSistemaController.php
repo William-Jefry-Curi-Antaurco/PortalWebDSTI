@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Archivo;
 use App\Models\EnlaceSistema;
+use App\Services\ArchivoLimpiezaService;
 use App\Services\EtiquetaContenidoService;
 use App\Support\EtiquetaEntidad;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -83,35 +85,54 @@ class EnlaceSistemaController extends Controller
             ], 422);
         }
 
-        $archivoManual = $request->hasFile('archivo_manual')
-            ? $this->guardarArchivo($request->file('archivo_manual'))
-            : null;
+        $rutaManualGuardada = null;
+        $rutaDocumentacionGuardada = null;
 
-        $archivoDocumentacion = $request->hasFile('archivo_documentacion')
-            ? $this->guardarArchivo($request->file('archivo_documentacion'))
-            : null;
+        try {
+            $enlace = DB::transaction(function () use ($request, $etiquetaService, &$rutaManualGuardada, &$rutaDocumentacionGuardada) {
+                $archivoManual = $request->hasFile('archivo_manual')
+                    ? $this->guardarArchivo($request->file('archivo_manual'), $rutaManualGuardada)
+                    : null;
 
-        $enlace = EnlaceSistema::create([
-            'nombre_sistema' => $request->nombre_sistema,
-            'slug' => $this->generarSlugUnico($request->nombre_sistema),
-            'descripcion' => $request->descripcion,
-            'url' => $request->url,
-            'icono' => $request->icono,
-            'idcategoria' => $request->idcategoria,
-            'idestadooperativo' => $request->idestadooperativo,
-            'idarchivo_manual' => $archivoManual?->idarchivo,
-            'idarchivo_documentacion' => $archivoDocumentacion?->idarchivo,
-            'orden' => $request->orden ?? 0,
-            'activo' => $request->has('activo')
-                ? $request->boolean('activo')
-                : true,
-        ]);
+                $archivoDocumentacion = $request->hasFile('archivo_documentacion')
+                    ? $this->guardarArchivo($request->file('archivo_documentacion'), $rutaDocumentacionGuardada)
+                    : null;
 
-        $etiquetaService->sincronizar(
-            EtiquetaEntidad::SISTEMAS,
-            $enlace->idenlace,
-            $request->input('etiquetas', [])
-        );
+                $enlace = EnlaceSistema::create([
+                    'nombre_sistema' => $request->nombre_sistema,
+                    'slug' => $this->generarSlugUnico($request->nombre_sistema),
+                    'descripcion' => $request->descripcion,
+                    'url' => $request->url,
+                    'icono' => $request->icono,
+                    'idcategoria' => $request->idcategoria,
+                    'idestadooperativo' => $request->idestadooperativo,
+                    'idarchivo_manual' => $archivoManual?->idarchivo,
+                    'idarchivo_documentacion' => $archivoDocumentacion?->idarchivo,
+                    'orden' => $request->orden ?? 0,
+                    'activo' => $request->has('activo')
+                        ? $request->boolean('activo')
+                        : true,
+                ]);
+
+                $etiquetaService->sincronizar(
+                    EtiquetaEntidad::SISTEMAS,
+                    $enlace->idenlace,
+                    $request->input('etiquetas', [])
+                );
+
+                return $enlace;
+            });
+        } catch (\Throwable $e) {
+            if ($rutaManualGuardada) {
+                Storage::disk('public')->delete($rutaManualGuardada);
+            }
+
+            if ($rutaDocumentacionGuardada) {
+                Storage::disk('public')->delete($rutaDocumentacionGuardada);
+            }
+
+            throw $e;
+        }
 
         $this->limpiarCachePublico();
 
@@ -157,7 +178,8 @@ class EnlaceSistemaController extends Controller
     public function update(
         Request $request,
                 $id,
-        EtiquetaContenidoService $etiquetaService
+        EtiquetaContenidoService $etiquetaService,
+        ArchivoLimpiezaService $archivoLimpieza
     ) {
         $enlace = EnlaceSistema::find($id);
 
@@ -182,54 +204,70 @@ class EnlaceSistemaController extends Controller
             ], 422);
         }
 
-        $slug = $enlace->nombre_sistema !== $request->nombre_sistema
-            ? $this->generarSlugUnico($request->nombre_sistema, $enlace->idenlace)
-            : $enlace->slug;
-
         $archivoManualAnteriorId = $enlace->idarchivo_manual;
         $archivoDocumentacionAnteriorId = $enlace->idarchivo_documentacion;
+        $rutaManualGuardada = null;
+        $rutaDocumentacionGuardada = null;
 
-        $idarchivoManual = $archivoManualAnteriorId;
-        $idarchivoDocumentacion = $archivoDocumentacionAnteriorId;
+        try {
+            DB::transaction(function () use ($request, $enlace, $etiquetaService, &$rutaManualGuardada, &$rutaDocumentacionGuardada) {
+                $slug = $enlace->nombre_sistema !== $request->nombre_sistema
+                    ? $this->generarSlugUnico($request->nombre_sistema, $enlace->idenlace)
+                    : $enlace->slug;
 
-        if ($request->hasFile('archivo_manual')) {
-            $idarchivoManual = $this->guardarArchivo($request->file('archivo_manual'))->idarchivo;
+                $idarchivoManual = $enlace->idarchivo_manual;
+                $idarchivoDocumentacion = $enlace->idarchivo_documentacion;
+
+                if ($request->hasFile('archivo_manual')) {
+                    $idarchivoManual = $this->guardarArchivo($request->file('archivo_manual'), $rutaManualGuardada)->idarchivo;
+                }
+
+                if ($request->hasFile('archivo_documentacion')) {
+                    $idarchivoDocumentacion = $this->guardarArchivo($request->file('archivo_documentacion'), $rutaDocumentacionGuardada)->idarchivo;
+                }
+
+                $enlace->update([
+                    'nombre_sistema' => $request->nombre_sistema,
+                    'slug' => $slug,
+                    'descripcion' => $request->descripcion,
+                    'url' => $request->url,
+                    'icono' => $request->icono,
+                    'idcategoria' => $request->idcategoria,
+                    'idestadooperativo' => $request->idestadooperativo,
+                    'idarchivo_manual' => $idarchivoManual,
+                    'idarchivo_documentacion' => $idarchivoDocumentacion,
+                    'orden' => $request->orden ?? 0,
+                    'activo' => $request->has('activo')
+                        ? $request->boolean('activo')
+                        : true,
+                ]);
+
+                $etiquetaService->sincronizar(
+                    EtiquetaEntidad::SISTEMAS,
+                    $enlace->idenlace,
+                    $request->input('etiquetas', [])
+                );
+            });
+        } catch (\Throwable $e) {
+            if ($rutaManualGuardada) {
+                Storage::disk('public')->delete($rutaManualGuardada);
+            }
+
+            if ($rutaDocumentacionGuardada) {
+                Storage::disk('public')->delete($rutaDocumentacionGuardada);
+            }
+
+            throw $e;
         }
-
-        if ($request->hasFile('archivo_documentacion')) {
-            $idarchivoDocumentacion = $this->guardarArchivo($request->file('archivo_documentacion'))->idarchivo;
-        }
-
-        $enlace->update([
-            'nombre_sistema' => $request->nombre_sistema,
-            'slug' => $slug,
-            'descripcion' => $request->descripcion,
-            'url' => $request->url,
-            'icono' => $request->icono,
-            'idcategoria' => $request->idcategoria,
-            'idestadooperativo' => $request->idestadooperativo,
-            'idarchivo_manual' => $idarchivoManual,
-            'idarchivo_documentacion' => $idarchivoDocumentacion,
-            'orden' => $request->orden ?? 0,
-            'activo' => $request->has('activo')
-                ? $request->boolean('activo')
-                : true,
-        ]);
-
-        $etiquetaService->sincronizar(
-            EtiquetaEntidad::SISTEMAS,
-            $enlace->idenlace,
-            $request->input('etiquetas', [])
-        );
 
         $this->limpiarCachePublico();
 
         if ($request->hasFile('archivo_manual') && $archivoManualAnteriorId) {
-            $this->eliminarArchivoSiHuerfano($archivoManualAnteriorId);
+            $archivoLimpieza->eliminarSiNoEstaEnUso(Archivo::find($archivoManualAnteriorId));
         }
 
         if ($request->hasFile('archivo_documentacion') && $archivoDocumentacionAnteriorId) {
-            $this->eliminarArchivoSiHuerfano($archivoDocumentacionAnteriorId);
+            $archivoLimpieza->eliminarSiNoEstaEnUso(Archivo::find($archivoDocumentacionAnteriorId));
         }
 
         $enlace->load(['categoria', 'estadoOperativo', 'archivoManual', 'archivoDocumentacion']);
@@ -248,7 +286,8 @@ class EnlaceSistemaController extends Controller
 
     public function destroy(
         $id,
-        EtiquetaContenidoService $etiquetaService
+        EtiquetaContenidoService $etiquetaService,
+        ArchivoLimpiezaService $archivoLimpieza
     ) {
         $enlace = EnlaceSistema::find($id);
 
@@ -264,20 +303,15 @@ class EnlaceSistemaController extends Controller
             $enlace->idenlace
         );
 
-        $archivoManualId = $enlace->idarchivo_manual;
-        $archivoDocumentacionId = $enlace->idarchivo_documentacion;
+        $archivoManual = $enlace->idarchivo_manual ? Archivo::find($enlace->idarchivo_manual) : null;
+        $archivoDocumentacion = $enlace->idarchivo_documentacion ? Archivo::find($enlace->idarchivo_documentacion) : null;
 
         $enlace->delete();
 
         $this->limpiarCachePublico();
 
-        if ($archivoManualId) {
-            $this->eliminarArchivoSiHuerfano($archivoManualId);
-        }
-
-        if ($archivoDocumentacionId) {
-            $this->eliminarArchivoSiHuerfano($archivoDocumentacionId);
-        }
+        $archivoLimpieza->eliminarSiNoEstaEnUso($archivoManual);
+        $archivoLimpieza->eliminarSiNoEstaEnUso($archivoDocumentacion);
 
         return response()->json([
             'success' => true,
@@ -402,40 +436,20 @@ class EnlaceSistemaController extends Controller
         Cache::forget('public:inicio');
     }
 
-    private function guardarArchivo(UploadedFile $archivoSubido): Archivo
+    private function guardarArchivo(UploadedFile $archivoSubido, ?string &$rutaGuardada = null): Archivo
     {
         $extension = $archivoSubido->getClientOriginalExtension();
         $nombreGuardado = 'enlace_' . now()->format('YmdHis') . '_' . Str::random(10) . '.' . $extension;
-        $ruta = $archivoSubido->storeAs('enlaces-sistemas', $nombreGuardado, 'public');
+        $rutaGuardada = $archivoSubido->storeAs('enlaces-sistemas', $nombreGuardado, 'public');
 
         return Archivo::create([
             'nombre_original' => $archivoSubido->getClientOriginalName(),
             'nombre_guardado' => $nombreGuardado,
-            'ruta' => $ruta,
+            'ruta' => $rutaGuardada,
             'extension' => $extension,
             'mime_type' => $archivoSubido->getMimeType(),
             'peso_bytes' => $archivoSubido->getSize(),
             'descargas' => 0,
         ]);
-    }
-
-    private function eliminarArchivoSiHuerfano(int $idarchivo): void
-    {
-        $enUso = EnlaceSistema::where('idarchivo_manual', $idarchivo)
-            ->orWhere('idarchivo_documentacion', $idarchivo)
-            ->exists();
-
-        if ($enUso) {
-            return;
-        }
-
-        $archivo = Archivo::find($idarchivo);
-
-        if (!$archivo) {
-            return;
-        }
-
-        Storage::disk('public')->delete($archivo->ruta);
-        $archivo->delete();
     }
 }

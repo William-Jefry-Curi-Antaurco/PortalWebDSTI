@@ -6,10 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\Archivo;
 use App\Models\Documento;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use App\Services\ArchivoLimpiezaService;
 use App\Services\EtiquetaContenidoService;
 use App\Support\EtiquetaEntidad;
 use Illuminate\Support\Facades\Cache;
@@ -169,48 +171,62 @@ class DocumentoController extends Controller
 
         $archivoSubido = $request->file('archivo');
 
-        $nombreOriginal = $archivoSubido->getClientOriginalName();
-        $extension = $archivoSubido->getClientOriginalExtension();
-        $mimeType = $archivoSubido->getMimeType();
-        $pesoBytes = $archivoSubido->getSize();
+        $rutaGuardada = null;
 
-        $nombreGuardado = Str::uuid() . '.' . $extension;
-        $ruta = $archivoSubido->storeAs('documentos', $nombreGuardado, 'public');
+        try {
+            $documento = DB::transaction(function () use ($request, $archivoSubido, $etiquetaService, &$rutaGuardada) {
+                $nombreOriginal = $archivoSubido->getClientOriginalName();
+                $extension = $archivoSubido->getClientOriginalExtension();
+                $mimeType = $archivoSubido->getMimeType();
+                $pesoBytes = $archivoSubido->getSize();
 
-        $archivo = Archivo::create([
-            'nombre_original' => $nombreOriginal,
-            'nombre_guardado' => $nombreGuardado,
-            'ruta' => $ruta,
-            'extension' => $extension,
-            'mime_type' => $mimeType,
-            'peso_bytes' => $pesoBytes,
-            'descargas' => 0,
-        ]);
+                $nombreGuardado = Str::uuid() . '.' . $extension;
+                $rutaGuardada = $archivoSubido->storeAs('documentos', $nombreGuardado, 'public');
 
-        $slug = $this->generarSlugUnico($request->titulo);
+                $archivo = Archivo::create([
+                    'nombre_original' => $nombreOriginal,
+                    'nombre_guardado' => $nombreGuardado,
+                    'ruta' => $rutaGuardada,
+                    'extension' => $extension,
+                    'mime_type' => $mimeType,
+                    'peso_bytes' => $pesoBytes,
+                    'descargas' => 0,
+                ]);
 
-        $documento = Documento::create([
-            'titulo' => $request->titulo,
-            'slug' => $slug,
-            'descripcion' => $request->descripcion,
-            'version' => $request->version ?? '1.0',
-            'es_version_actual' => $request->has('es_version_actual')
-                ? $request->boolean('es_version_actual')
-                : true,
-            'fecha_documento' => $request->fecha_documento,
-            'iddocumento_padre' => $request->iddocumento_padre,
-            'idarchivo' => $archivo->idarchivo,
-            'idcategoria' => $request->idcategoria,
-            'idusuario_subidor' => $request->user()->idusuario,
-            'idestado' => $request->idestado,
-            'idtipodocumento' => $request->idtipodocumento,
-        ]);
+                $slug = $this->generarSlugUnico($request->titulo);
 
-        $etiquetaService->sincronizar(
-            EtiquetaEntidad::DOCUMENTOS,
-            $documento->iddocumento,
-            $request->input('etiquetas', [])
-        );
+                $documento = Documento::create([
+                    'titulo' => $request->titulo,
+                    'slug' => $slug,
+                    'descripcion' => $request->descripcion,
+                    'version' => $request->version ?? '1.0',
+                    'es_version_actual' => $request->has('es_version_actual')
+                        ? $request->boolean('es_version_actual')
+                        : true,
+                    'fecha_documento' => $request->fecha_documento,
+                    'iddocumento_padre' => $request->iddocumento_padre,
+                    'idarchivo' => $archivo->idarchivo,
+                    'idcategoria' => $request->idcategoria,
+                    'idusuario_subidor' => $request->user()->idusuario,
+                    'idestado' => $request->idestado,
+                    'idtipodocumento' => $request->idtipodocumento,
+                ]);
+
+                $etiquetaService->sincronizar(
+                    EtiquetaEntidad::DOCUMENTOS,
+                    $documento->iddocumento,
+                    $request->input('etiquetas', [])
+                );
+
+                return $documento;
+            });
+        } catch (\Throwable $e) {
+            if ($rutaGuardada) {
+                Storage::disk('public')->delete($rutaGuardada);
+            }
+
+            throw $e;
+        }
 
         $this->limpiarCachePublico();
 
@@ -273,7 +289,8 @@ class DocumentoController extends Controller
     public function update(
         Request $request,
                 $id,
-        EtiquetaContenidoService $etiquetaService
+        EtiquetaContenidoService $etiquetaService,
+        ArchivoLimpiezaService $archivoLimpieza
     )
     {
         $documento = Documento::with('archivo')->find($id);
@@ -365,78 +382,74 @@ class DocumentoController extends Controller
 
 
         $archivoAnterior = null;
+        $rutaGuardada = null;
 
+        try {
+            DB::transaction(function () use ($request, $documento, $etiquetaService, &$archivoAnterior, &$rutaGuardada) {
+                if ($request->hasFile('archivo')) {
+                    $archivoAnterior = $documento->archivo;
 
-        if ($request->hasFile('archivo')) {
-            $archivoAnterior = $documento->archivo;
+                    $archivoSubido = $request->file('archivo');
 
-            $archivoSubido = $request->file('archivo');
+                    $nombreOriginal = $archivoSubido->getClientOriginalName();
+                    $extension = $archivoSubido->getClientOriginalExtension();
+                    $mimeType = $archivoSubido->getMimeType();
+                    $pesoBytes = $archivoSubido->getSize();
 
-            $nombreOriginal = $archivoSubido->getClientOriginalName();
-            $extension = $archivoSubido->getClientOriginalExtension();
-            $mimeType = $archivoSubido->getMimeType();
-            $pesoBytes = $archivoSubido->getSize();
+                    $nombreGuardado = 'documento_' . now()->format('YmdHis') . '_' . Str::random(10) . '.' . $extension;
 
-            $nombreGuardado = 'documento_' . now()->format('YmdHis') . '_' . Str::random(10) . '.' . $extension;
+                    $rutaGuardada = $archivoSubido->storeAs('documentos', $nombreGuardado, 'public');
 
-            $ruta = $archivoSubido->storeAs('documentos', $nombreGuardado, 'public');
+                    $nuevoArchivo = Archivo::create([
+                        'nombre_original' => $nombreOriginal,
+                        'nombre_guardado' => $nombreGuardado,
+                        'ruta' => $rutaGuardada,
+                        'extension' => $extension,
+                        'mime_type' => $mimeType,
+                        'peso_bytes' => $pesoBytes,
+                        'descargas' => 0,
+                    ]);
 
-            $nuevoArchivo = Archivo::create([
-                'nombre_original' => $nombreOriginal,
-                'nombre_guardado' => $nombreGuardado,
-                'ruta' => $ruta,
-                'extension' => $extension,
-                'mime_type' => $mimeType,
-                'peso_bytes' => $pesoBytes,
-                'descargas' => 0,
-            ]);
+                    $documento->idarchivo = $nuevoArchivo->idarchivo;
+                }
 
+                $slug = $documento->titulo !== $request->titulo
+                    ? $this->generarSlugUnico($request->titulo, $documento->iddocumento)
+                    : $documento->slug;
 
-            $documento->idarchivo = $nuevoArchivo->idarchivo;
+                $documento->update([
+                    'titulo' => $request->titulo,
+                    'slug' => $slug,
+                    'descripcion' => $request->descripcion,
+                    'version' => $request->version ?? '1.0',
+                    'es_version_actual' => $request->has('es_version_actual')
+                        ? $request->boolean('es_version_actual')
+                        : true,
+                    'fecha_documento' => $request->fecha_documento,
+                    'iddocumento_padre' => $request->iddocumento_padre,
+                    'idarchivo' => $documento->idarchivo,
+                    'idcategoria' => $request->idcategoria,
+                    'idestado' => $request->idestado,
+                    'idtipodocumento' => $request->idtipodocumento,
+                ]);
+
+                $etiquetaService->sincronizar(
+                    EtiquetaEntidad::DOCUMENTOS,
+                    $documento->iddocumento,
+                    $request->input('etiquetas', [])
+                );
+            });
+        } catch (\Throwable $e) {
+            if ($rutaGuardada) {
+                Storage::disk('public')->delete($rutaGuardada);
+            }
+
+            throw $e;
         }
-
-
-        $slug = $documento->titulo !== $request->titulo
-            ? $this->generarSlugUnico($request->titulo, $documento->iddocumento)
-            : $documento->slug;
-
-
-        $documento->update([
-            'titulo' => $request->titulo,
-            'slug' => $slug,
-            'descripcion' => $request->descripcion,
-            'version' => $request->version ?? '1.0',
-            'es_version_actual' => $request->has('es_version_actual')
-                ? $request->boolean('es_version_actual')
-                : true,
-            'fecha_documento' => $request->fecha_documento,
-            'iddocumento_padre' => $request->iddocumento_padre,
-            'idarchivo' => $documento->idarchivo,
-            'idcategoria' => $request->idcategoria,
-            'idestado' => $request->idestado,
-            'idtipodocumento' => $request->idtipodocumento,
-        ]);
-
-        $etiquetaService->sincronizar(
-            EtiquetaEntidad::DOCUMENTOS,
-            $documento->iddocumento,
-            $request->input('etiquetas', [])
-        );
 
         $this->limpiarCachePublico();
 
-
-
-
-        if ($archivoAnterior) {
-            $usosArchivo = Documento::where('idarchivo', $archivoAnterior->idarchivo)->count();
-
-            if ($usosArchivo === 0) {
-                Storage::disk('public')->delete($archivoAnterior->ruta);
-                $archivoAnterior->delete();
-            }
-        }
-
+        $archivoLimpieza->eliminarSiNoEstaEnUso($archivoAnterior);
 
         $documento->load([
             'archivo',
@@ -462,7 +475,8 @@ class DocumentoController extends Controller
     //public function destroy($id)
     public function destroy(
         $id,
-        EtiquetaContenidoService $etiquetaService
+        EtiquetaContenidoService $etiquetaService,
+        ArchivoLimpiezaService $archivoLimpieza
     )
     {
         $documento = Documento::with('archivo')->withCount('versiones')->find($id);
@@ -490,14 +504,8 @@ class DocumentoController extends Controller
 
         $documento->delete();
 
-        if ($archivo) {
-            $usosArchivo = Documento::where('idarchivo', $archivo->idarchivo)->count();
+        $archivoLimpieza->eliminarSiNoEstaEnUso($archivo);
 
-            if ($usosArchivo === 0) {
-                Storage::disk('public')->delete($archivo->ruta);
-                $archivo->delete();
-            }
-        }
         $this->limpiarCachePublico();
 
         return response()->json([

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Archivo;
 use App\Models\Proyecto;
+use App\Services\ArchivoLimpiezaService;
 use App\Services\EtiquetaContenidoService;
 use App\Support\EtiquetaEntidad;
 use Illuminate\Http\JsonResponse;
@@ -173,55 +174,69 @@ class ProyectoController extends Controller
             ], 422);
         }
 
-        $idArchivo = null;
+        $rutaGuardada = null;
 
-        if ($request->hasFile('archivo')) {
-            $archivoSubido = $request->file('archivo');
+        try {
+            $proyecto = DB::transaction(function () use ($request, $etiquetaService, &$rutaGuardada) {
+                $idArchivo = null;
 
-            $nombreOriginal = $archivoSubido->getClientOriginalName();
-            $extension = $archivoSubido->getClientOriginalExtension();
-            $mimeType = $archivoSubido->getMimeType();
-            $pesoBytes = $archivoSubido->getSize();
+                if ($request->hasFile('archivo')) {
+                    $archivoSubido = $request->file('archivo');
 
-            $nombreGuardado = 'proyecto_' . now()->format('YmdHis') . '_' . Str::random(10) . '.' . $extension;
-            $ruta = $archivoSubido->storeAs('proyectos', $nombreGuardado, 'public');
+                    $nombreOriginal = $archivoSubido->getClientOriginalName();
+                    $extension = $archivoSubido->getClientOriginalExtension();
+                    $mimeType = $archivoSubido->getMimeType();
+                    $pesoBytes = $archivoSubido->getSize();
 
-            $archivo = Archivo::create([
-                'nombre_original' => $nombreOriginal,
-                'nombre_guardado' => $nombreGuardado,
-                'ruta' => $ruta,
-                'extension' => $extension,
-                'mime_type' => $mimeType,
-                'peso_bytes' => $pesoBytes,
-                'descargas' => 0,
-            ]);
+                    $nombreGuardado = 'proyecto_' . now()->format('YmdHis') . '_' . Str::random(10) . '.' . $extension;
+                    $rutaGuardada = $archivoSubido->storeAs('proyectos', $nombreGuardado, 'public');
 
-            $idArchivo = $archivo->idarchivo;
+                    $archivo = Archivo::create([
+                        'nombre_original' => $nombreOriginal,
+                        'nombre_guardado' => $nombreGuardado,
+                        'ruta' => $rutaGuardada,
+                        'extension' => $extension,
+                        'mime_type' => $mimeType,
+                        'peso_bytes' => $pesoBytes,
+                        'descargas' => 0,
+                    ]);
+
+                    $idArchivo = $archivo->idarchivo;
+                }
+
+                $proyecto = Proyecto::create([
+                    'titulo' => $request->titulo,
+                    'slug' => $this->generarSlugUnico($request->titulo),
+                    'descripcion' => $request->descripcion,
+                    'porcentaje_avance' => $request->porcentaje_avance ?? 0,
+                    'fecha_inicio' => $request->fecha_inicio,
+                    'fecha_fin' => $request->fecha_fin,
+                    'responsable' => $request->responsable,
+                    'url_resultado' => $request->url_resultado,
+                    'idcategoria' => $request->idcategoria,
+                    'idestado' => $request->idestado,
+                    'idarchivo' => $idArchivo,
+                    'orden' => $request->orden ?? 0,
+                    'activo' => $request->has('activo')
+                        ? $request->boolean('activo')
+                        : true,
+                ]);
+
+                $etiquetaService->sincronizar(
+                    EtiquetaEntidad::PROYECTOS,
+                    $proyecto->idproyecto,
+                    $request->input('etiquetas', [])
+                );
+
+                return $proyecto;
+            });
+        } catch (\Throwable $e) {
+            if ($rutaGuardada) {
+                Storage::disk('public')->delete($rutaGuardada);
+            }
+
+            throw $e;
         }
-
-        $proyecto = Proyecto::create([
-            'titulo' => $request->titulo,
-            'slug' => $this->generarSlugUnico($request->titulo),
-            'descripcion' => $request->descripcion,
-            'porcentaje_avance' => $request->porcentaje_avance ?? 0,
-            'fecha_inicio' => $request->fecha_inicio,
-            'fecha_fin' => $request->fecha_fin,
-            'responsable' => $request->responsable,
-            'url_resultado' => $request->url_resultado,
-            'idcategoria' => $request->idcategoria,
-            'idestado' => $request->idestado,
-            'idarchivo' => $idArchivo,
-            'orden' => $request->orden ?? 0,
-            'activo' => $request->has('activo')
-                ? $request->boolean('activo')
-                : true,
-        ]);
-
-        $etiquetaService->sincronizar(
-            EtiquetaEntidad::PROYECTOS,
-            $proyecto->idproyecto,
-            $request->input('etiquetas', [])
-        );
 
         $this->limpiarCachePublico();
 
@@ -275,7 +290,8 @@ class ProyectoController extends Controller
     public function update(
         Request $request,
         int $id,
-        EtiquetaContenidoService $etiquetaService
+        EtiquetaContenidoService $etiquetaService,
+        ArchivoLimpiezaService $archivoLimpieza
     ): JsonResponse {
         $proyecto = Proyecto::with('archivo')->find($id);
 
@@ -385,67 +401,75 @@ class ProyectoController extends Controller
         }
 
         $archivoAnterior = null;
+        $rutaGuardada = null;
 
-        if ($request->hasFile('archivo')) {
-            $archivoAnterior = $proyecto->archivo;
+        try {
+            DB::transaction(function () use ($request, $proyecto, $etiquetaService, &$archivoAnterior, &$rutaGuardada) {
+                if ($request->hasFile('archivo')) {
+                    $archivoAnterior = $proyecto->archivo;
 
-            $archivoSubido = $request->file('archivo');
+                    $archivoSubido = $request->file('archivo');
 
-            $nombreOriginal = $archivoSubido->getClientOriginalName();
-            $extension = $archivoSubido->getClientOriginalExtension();
-            $mimeType = $archivoSubido->getMimeType();
-            $pesoBytes = $archivoSubido->getSize();
+                    $nombreOriginal = $archivoSubido->getClientOriginalName();
+                    $extension = $archivoSubido->getClientOriginalExtension();
+                    $mimeType = $archivoSubido->getMimeType();
+                    $pesoBytes = $archivoSubido->getSize();
 
-            $nombreGuardado = 'proyecto_' . now()->format('YmdHis') . '_' . Str::random(10) . '.' . $extension;
-            $ruta = $archivoSubido->storeAs('proyectos', $nombreGuardado, 'public');
+                    $nombreGuardado = 'proyecto_' . now()->format('YmdHis') . '_' . Str::random(10) . '.' . $extension;
+                    $rutaGuardada = $archivoSubido->storeAs('proyectos', $nombreGuardado, 'public');
 
-            $nuevoArchivo = Archivo::create([
-                'nombre_original' => $nombreOriginal,
-                'nombre_guardado' => $nombreGuardado,
-                'ruta' => $ruta,
-                'extension' => $extension,
-                'mime_type' => $mimeType,
-                'peso_bytes' => $pesoBytes,
-                'descargas' => 0,
-            ]);
+                    $nuevoArchivo = Archivo::create([
+                        'nombre_original' => $nombreOriginal,
+                        'nombre_guardado' => $nombreGuardado,
+                        'ruta' => $rutaGuardada,
+                        'extension' => $extension,
+                        'mime_type' => $mimeType,
+                        'peso_bytes' => $pesoBytes,
+                        'descargas' => 0,
+                    ]);
 
-            $proyecto->idarchivo = $nuevoArchivo->idarchivo;
+                    $proyecto->idarchivo = $nuevoArchivo->idarchivo;
+                }
+
+                $slug = $proyecto->titulo !== $request->titulo
+                    ? $this->generarSlugUnico($request->titulo, $proyecto->idproyecto)
+                    : $proyecto->slug;
+
+                $proyecto->update([
+                    'titulo' => $request->titulo,
+                    'slug' => $slug,
+                    'descripcion' => $request->descripcion,
+                    'porcentaje_avance' => $request->porcentaje_avance ?? 0,
+                    'fecha_inicio' => $request->fecha_inicio,
+                    'fecha_fin' => $request->fecha_fin,
+                    'responsable' => $request->responsable,
+                    'url_resultado' => $request->url_resultado,
+                    'idcategoria' => $request->idcategoria,
+                    'idestado' => $request->idestado,
+                    'idarchivo' => $proyecto->idarchivo,
+                    'orden' => $request->orden ?? 0,
+                    'activo' => $request->has('activo')
+                        ? $request->boolean('activo')
+                        : true,
+                ]);
+
+                $etiquetaService->sincronizar(
+                    EtiquetaEntidad::PROYECTOS,
+                    $proyecto->idproyecto,
+                    $request->input('etiquetas', [])
+                );
+            });
+        } catch (\Throwable $e) {
+            if ($rutaGuardada) {
+                Storage::disk('public')->delete($rutaGuardada);
+            }
+
+            throw $e;
         }
-
-        $slug = $proyecto->titulo !== $request->titulo
-            ? $this->generarSlugUnico($request->titulo, $proyecto->idproyecto)
-            : $proyecto->slug;
-
-        $proyecto->update([
-            'titulo' => $request->titulo,
-            'slug' => $slug,
-            'descripcion' => $request->descripcion,
-            'porcentaje_avance' => $request->porcentaje_avance ?? 0,
-            'fecha_inicio' => $request->fecha_inicio,
-            'fecha_fin' => $request->fecha_fin,
-            'responsable' => $request->responsable,
-            'url_resultado' => $request->url_resultado,
-            'idcategoria' => $request->idcategoria,
-            'idestado' => $request->idestado,
-            'idarchivo' => $proyecto->idarchivo,
-            'orden' => $request->orden ?? 0,
-            'activo' => $request->has('activo')
-                ? $request->boolean('activo')
-                : true,
-        ]);
-
-        $etiquetaService->sincronizar(
-            EtiquetaEntidad::PROYECTOS,
-            $proyecto->idproyecto,
-            $request->input('etiquetas', [])
-        );
 
         $this->limpiarCachePublico();
 
-        if ($archivoAnterior && !$this->archivoTieneUsos($archivoAnterior->idarchivo)) {
-            Storage::disk('public')->delete($archivoAnterior->ruta);
-            $archivoAnterior->delete();
-        }
+        $archivoLimpieza->eliminarSiNoEstaEnUso($archivoAnterior);
 
         $proyecto->load([
             'categoria',
@@ -467,7 +491,8 @@ class ProyectoController extends Controller
 
     public function destroy(
         int $id,
-        EtiquetaContenidoService $etiquetaService
+        EtiquetaContenidoService $etiquetaService,
+        ArchivoLimpiezaService $archivoLimpieza
     ): JsonResponse {
         $proyecto = Proyecto::with('archivo')->find($id);
 
@@ -487,10 +512,7 @@ class ProyectoController extends Controller
 
         $proyecto->delete();
 
-        if ($archivo && !$this->archivoTieneUsos($archivo->idarchivo)) {
-            Storage::disk('public')->delete($archivo->ruta);
-            $archivo->delete();
-        }
+        $archivoLimpieza->eliminarSiNoEstaEnUso($archivo);
 
         $this->limpiarCachePublico();
 
@@ -518,17 +540,6 @@ class ProyectoController extends Controller
         }
 
         return $slug;
-    }
-
-    private function archivoTieneUsos(int $idarchivo): bool
-    {
-        return DB::table('documentos')->where('idarchivo', $idarchivo)->exists()
-            || DB::table('eventos')->where('idarchivo', $idarchivo)->exists()
-            || DB::table('eventos_archivos')->where('idarchivo', $idarchivo)->exists()
-            || DB::table('noticias_imagen')->where('idarchivo', $idarchivo)->exists()
-            || DB::table('tutoriales')->where('idarchivo', $idarchivo)->exists()
-            || DB::table('solicitudes_soporte')->where('idarchivo', $idarchivo)->exists()
-            || DB::table('proyectos')->where('idarchivo', $idarchivo)->exists();
     }
 
     private function limpiarCachePublico(): void

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Archivo;
 use App\Models\PortalConfiguracion;
+use App\Services\ArchivoLimpiezaService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -106,7 +107,7 @@ class ConfiguracionController extends Controller
      * clave   = img_logo
      * archivo = archivo seleccionado
      */
-    public function updateArchivo(Request $request): JsonResponse
+    public function updateArchivo(Request $request, ArchivoLimpiezaService $archivoLimpieza): JsonResponse
     {
         $payload = $request->validate([
             'clave' => [
@@ -133,8 +134,11 @@ class ConfiguracionController extends Controller
             'archivo.max'      => 'La imagen no debe superar los 5 MB.',
         ]);
 
+        $rutaGuardada = null;
+        $archivoAnterior = null;
+
         try {
-            $resultado = DB::transaction(function () use ($payload) {
+            $resultado = DB::transaction(function () use ($payload, &$rutaGuardada, &$archivoAnterior) {
                 $configuracion = PortalConfiguracion::query()
                     ->with('archivo')
                     ->where('clave', $payload['clave'])
@@ -152,13 +156,13 @@ class ConfiguracionController extends Controller
                     $archivoSubido
                 );
 
-                $ruta = $archivoSubido->storeAs(
+                $rutaGuardada = $archivoSubido->storeAs(
                     'configuracion',
                     $nombreGuardado,
                     'public'
                 );
 
-                if (!$ruta) {
+                if (!$rutaGuardada) {
                     throw new \RuntimeException(
                         'No se pudo almacenar el archivo.'
                     );
@@ -167,7 +171,7 @@ class ConfiguracionController extends Controller
                 $nuevoArchivo = Archivo::query()->create([
                     'nombre_original' => $archivoSubido->getClientOriginalName(),
                     'nombre_guardado' => $nombreGuardado,
-                    'ruta'            => $ruta,
+                    'ruta'            => $rutaGuardada,
                     'extension'       => strtolower(
                         $archivoSubido->getClientOriginalExtension()
                     ),
@@ -182,43 +186,35 @@ class ConfiguracionController extends Controller
                     'valor'     => null,
                 ]);
 
-                /*
-                 * Eliminar el archivo anterior solamente si ya no está
-                 * siendo usado por otra configuración.
-                 */
-                if ($archivoAnterior) {
-                    $cantidadUsos = PortalConfiguracion::query()
-                        ->where('idarchivo', $archivoAnterior->idarchivo)
-                        ->count();
-
-                    if ($cantidadUsos === 0) {
-                        Storage::disk('public')->delete(
-                            $archivoAnterior->ruta
-                        );
-
-                        $archivoAnterior->delete();
-                    }
-                }
-
                 return $configuracion
                     ->fresh('archivo');
             });
-
-            return response()->json([
-                'message' => 'Imagen de configuración actualizada correctamente.',
-                'data'    => [
-                    $resultado->clave => $this->transformarConfiguracion(
-                        $resultado
-                    ),
-                ],
-            ]);
         } catch (Throwable $exception) {
+            if ($rutaGuardada) {
+                Storage::disk('public')->delete($rutaGuardada);
+            }
+
             report($exception);
 
             return response()->json([
                 'message' => 'No se pudo guardar la imagen de configuración.',
             ], 500);
         }
+
+        /*
+         * Eliminar el archivo anterior solamente si ya no está siendo
+         * usado por otra configuración o por otro módulo.
+         */
+        $archivoLimpieza->eliminarSiNoEstaEnUso($archivoAnterior);
+
+        return response()->json([
+            'message' => 'Imagen de configuración actualizada correctamente.',
+            'data'    => [
+                $resultado->clave => $this->transformarConfiguracion(
+                    $resultado
+                ),
+            ],
+        ]);
     }
 
     /**
@@ -226,7 +222,7 @@ class ConfiguracionController extends Controller
      *
      * Quita la imagen administrable y deja activo el fallback del frontend.
      */
-    public function eliminarArchivo(string $clave): JsonResponse
+    public function eliminarArchivo(string $clave, ArchivoLimpiezaService $archivoLimpieza): JsonResponse
     {
         $configuracion = PortalConfiguracion::query()
             ->with('archivo')
@@ -236,25 +232,12 @@ class ConfiguracionController extends Controller
 
         $archivo = $configuracion->archivo;
 
-        DB::transaction(function () use ($configuracion, $archivo) {
-            $configuracion->update([
-                'idarchivo' => null,
-                'valor'     => null,
-            ]);
+        $configuracion->update([
+            'idarchivo' => null,
+            'valor'     => null,
+        ]);
 
-            if (!$archivo) {
-                return;
-            }
-
-            $cantidadUsos = PortalConfiguracion::query()
-                ->where('idarchivo', $archivo->idarchivo)
-                ->count();
-
-            if ($cantidadUsos === 0) {
-                Storage::disk('public')->delete($archivo->ruta);
-                $archivo->delete();
-            }
-        });
+        $archivoLimpieza->eliminarSiNoEstaEnUso($archivo);
 
         return response()->json([
             'message' => 'Imagen eliminada correctamente.',

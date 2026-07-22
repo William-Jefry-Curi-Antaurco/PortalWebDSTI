@@ -7,8 +7,10 @@ use App\Models\Archivo;
 use App\Models\Prioridad;
 use App\Models\SolicitudRespuesta;
 use App\Models\SolicitudSoporte;
+use App\Services\ArchivoLimpiezaService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -154,48 +156,60 @@ class SolicitudSoporteController extends Controller
             ], 422);
         }
 
-        $idArchivo = null;
+        $rutaGuardada = null;
 
-        if ($request->hasFile('adjunto')) {
-            $archivoSubido = $request->file('adjunto');
+        try {
+            $solicitud = DB::transaction(function () use ($request, &$rutaGuardada) {
+                $idArchivo = null;
 
-            $nombreOriginal = $archivoSubido->getClientOriginalName();
-            $extension = $archivoSubido->getClientOriginalExtension();
-            $mimeType = $archivoSubido->getMimeType();
-            $pesoBytes = $archivoSubido->getSize();
+                if ($request->hasFile('adjunto')) {
+                    $archivoSubido = $request->file('adjunto');
 
-            $nombreGuardado = 'soporte_' . now()->format('YmdHis') . '_' . Str::random(10) . '.' . $extension;
-            $ruta = $archivoSubido->storeAs('soporte', $nombreGuardado, 'public');
+                    $nombreOriginal = $archivoSubido->getClientOriginalName();
+                    $extension = $archivoSubido->getClientOriginalExtension();
+                    $mimeType = $archivoSubido->getMimeType();
+                    $pesoBytes = $archivoSubido->getSize();
 
-            $archivo = Archivo::create([
-                'nombre_original' => $nombreOriginal,
-                'nombre_guardado' => $nombreGuardado,
-                'ruta' => $ruta,
-                'extension' => $extension,
-                'mime_type' => $mimeType,
-                'peso_bytes' => $pesoBytes,
-                'descargas' => 0,
-            ]);
+                    $nombreGuardado = 'soporte_' . now()->format('YmdHis') . '_' . Str::random(10) . '.' . $extension;
+                    $rutaGuardada = $archivoSubido->storeAs('soporte', $nombreGuardado, 'public');
 
-            $idArchivo = $archivo->idarchivo;
+                    $archivo = Archivo::create([
+                        'nombre_original' => $nombreOriginal,
+                        'nombre_guardado' => $nombreGuardado,
+                        'ruta' => $rutaGuardada,
+                        'extension' => $extension,
+                        'mime_type' => $mimeType,
+                        'peso_bytes' => $pesoBytes,
+                        'descargas' => 0,
+                    ]);
+
+                    $idArchivo = $archivo->idarchivo;
+                }
+
+                return SolicitudSoporte::create([
+                    'nombres' => $request->nombres,
+                    'email' => $request->email,
+                    'telefono' => $request->telefono,
+                    'dependencia' => $request->dependencia,
+                    'asunto' => $request->asunto,
+                    'descripcion' => $request->descripcion,
+                    'idarchivo' => $idArchivo,
+                    'ip_origen' => $request->ip(),
+                    'consentimiento_privacidad' => $request->boolean('consentimiento_privacidad'),
+                    'codigo_ticket' => $this->generarCodigoTicket(),
+                    'idtiposoporte' => $request->idtiposoporte,
+                    'idprioridad' => $request->idprioridad ?? $this->prioridadPorDefecto(),
+                    'idestado' => $request->idestado,
+                    'idusuario_atendio' => $request->idusuario_atendio,
+                ]);
+            });
+        } catch (\Throwable $e) {
+            if ($rutaGuardada) {
+                Storage::disk('public')->delete($rutaGuardada);
+            }
+
+            throw $e;
         }
-
-        $solicitud = SolicitudSoporte::create([
-            'nombres' => $request->nombres,
-            'email' => $request->email,
-            'telefono' => $request->telefono,
-            'dependencia' => $request->dependencia,
-            'asunto' => $request->asunto,
-            'descripcion' => $request->descripcion,
-            'idarchivo' => $idArchivo,
-            'ip_origen' => $request->ip(),
-            'consentimiento_privacidad' => $request->boolean('consentimiento_privacidad'),
-            'codigo_ticket' => $this->generarCodigoTicket(),
-            'idtiposoporte' => $request->idtiposoporte,
-            'idprioridad' => $request->idprioridad ?? $this->prioridadPorDefecto(),
-            'idestado' => $request->idestado,
-            'idusuario_atendio' => $request->idusuario_atendio,
-        ]);
 
         $solicitud->load([
             'archivo',
@@ -237,7 +251,7 @@ class SolicitudSoporteController extends Controller
         ]);
     }
 
-    public function update(Request $request, int $id): JsonResponse
+    public function update(Request $request, int $id, ArchivoLimpiezaService $archivoLimpieza): JsonResponse
     {
         $solicitud = SolicitudSoporte::with('archivo')->find($id);
 
@@ -335,56 +349,60 @@ class SolicitudSoporteController extends Controller
         }
 
         $archivoAnterior = null;
+        $rutaGuardada = null;
 
-        if ($request->hasFile('adjunto')) {
-            $archivoAnterior = $solicitud->archivo;
+        try {
+            DB::transaction(function () use ($request, $solicitud, &$archivoAnterior, &$rutaGuardada) {
+                if ($request->hasFile('adjunto')) {
+                    $archivoAnterior = $solicitud->archivo;
 
-            $archivoSubido = $request->file('adjunto');
+                    $archivoSubido = $request->file('adjunto');
 
-            $nombreOriginal = $archivoSubido->getClientOriginalName();
-            $extension = $archivoSubido->getClientOriginalExtension();
-            $mimeType = $archivoSubido->getMimeType();
-            $pesoBytes = $archivoSubido->getSize();
+                    $nombreOriginal = $archivoSubido->getClientOriginalName();
+                    $extension = $archivoSubido->getClientOriginalExtension();
+                    $mimeType = $archivoSubido->getMimeType();
+                    $pesoBytes = $archivoSubido->getSize();
 
-            $nombreGuardado = 'soporte_' . now()->format('YmdHis') . '_' . Str::random(10) . '.' . $extension;
-            $ruta = $archivoSubido->storeAs('soporte', $nombreGuardado, 'public');
+                    $nombreGuardado = 'soporte_' . now()->format('YmdHis') . '_' . Str::random(10) . '.' . $extension;
+                    $rutaGuardada = $archivoSubido->storeAs('soporte', $nombreGuardado, 'public');
 
-            $nuevoArchivo = Archivo::create([
-                'nombre_original' => $nombreOriginal,
-                'nombre_guardado' => $nombreGuardado,
-                'ruta' => $ruta,
-                'extension' => $extension,
-                'mime_type' => $mimeType,
-                'peso_bytes' => $pesoBytes,
-                'descargas' => 0,
-            ]);
+                    $nuevoArchivo = Archivo::create([
+                        'nombre_original' => $nombreOriginal,
+                        'nombre_guardado' => $nombreGuardado,
+                        'ruta' => $rutaGuardada,
+                        'extension' => $extension,
+                        'mime_type' => $mimeType,
+                        'peso_bytes' => $pesoBytes,
+                        'descargas' => 0,
+                    ]);
 
-            $solicitud->idarchivo = $nuevoArchivo->idarchivo;
-        }
+                    $solicitud->idarchivo = $nuevoArchivo->idarchivo;
+                }
 
-        $solicitud->update([
-            'nombres' => $request->nombres,
-            'email' => $request->email,
-            'telefono' => $request->telefono,
-            'dependencia' => $request->dependencia,
-            'asunto' => $request->asunto,
-            'descripcion' => $request->descripcion,
-            'idarchivo' => $solicitud->idarchivo,
-            'consentimiento_privacidad' => $request->boolean('consentimiento_privacidad'),
-            'idtiposoporte' => $request->idtiposoporte,
-            'idprioridad' => $request->idprioridad ?? $solicitud->idprioridad,
-            'idestado' => $request->idestado,
-            'idusuario_atendio' => $request->idusuario_atendio,
-        ]);
-
-        if ($archivoAnterior) {
-            $usosArchivo = SolicitudSoporte::where('idarchivo', $archivoAnterior->idarchivo)->count();
-
-            if ($usosArchivo === 0) {
-                Storage::disk('public')->delete($archivoAnterior->ruta);
-                $archivoAnterior->delete();
+                $solicitud->update([
+                    'nombres' => $request->nombres,
+                    'email' => $request->email,
+                    'telefono' => $request->telefono,
+                    'dependencia' => $request->dependencia,
+                    'asunto' => $request->asunto,
+                    'descripcion' => $request->descripcion,
+                    'idarchivo' => $solicitud->idarchivo,
+                    'consentimiento_privacidad' => $request->boolean('consentimiento_privacidad'),
+                    'idtiposoporte' => $request->idtiposoporte,
+                    'idprioridad' => $request->idprioridad ?? $solicitud->idprioridad,
+                    'idestado' => $request->idestado,
+                    'idusuario_atendio' => $request->idusuario_atendio,
+                ]);
+            });
+        } catch (\Throwable $e) {
+            if ($rutaGuardada) {
+                Storage::disk('public')->delete($rutaGuardada);
             }
+
+            throw $e;
         }
+
+        $archivoLimpieza->eliminarSiNoEstaEnUso($archivoAnterior);
 
         $solicitud->load([
             'archivo',
@@ -477,7 +495,7 @@ class SolicitudSoporteController extends Controller
         ]);
     }
 
-    public function destroy(int $id): JsonResponse
+    public function destroy(int $id, ArchivoLimpiezaService $archivoLimpieza): JsonResponse
     {
         $solicitud = SolicitudSoporte::with('archivo')
             ->withCount('respuestas')
@@ -504,14 +522,7 @@ class SolicitudSoporteController extends Controller
 
         $solicitud->delete();
 
-        if ($archivo) {
-            $usosArchivo = SolicitudSoporte::where('idarchivo', $archivo->idarchivo)->count();
-
-            if ($usosArchivo === 0) {
-                Storage::disk('public')->delete($archivo->ruta);
-                $archivo->delete();
-            }
-        }
+        $archivoLimpieza->eliminarSiNoEstaEnUso($archivo);
 
         return response()->json([
             'success' => true,

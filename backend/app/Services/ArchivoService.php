@@ -25,7 +25,7 @@ class ArchivoService
         return Archivo::create([
             'nombre_original' => $nombreOriginal,
             'nombre_guardado' => $nombreGuardado,
-            'ruta' => 'storage/' . $ruta,
+            'ruta' => $ruta,
             'extension' => $extension,
             'mime_type' => $archivo->getMimeType(),
             'peso_bytes' => $archivo->getSize(),

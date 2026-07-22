@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Autoridad;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
@@ -126,35 +127,52 @@ class AutoridadController extends Controller
             ], 422);
         }
 
-        $fotoUrl = $request->foto_url;
-        $cvUrl = $request->cv_url;
+        $fotoGuardada = null;
+        $cvGuardado = null;
 
-        if ($request->hasFile('foto')) {
-            $foto = $request->file('foto');
-            $extension = $foto->getClientOriginalExtension();
-            $nombreFoto = 'autoridad_foto_' . now()->format('YmdHis') . '_' . uniqid() . '.' . $extension;
-            $fotoUrl = $foto->storeAs('autoridades/fotos', $nombreFoto, 'public');
+        try {
+            $autoridad = DB::transaction(function () use ($request, &$fotoGuardada, &$cvGuardado) {
+                $fotoUrl = $request->foto_url;
+                $cvUrl = $request->cv_url;
+
+                if ($request->hasFile('foto')) {
+                    $foto = $request->file('foto');
+                    $extension = $foto->getClientOriginalExtension();
+                    $nombreFoto = 'autoridad_foto_' . now()->format('YmdHis') . '_' . uniqid() . '.' . $extension;
+                    $fotoUrl = $fotoGuardada = $foto->storeAs('autoridades/fotos', $nombreFoto, 'public');
+                }
+
+                if ($request->hasFile('cv')) {
+                    $cv = $request->file('cv');
+                    $extension = $cv->getClientOriginalExtension();
+                    $nombreCv = 'autoridad_cv_' . now()->format('YmdHis') . '_' . uniqid() . '.' . $extension;
+                    $cvUrl = $cvGuardado = $cv->storeAs('autoridades/cv', $nombreCv, 'public');
+                }
+
+                return Autoridad::create([
+                    'nombre_completo' => $request->nombre_completo,
+                    'cargo' => $request->cargo,
+                    'funciones_principales' => $request->funciones_principales,
+                    'correo_institucional' => $request->correo_institucional,
+                    'foto_url' => $fotoUrl,
+                    'cv_url' => $cvUrl,
+                    'orden' => $request->orden ?? 0,
+                    'fecha_inicio_gestion' => $request->fecha_inicio_gestion,
+                    'fecha_fin_gestion' => $request->fecha_fin_gestion,
+                    'activo' => $request->has('activo') ? $request->boolean('activo') : true,
+                ]);
+            });
+        } catch (\Throwable $e) {
+            if ($fotoGuardada) {
+                Storage::disk('public')->delete($fotoGuardada);
+            }
+
+            if ($cvGuardado) {
+                Storage::disk('public')->delete($cvGuardado);
+            }
+
+            throw $e;
         }
-
-        if ($request->hasFile('cv')) {
-            $cv = $request->file('cv');
-            $extension = $cv->getClientOriginalExtension();
-            $nombreCv = 'autoridad_cv_' . now()->format('YmdHis') . '_' . uniqid() . '.' . $extension;
-            $cvUrl = $cv->storeAs('autoridades/cv', $nombreCv, 'public');
-        }
-
-        $autoridad = Autoridad::create([
-            'nombre_completo' => $request->nombre_completo,
-            'cargo' => $request->cargo,
-            'funciones_principales' => $request->funciones_principales,
-            'correo_institucional' => $request->correo_institucional,
-            'foto_url' => $fotoUrl,
-            'cv_url' => $cvUrl,
-            'orden' => $request->orden ?? 0,
-            'fecha_inicio_gestion' => $request->fecha_inicio_gestion,
-            'fecha_fin_gestion' => $request->fecha_fin_gestion,
-            'activo' => $request->has('activo') ? $request->boolean('activo') : true,
-        ]);
 
         return response()->json([
             'success' => true,
@@ -275,36 +293,52 @@ class AutoridadController extends Controller
 
         $fotoAnterior = $autoridad->foto_url;
         $cvAnterior = $autoridad->cv_url;
+        $fotoGuardada = null;
+        $cvGuardado = null;
 
-        $fotoUrl = $request->foto_url ?? $autoridad->foto_url;
-        $cvUrl = $request->cv_url ?? $autoridad->cv_url;
+        try {
+            DB::transaction(function () use ($request, $autoridad, &$fotoGuardada, &$cvGuardado) {
+                $fotoUrl = $request->foto_url ?? $autoridad->foto_url;
+                $cvUrl = $request->cv_url ?? $autoridad->cv_url;
 
-        if ($request->hasFile('foto')) {
-            $foto = $request->file('foto');
-            $extension = $foto->getClientOriginalExtension();
-            $nombreFoto = 'autoridad_foto_' . now()->format('YmdHis') . '_' . uniqid() . '.' . $extension;
-            $fotoUrl = $foto->storeAs('autoridades/fotos', $nombreFoto, 'public');
+                if ($request->hasFile('foto')) {
+                    $foto = $request->file('foto');
+                    $extension = $foto->getClientOriginalExtension();
+                    $nombreFoto = 'autoridad_foto_' . now()->format('YmdHis') . '_' . uniqid() . '.' . $extension;
+                    $fotoUrl = $fotoGuardada = $foto->storeAs('autoridades/fotos', $nombreFoto, 'public');
+                }
+
+                if ($request->hasFile('cv')) {
+                    $cv = $request->file('cv');
+                    $extension = $cv->getClientOriginalExtension();
+                    $nombreCv = 'autoridad_cv_' . now()->format('YmdHis') . '_' . uniqid() . '.' . $extension;
+                    $cvUrl = $cvGuardado = $cv->storeAs('autoridades/cv', $nombreCv, 'public');
+                }
+
+                $autoridad->update([
+                    'nombre_completo' => $request->nombre_completo,
+                    'cargo' => $request->cargo,
+                    'funciones_principales' => $request->funciones_principales,
+                    'correo_institucional' => $request->correo_institucional,
+                    'foto_url' => $fotoUrl,
+                    'cv_url' => $cvUrl,
+                    'orden' => $request->orden ?? 0,
+                    'fecha_inicio_gestion' => $request->fecha_inicio_gestion,
+                    'fecha_fin_gestion' => $request->fecha_fin_gestion,
+                    'activo' => $request->has('activo') ? $request->boolean('activo') : true,
+                ]);
+            });
+        } catch (\Throwable $e) {
+            if ($fotoGuardada) {
+                Storage::disk('public')->delete($fotoGuardada);
+            }
+
+            if ($cvGuardado) {
+                Storage::disk('public')->delete($cvGuardado);
+            }
+
+            throw $e;
         }
-
-        if ($request->hasFile('cv')) {
-            $cv = $request->file('cv');
-            $extension = $cv->getClientOriginalExtension();
-            $nombreCv = 'autoridad_cv_' . now()->format('YmdHis') . '_' . uniqid() . '.' . $extension;
-            $cvUrl = $cv->storeAs('autoridades/cv', $nombreCv, 'public');
-        }
-
-        $autoridad->update([
-            'nombre_completo' => $request->nombre_completo,
-            'cargo' => $request->cargo,
-            'funciones_principales' => $request->funciones_principales,
-            'correo_institucional' => $request->correo_institucional,
-            'foto_url' => $fotoUrl,
-            'cv_url' => $cvUrl,
-            'orden' => $request->orden ?? 0,
-            'fecha_inicio_gestion' => $request->fecha_inicio_gestion,
-            'fecha_fin_gestion' => $request->fecha_fin_gestion,
-            'activo' => $request->has('activo') ? $request->boolean('activo') : true,
-        ]);
 
         if ($request->hasFile('foto') && $fotoAnterior && !$this->esUrlExterna($fotoAnterior)) {
             Storage::disk('public')->delete($fotoAnterior);

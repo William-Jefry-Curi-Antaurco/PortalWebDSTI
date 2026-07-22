@@ -6,10 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\Archivo;
 use App\Models\Evento;
 use App\Models\EventoArchivo;
+use App\Services\ArchivoLimpiezaService;
 use App\Services\EtiquetaContenidoService;
 use App\Support\EtiquetaEntidad;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -189,39 +191,58 @@ class EventoController extends Controller
             ], 422);
         }
 
-        $idArchivo = null;
+        $rutasGuardadas = [];
 
-        if ($request->hasFile('archivo')) {
-            $idArchivo = $this->guardarArchivoEvento($request->file('archivo'))->idarchivo;
+        try {
+            $evento = DB::transaction(function () use ($request, $etiquetaService, &$rutasGuardadas) {
+                $idArchivo = null;
+
+                if ($request->hasFile('archivo')) {
+                    $ruta = null;
+                    $idArchivo = $this->guardarArchivoEvento($request->file('archivo'), $ruta)->idarchivo;
+                    $rutasGuardadas[] = $ruta;
+                }
+
+                $evento = Evento::create([
+                    'titulo' => $request->titulo,
+                    'slug' => $this->generarSlugUnico($request->titulo),
+                    'descripcion' => $request->descripcion,
+                    'fecha_inicio' => $request->fecha_inicio,
+                    'fecha_fin' => $request->fecha_fin,
+                    'ubicacion' => $request->ubicacion,
+                    'enlace_virtual' => $request->enlace_virtual,
+                    'cupo_maximo' => $request->cupo_maximo ?? 0,
+                    'cupos_ocupados' => 0,
+                    'idarchivo' => $idArchivo,
+                    'idcategoria' => $request->idcategoria,
+                    'idusuario_organizador' => $request->user()->idusuario,
+                    'idestado' => $request->idestado,
+                    'idtipoevento' => $request->idtipoevento,
+                    'idmodalidad' => $request->idmodalidad,
+                ]);
+
+                if ($request->hasFile('imagenes')) {
+                    $rutasGuardadas = array_merge(
+                        $rutasGuardadas,
+                        $this->guardarGaleriaImagenes($request->file('imagenes'), $evento->idevento)
+                    );
+                }
+
+                $etiquetaService->sincronizar(
+                    EtiquetaEntidad::EVENTOS,
+                    $evento->idevento,
+                    $request->input('etiquetas', [])
+                );
+
+                return $evento;
+            });
+        } catch (\Throwable $e) {
+            foreach ($rutasGuardadas as $ruta) {
+                Storage::disk('public')->delete($ruta);
+            }
+
+            throw $e;
         }
-
-        $evento = Evento::create([
-            'titulo' => $request->titulo,
-            'slug' => $this->generarSlugUnico($request->titulo),
-            'descripcion' => $request->descripcion,
-            'fecha_inicio' => $request->fecha_inicio,
-            'fecha_fin' => $request->fecha_fin,
-            'ubicacion' => $request->ubicacion,
-            'enlace_virtual' => $request->enlace_virtual,
-            'cupo_maximo' => $request->cupo_maximo ?? 0,
-            'cupos_ocupados' => 0,
-            'idarchivo' => $idArchivo,
-            'idcategoria' => $request->idcategoria,
-            'idusuario_organizador' => $request->user()->idusuario,
-            'idestado' => $request->idestado,
-            'idtipoevento' => $request->idtipoevento,
-            'idmodalidad' => $request->idmodalidad,
-        ]);
-
-        if ($request->hasFile('imagenes')) {
-            $this->guardarGaleriaImagenes($request->file('imagenes'), $evento->idevento);
-        }
-
-        $etiquetaService->sincronizar(
-            EtiquetaEntidad::EVENTOS,
-            $evento->idevento,
-            $request->input('etiquetas', [])
-        );
 
         $this->limpiarCachePublico();
 
@@ -286,7 +307,8 @@ class EventoController extends Controller
     public function update(
         Request $request,
                 $id,
-        EtiquetaContenidoService $etiquetaService
+        EtiquetaContenidoService $etiquetaService,
+        ArchivoLimpiezaService $archivoLimpieza
     ) {
         $evento = Evento::with('archivo')->find($id);
 
@@ -413,54 +435,68 @@ class EventoController extends Controller
         }
 
         $archivoAnterior = null;
+        $archivosGaleriaAnteriores = [];
+        $rutasGuardadas = [];
 
-        if ($request->hasFile('archivo')) {
-            $archivoAnterior = $evento->archivo;
-            $nuevoArchivo = $this->guardarArchivoEvento($request->file('archivo'));
-            $evento->idarchivo = $nuevoArchivo->idarchivo;
+        try {
+            DB::transaction(function () use ($request, $evento, $etiquetaService, &$archivoAnterior, &$archivosGaleriaAnteriores, &$rutasGuardadas) {
+                if ($request->hasFile('archivo')) {
+                    $archivoAnterior = $evento->archivo;
+                    $ruta = null;
+                    $nuevoArchivo = $this->guardarArchivoEvento($request->file('archivo'), $ruta);
+                    $rutasGuardadas[] = $ruta;
+                    $evento->idarchivo = $nuevoArchivo->idarchivo;
+                }
+
+                $slug = $evento->titulo !== $request->titulo
+                    ? $this->generarSlugUnico($request->titulo, $evento->idevento)
+                    : $evento->slug;
+
+                $evento->update([
+                    'titulo' => $request->titulo,
+                    'slug' => $slug,
+                    'descripcion' => $request->descripcion,
+                    'fecha_inicio' => $request->fecha_inicio,
+                    'fecha_fin' => $request->fecha_fin,
+                    'ubicacion' => $request->ubicacion,
+                    'enlace_virtual' => $request->enlace_virtual,
+                    'cupo_maximo' => $request->cupo_maximo ?? 0,
+                    'cupos_ocupados' => $request->cupos_ocupados ?? $evento->cupos_ocupados,
+                    'idarchivo' => $evento->idarchivo,
+                    'idcategoria' => $request->idcategoria,
+                    'idestado' => $request->idestado,
+                    'idtipoevento' => $request->idtipoevento,
+                    'idmodalidad' => $request->idmodalidad,
+                ]);
+
+                $etiquetaService->sincronizar(
+                    EtiquetaEntidad::EVENTOS,
+                    $evento->idevento,
+                    $request->input('etiquetas', [])
+                );
+
+                if ($request->hasFile('imagenes')) {
+                    $archivosGaleriaAnteriores = $this->eliminarGaleriaImagenes($evento->idevento);
+                    $rutasGuardadas = array_merge(
+                        $rutasGuardadas,
+                        $this->guardarGaleriaImagenes($request->file('imagenes'), $evento->idevento)
+                    );
+                }
+            });
+        } catch (\Throwable $e) {
+            foreach ($rutasGuardadas as $ruta) {
+                Storage::disk('public')->delete($ruta);
+            }
+
+            throw $e;
         }
-
-        $slug = $evento->titulo !== $request->titulo
-            ? $this->generarSlugUnico($request->titulo, $evento->idevento)
-            : $evento->slug;
-
-        $evento->update([
-            'titulo' => $request->titulo,
-            'slug' => $slug,
-            'descripcion' => $request->descripcion,
-            'fecha_inicio' => $request->fecha_inicio,
-            'fecha_fin' => $request->fecha_fin,
-            'ubicacion' => $request->ubicacion,
-            'enlace_virtual' => $request->enlace_virtual,
-            'cupo_maximo' => $request->cupo_maximo ?? 0,
-            'cupos_ocupados' => $request->cupos_ocupados ?? $evento->cupos_ocupados,
-            'idarchivo' => $evento->idarchivo,
-            'idcategoria' => $request->idcategoria,
-            'idestado' => $request->idestado,
-            'idtipoevento' => $request->idtipoevento,
-            'idmodalidad' => $request->idmodalidad,
-        ]);
-
-        $etiquetaService->sincronizar(
-            EtiquetaEntidad::EVENTOS,
-            $evento->idevento,
-            $request->input('etiquetas', [])
-        );
 
         $this->limpiarCachePublico();
 
-        if ($archivoAnterior) {
-            $usosArchivo = Evento::where('idarchivo', $archivoAnterior->idarchivo)->count();
+        $archivoLimpieza->eliminarSiNoEstaEnUso($archivoAnterior);
 
-            if ($usosArchivo === 0) {
-                Storage::disk('public')->delete($archivoAnterior->ruta);
-                $archivoAnterior->delete();
-            }
-        }
-
-        if ($request->hasFile('imagenes')) {
-            $this->eliminarGaleriaImagenes($evento->idevento);
-            $this->guardarGaleriaImagenes($request->file('imagenes'), $evento->idevento);
+        foreach ($archivosGaleriaAnteriores as $archivoGaleria) {
+            $archivoLimpieza->eliminarSiNoEstaEnUso($archivoGaleria);
         }
 
         $evento->load([
@@ -543,17 +579,29 @@ class EventoController extends Controller
             ], 422);
         }
 
-        $archivo = $this->guardarArchivoEvento($request->file('archivo'));
+        $rutaGuardada = null;
 
-        $eventoArchivo = EventoArchivo::create([
-            'titulo' => $request->titulo,
-            'descripcion' => $request->descripcion,
-            'tipo' => $request->tipo,
-            'es_portada' => $request->has('es_portada') ? $request->boolean('es_portada') : false,
-            'orden' => $request->orden ?? 0,
-            'idarchivo' => $archivo->idarchivo,
-            'idevento' => $evento->idevento,
-        ]);
+        try {
+            $eventoArchivo = DB::transaction(function () use ($request, $evento, &$rutaGuardada) {
+                $archivo = $this->guardarArchivoEvento($request->file('archivo'), $rutaGuardada);
+
+                return EventoArchivo::create([
+                    'titulo' => $request->titulo,
+                    'descripcion' => $request->descripcion,
+                    'tipo' => $request->tipo,
+                    'es_portada' => $request->has('es_portada') ? $request->boolean('es_portada') : false,
+                    'orden' => $request->orden ?? 0,
+                    'idarchivo' => $archivo->idarchivo,
+                    'idevento' => $evento->idevento,
+                ]);
+            });
+        } catch (\Throwable $e) {
+            if ($rutaGuardada) {
+                Storage::disk('public')->delete($rutaGuardada);
+            }
+
+            throw $e;
+        }
 
         $this->limpiarCachePublico();
 
@@ -566,7 +614,7 @@ class EventoController extends Controller
         ], 201);
     }
 
-    public function actualizarArchivo(Request $request, $id)
+    public function actualizarArchivo(Request $request, $id, ArchivoLimpiezaService $archivoLimpieza)
     {
         $eventoArchivo = EventoArchivo::with('archivo')->find($id);
 
@@ -623,30 +671,34 @@ class EventoController extends Controller
         }
 
         $archivoAnterior = null;
+        $rutaGuardada = null;
 
-        if ($request->hasFile('archivo')) {
-            $archivoAnterior = $eventoArchivo->archivo;
-            $nuevoArchivo = $this->guardarArchivoEvento($request->file('archivo'));
-            $eventoArchivo->idarchivo = $nuevoArchivo->idarchivo;
-        }
+        try {
+            DB::transaction(function () use ($request, $eventoArchivo, &$archivoAnterior, &$rutaGuardada) {
+                if ($request->hasFile('archivo')) {
+                    $archivoAnterior = $eventoArchivo->archivo;
+                    $nuevoArchivo = $this->guardarArchivoEvento($request->file('archivo'), $rutaGuardada);
+                    $eventoArchivo->idarchivo = $nuevoArchivo->idarchivo;
+                }
 
-        $eventoArchivo->update([
-            'titulo' => $request->titulo,
-            'descripcion' => $request->descripcion,
-            'tipo' => $request->tipo,
-            'es_portada' => $request->has('es_portada') ? $request->boolean('es_portada') : false,
-            'orden' => $request->orden ?? 0,
-            'idarchivo' => $eventoArchivo->idarchivo,
-        ]);
-
-        if ($archivoAnterior) {
-            $usosArchivo = EventoArchivo::where('idarchivo', $archivoAnterior->idarchivo)->count();
-
-            if ($usosArchivo === 0) {
-                Storage::disk('public')->delete($archivoAnterior->ruta);
-                $archivoAnterior->delete();
+                $eventoArchivo->update([
+                    'titulo' => $request->titulo,
+                    'descripcion' => $request->descripcion,
+                    'tipo' => $request->tipo,
+                    'es_portada' => $request->has('es_portada') ? $request->boolean('es_portada') : false,
+                    'orden' => $request->orden ?? 0,
+                    'idarchivo' => $eventoArchivo->idarchivo,
+                ]);
+            });
+        } catch (\Throwable $e) {
+            if ($rutaGuardada) {
+                Storage::disk('public')->delete($rutaGuardada);
             }
+
+            throw $e;
         }
+
+        $archivoLimpieza->eliminarSiNoEstaEnUso($archivoAnterior);
 
         $this->limpiarCachePublico();
 
@@ -659,7 +711,7 @@ class EventoController extends Controller
         ]);
     }
 
-    public function eliminarArchivo($id)
+    public function eliminarArchivo($id, ArchivoLimpiezaService $archivoLimpieza)
     {
         $eventoArchivo = EventoArchivo::with('archivo')->find($id);
 
@@ -674,14 +726,7 @@ class EventoController extends Controller
 
         $eventoArchivo->delete();
 
-        if ($archivo) {
-            $usosArchivo = EventoArchivo::where('idarchivo', $archivo->idarchivo)->count();
-
-            if ($usosArchivo === 0) {
-                Storage::disk('public')->delete($archivo->ruta);
-                $archivo->delete();
-            }
-        }
+        $archivoLimpieza->eliminarSiNoEstaEnUso($archivo);
 
         $this->limpiarCachePublico();
 
@@ -693,7 +738,8 @@ class EventoController extends Controller
 
     public function destroy(
         $id,
-        EtiquetaContenidoService $etiquetaService
+        EtiquetaContenidoService $etiquetaService,
+        ArchivoLimpiezaService $archivoLimpieza
     ) {
         $evento = Evento::with('archivo')
             ->withCount(['inscripciones', 'archivos'])
@@ -713,24 +759,24 @@ class EventoController extends Controller
             ], 409);
         }
 
-        $this->eliminarGaleriaImagenes($evento->idevento);
-
         $archivo = $evento->archivo;
+        $archivosGaleria = [];
 
-        $etiquetaService->eliminarRelaciones(
-            EtiquetaEntidad::EVENTOS,
-            $evento->idevento
-        );
+        DB::transaction(function () use ($evento, $etiquetaService, &$archivosGaleria) {
+            $archivosGaleria = $this->eliminarGaleriaImagenes($evento->idevento);
 
-        $evento->delete();
+            $etiquetaService->eliminarRelaciones(
+                EtiquetaEntidad::EVENTOS,
+                $evento->idevento
+            );
 
-        if ($archivo) {
-            $usosArchivo = Evento::where('idarchivo', $archivo->idarchivo)->count();
+            $evento->delete();
+        });
 
-            if ($usosArchivo === 0) {
-                Storage::disk('public')->delete($archivo->ruta);
-                $archivo->delete();
-            }
+        $archivoLimpieza->eliminarSiNoEstaEnUso($archivo);
+
+        foreach ($archivosGaleria as $archivoGaleria) {
+            $archivoLimpieza->eliminarSiNoEstaEnUso($archivoGaleria);
         }
 
         $this->limpiarCachePublico();
@@ -741,16 +787,16 @@ class EventoController extends Controller
         ]);
     }
 
-    private function guardarArchivoEvento($archivoSubido): Archivo
+    private function guardarArchivoEvento($archivoSubido, ?string &$rutaGuardada = null): Archivo
     {
         $extension = $archivoSubido->getClientOriginalExtension();
         $nombreGuardado = 'evento_' . now()->format('YmdHis') . '_' . Str::random(10) . '.' . $extension;
-        $ruta = $archivoSubido->storeAs('eventos', $nombreGuardado, 'public');
+        $rutaGuardada = $archivoSubido->storeAs('eventos', $nombreGuardado, 'public');
 
         return Archivo::create([
             'nombre_original' => $archivoSubido->getClientOriginalName(),
             'nombre_guardado' => $nombreGuardado,
-            'ruta' => $ruta,
+            'ruta' => $rutaGuardada,
             'extension' => $extension,
             'mime_type' => $archivoSubido->getMimeType(),
             'peso_bytes' => $archivoSubido->getSize(),
@@ -758,10 +804,18 @@ class EventoController extends Controller
         ]);
     }
 
-    private function guardarGaleriaImagenes(array $imagenes, int $idEvento): void
+    /**
+     * Guarda las imágenes de galería y devuelve las rutas físicas guardadas,
+     * para que el llamador pueda borrarlas del disco si la transacción falla.
+     */
+    private function guardarGaleriaImagenes(array $imagenes, int $idEvento): array
     {
+        $rutas = [];
+
         foreach (array_values($imagenes) as $indice => $img) {
-            $archivoImg = $this->guardarArchivoEvento($img);
+            $ruta = null;
+            $archivoImg = $this->guardarArchivoEvento($img, $ruta);
+            $rutas[] = $ruta;
 
             EventoArchivo::create([
                 'titulo' => 'Imagen del evento',
@@ -773,28 +827,33 @@ class EventoController extends Controller
                 'idevento' => $idEvento,
             ]);
         }
+
+        return $rutas;
     }
 
-    private function eliminarGaleriaImagenes(int $idEvento): void
+    /**
+     * Borra las filas de galería (solo BD) y devuelve los Archivo desvinculados,
+     * para que el llamador los limpie del disco fuera de la transacción, una
+     * vez confirmado que el borrado se guardó.
+     */
+    private function eliminarGaleriaImagenes(int $idEvento): array
     {
         $registros = EventoArchivo::with('archivo')
             ->where('idevento', $idEvento)
             ->where('tipo', 'imagen')
             ->get();
 
+        $archivos = [];
+
         foreach ($registros as $registro) {
-            $archivo = $registro->archivo;
-            $registro->delete();
-
-            if ($archivo) {
-                $enUso = EventoArchivo::where('idarchivo', $archivo->idarchivo)->count();
-
-                if ($enUso === 0) {
-                    Storage::disk('public')->delete($archivo->ruta);
-                    $archivo->delete();
-                }
+            if ($registro->archivo) {
+                $archivos[] = $registro->archivo;
             }
+
+            $registro->delete();
         }
+
+        return $archivos;
     }
 
     private function generarSlugUnico(string $titulo, ?int $idEventoIgnorar = null): string

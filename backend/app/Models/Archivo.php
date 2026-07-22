@@ -68,6 +68,18 @@ class Archivo extends Model
         return $this->hasMany(SolicitudSoporte::class, 'idarchivo', 'idarchivo');
     }
 
+    public function enlacesSistemasManual(): HasMany
+    {
+        return $this->hasMany(EnlaceSistema::class, 'idarchivo_manual', 'idarchivo');
+    }
 
+    public function enlacesSistemasDocumentacion(): HasMany
+    {
+        return $this->hasMany(EnlaceSistema::class, 'idarchivo_documentacion', 'idarchivo');
+    }
 
+    public function portalConfiguraciones(): HasMany
+    {
+        return $this->hasMany(PortalConfiguracion::class, 'idarchivo', 'idarchivo');
+    }
 }

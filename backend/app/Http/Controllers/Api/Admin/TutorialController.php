@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Archivo;
 use App\Models\Tutorial;
+use App\Services\ArchivoLimpiezaService;
 use App\Services\EtiquetaContenidoService;
 use App\Support\EtiquetaEntidad;
 use Illuminate\Http\Request;
@@ -171,53 +172,67 @@ class TutorialController extends Controller
             ], 422);
         }
 
-        $idArchivo = null;
+        $rutaGuardada = null;
 
-        if ($request->hasFile('archivo')) {
-            $archivoSubido = $request->file('archivo');
+        try {
+            $tutorial = DB::transaction(function () use ($request, $etiquetaService, &$rutaGuardada) {
+                $idArchivo = null;
 
-            $nombreOriginal = $archivoSubido->getClientOriginalName();
-            $extension = $archivoSubido->getClientOriginalExtension();
-            $mimeType = $archivoSubido->getMimeType();
-            $pesoBytes = $archivoSubido->getSize();
+                if ($request->hasFile('archivo')) {
+                    $archivoSubido = $request->file('archivo');
 
-            $nombreGuardado = 'tutorial_' . now()->format('YmdHis') . '_' . Str::random(10) . '.' . $extension;
-            $ruta = $archivoSubido->storeAs('tutoriales', $nombreGuardado, 'public');
+                    $nombreOriginal = $archivoSubido->getClientOriginalName();
+                    $extension = $archivoSubido->getClientOriginalExtension();
+                    $mimeType = $archivoSubido->getMimeType();
+                    $pesoBytes = $archivoSubido->getSize();
 
-            $archivo = Archivo::create([
-                'nombre_original' => $nombreOriginal,
-                'nombre_guardado' => $nombreGuardado,
-                'ruta' => $ruta,
-                'extension' => $extension,
-                'mime_type' => $mimeType,
-                'peso_bytes' => $pesoBytes,
-                'descargas' => 0,
-            ]);
+                    $nombreGuardado = 'tutorial_' . now()->format('YmdHis') . '_' . Str::random(10) . '.' . $extension;
+                    $rutaGuardada = $archivoSubido->storeAs('tutoriales', $nombreGuardado, 'public');
 
-            $idArchivo = $archivo->idarchivo;
+                    $archivo = Archivo::create([
+                        'nombre_original' => $nombreOriginal,
+                        'nombre_guardado' => $nombreGuardado,
+                        'ruta' => $rutaGuardada,
+                        'extension' => $extension,
+                        'mime_type' => $mimeType,
+                        'peso_bytes' => $pesoBytes,
+                        'descargas' => 0,
+                    ]);
+
+                    $idArchivo = $archivo->idarchivo;
+                }
+
+                $tutorial = Tutorial::create([
+                    'titulo' => $request->titulo,
+                    'slug' => $this->generarSlugUnico($request->titulo),
+                    'descripcion' => $request->descripcion,
+                    'contenido_html' => $request->contenido_html,
+                    'enlace_video' => $request->enlace_video,
+                    'duracion_minutos' => $request->duracion_minutos ?? 0,
+                    'visitas' => 0,
+                    'orden' => $request->orden ?? 0,
+                    'idarchivo' => $idArchivo,
+                    'idcategoria' => $request->idcategoria,
+                    'idusuario_autor' => $request->user()->idusuario,
+                    'idestado' => $request->idestado,
+                    'idtipotutorial' => $request->idtipotutorial,
+                ]);
+
+                $etiquetaService->sincronizar(
+                    EtiquetaEntidad::TUTORIALES,
+                    $tutorial->idtutorial,
+                    $request->input('etiquetas', [])
+                );
+
+                return $tutorial;
+            });
+        } catch (\Throwable $e) {
+            if ($rutaGuardada) {
+                Storage::disk('public')->delete($rutaGuardada);
+            }
+
+            throw $e;
         }
-
-        $tutorial = Tutorial::create([
-            'titulo' => $request->titulo,
-            'slug' => $this->generarSlugUnico($request->titulo),
-            'descripcion' => $request->descripcion,
-            'contenido_html' => $request->contenido_html,
-            'enlace_video' => $request->enlace_video,
-            'duracion_minutos' => $request->duracion_minutos ?? 0,
-            'visitas' => 0,
-            'orden' => $request->orden ?? 0,
-            'idarchivo' => $idArchivo,
-            'idcategoria' => $request->idcategoria,
-            'idusuario_autor' => $request->user()->idusuario,
-            'idestado' => $request->idestado,
-            'idtipotutorial' => $request->idtipotutorial,
-        ]);
-
-        $etiquetaService->sincronizar(
-            EtiquetaEntidad::TUTORIALES,
-            $tutorial->idtutorial,
-            $request->input('etiquetas', [])
-        );
 
         $this->limpiarCachePublico();
 
@@ -275,7 +290,8 @@ class TutorialController extends Controller
     public function update(
         Request $request,
                 $id,
-        EtiquetaContenidoService $etiquetaService
+        EtiquetaContenidoService $etiquetaService,
+        ArchivoLimpiezaService $archivoLimpieza
     ) {
         $tutorial = Tutorial::with('archivo')->find($id);
 
@@ -398,64 +414,72 @@ class TutorialController extends Controller
         }
 
         $archivoAnterior = null;
+        $rutaGuardada = null;
 
-        if ($request->hasFile('archivo')) {
-            $archivoAnterior = $tutorial->archivo;
+        try {
+            DB::transaction(function () use ($request, $tutorial, $etiquetaService, &$archivoAnterior, &$rutaGuardada) {
+                if ($request->hasFile('archivo')) {
+                    $archivoAnterior = $tutorial->archivo;
 
-            $archivoSubido = $request->file('archivo');
+                    $archivoSubido = $request->file('archivo');
 
-            $nombreOriginal = $archivoSubido->getClientOriginalName();
-            $extension = $archivoSubido->getClientOriginalExtension();
-            $mimeType = $archivoSubido->getMimeType();
-            $pesoBytes = $archivoSubido->getSize();
+                    $nombreOriginal = $archivoSubido->getClientOriginalName();
+                    $extension = $archivoSubido->getClientOriginalExtension();
+                    $mimeType = $archivoSubido->getMimeType();
+                    $pesoBytes = $archivoSubido->getSize();
 
-            $nombreGuardado = 'tutorial_' . now()->format('YmdHis') . '_' . Str::random(10) . '.' . $extension;
-            $ruta = $archivoSubido->storeAs('tutoriales', $nombreGuardado, 'public');
+                    $nombreGuardado = 'tutorial_' . now()->format('YmdHis') . '_' . Str::random(10) . '.' . $extension;
+                    $rutaGuardada = $archivoSubido->storeAs('tutoriales', $nombreGuardado, 'public');
 
-            $nuevoArchivo = Archivo::create([
-                'nombre_original' => $nombreOriginal,
-                'nombre_guardado' => $nombreGuardado,
-                'ruta' => $ruta,
-                'extension' => $extension,
-                'mime_type' => $mimeType,
-                'peso_bytes' => $pesoBytes,
-                'descargas' => 0,
-            ]);
+                    $nuevoArchivo = Archivo::create([
+                        'nombre_original' => $nombreOriginal,
+                        'nombre_guardado' => $nombreGuardado,
+                        'ruta' => $rutaGuardada,
+                        'extension' => $extension,
+                        'mime_type' => $mimeType,
+                        'peso_bytes' => $pesoBytes,
+                        'descargas' => 0,
+                    ]);
 
-            $tutorial->idarchivo = $nuevoArchivo->idarchivo;
+                    $tutorial->idarchivo = $nuevoArchivo->idarchivo;
+                }
+
+                $slug = $tutorial->titulo !== $request->titulo
+                    ? $this->generarSlugUnico($request->titulo, $tutorial->idtutorial)
+                    : $tutorial->slug;
+
+                $tutorial->update([
+                    'titulo' => $request->titulo,
+                    'slug' => $slug,
+                    'descripcion' => $request->descripcion,
+                    'contenido_html' => $request->contenido_html,
+                    'enlace_video' => $request->enlace_video,
+                    'duracion_minutos' => $request->duracion_minutos ?? 0,
+                    'visitas' => $request->visitas ?? $tutorial->visitas,
+                    'orden' => $request->orden ?? 0,
+                    'idarchivo' => $tutorial->idarchivo,
+                    'idcategoria' => $request->idcategoria,
+                    'idestado' => $request->idestado,
+                    'idtipotutorial' => $request->idtipotutorial,
+                ]);
+
+                $etiquetaService->sincronizar(
+                    EtiquetaEntidad::TUTORIALES,
+                    $tutorial->idtutorial,
+                    $request->input('etiquetas', [])
+                );
+            });
+        } catch (\Throwable $e) {
+            if ($rutaGuardada) {
+                Storage::disk('public')->delete($rutaGuardada);
+            }
+
+            throw $e;
         }
-
-        $slug = $tutorial->titulo !== $request->titulo
-            ? $this->generarSlugUnico($request->titulo, $tutorial->idtutorial)
-            : $tutorial->slug;
-
-        $tutorial->update([
-            'titulo' => $request->titulo,
-            'slug' => $slug,
-            'descripcion' => $request->descripcion,
-            'contenido_html' => $request->contenido_html,
-            'enlace_video' => $request->enlace_video,
-            'duracion_minutos' => $request->duracion_minutos ?? 0,
-            'visitas' => $request->visitas ?? $tutorial->visitas,
-            'orden' => $request->orden ?? 0,
-            'idarchivo' => $tutorial->idarchivo,
-            'idcategoria' => $request->idcategoria,
-            'idestado' => $request->idestado,
-            'idtipotutorial' => $request->idtipotutorial,
-        ]);
-
-        $etiquetaService->sincronizar(
-            EtiquetaEntidad::TUTORIALES,
-            $tutorial->idtutorial,
-            $request->input('etiquetas', [])
-        );
 
         $this->limpiarCachePublico();
 
-        if ($archivoAnterior && !$this->archivoTieneUsos($archivoAnterior->idarchivo)) {
-            Storage::disk('public')->delete($archivoAnterior->ruta);
-            $archivoAnterior->delete();
-        }
+        $archivoLimpieza->eliminarSiNoEstaEnUso($archivoAnterior);
 
         $tutorial->load([
             'archivo',
@@ -479,7 +503,8 @@ class TutorialController extends Controller
 
     public function destroy(
         $id,
-        EtiquetaContenidoService $etiquetaService
+        EtiquetaContenidoService $etiquetaService,
+        ArchivoLimpiezaService $archivoLimpieza
     ) {
         $tutorial = Tutorial::with('archivo')->find($id);
 
@@ -499,10 +524,7 @@ class TutorialController extends Controller
 
         $tutorial->delete();
 
-        if ($archivo && !$this->archivoTieneUsos($archivo->idarchivo)) {
-            Storage::disk('public')->delete($archivo->ruta);
-            $archivo->delete();
-        }
+        $archivoLimpieza->eliminarSiNoEstaEnUso($archivo);
 
         $this->limpiarCachePublico();
 
@@ -530,15 +552,6 @@ class TutorialController extends Controller
         }
 
         return $slug;
-    }
-
-    private function archivoTieneUsos(int $idarchivo): bool
-    {
-        return DB::table('tutoriales')->where('idarchivo', $idarchivo)->exists()
-            || DB::table('documentos')->where('idarchivo', $idarchivo)->exists()
-            || DB::table('eventos')->where('idarchivo', $idarchivo)->exists()
-            || DB::table('eventos_archivos')->where('idarchivo', $idarchivo)->exists()
-            || DB::table('noticias_imagen')->where('idarchivo', $idarchivo)->exists();
     }
 
     private function limpiarCachePublico(): void

@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Noticia;
 use App\Models\NoticiaImagen;
+use App\Services\ArchivoLimpiezaService;
 use App\Services\ArchivoService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Services\EtiquetaContenidoService;
@@ -469,21 +471,34 @@ class NoticiaController extends Controller
             'orden.max' => 'El orden no debe superar 255.',
         ]);
 
-        $archivo = $archivoService->guardarImagenNoticia($request->file('imagen'));
+        $rutaGuardada = null;
 
-        if (($validated['es_portada'] ?? false) === true) {
-            NoticiaImagen::where('idnoticia', $noticia->idnoticia)
-                ->update(['es_portada' => false]);
+        try {
+            $imagen = DB::transaction(function () use ($request, $noticia, $validated, $archivoService, &$rutaGuardada) {
+                $archivo = $archivoService->guardarImagenNoticia($request->file('imagen'));
+                $rutaGuardada = $archivo->ruta;
+
+                if (($validated['es_portada'] ?? false) === true) {
+                    NoticiaImagen::where('idnoticia', $noticia->idnoticia)
+                        ->update(['es_portada' => false]);
+                }
+
+                return NoticiaImagen::create([
+                    'texto_alternativo' => $validated['texto_alternativo'] ?? null,
+                    'descripcion' => $validated['descripcion'] ?? null,
+                    'es_portada' => $validated['es_portada'] ?? false,
+                    'orden' => $validated['orden'] ?? 0,
+                    'idarchivo' => $archivo->idarchivo,
+                    'idnoticia' => $noticia->idnoticia,
+                ]);
+            });
+        } catch (\Throwable $e) {
+            if ($rutaGuardada) {
+                Storage::disk('public')->delete($rutaGuardada);
+            }
+
+            throw $e;
         }
-
-        $imagen = NoticiaImagen::create([
-            'texto_alternativo' => $validated['texto_alternativo'] ?? null,
-            'descripcion' => $validated['descripcion'] ?? null,
-            'es_portada' => $validated['es_portada'] ?? false,
-            'orden' => $validated['orden'] ?? 0,
-            'idarchivo' => $archivo->idarchivo,
-            'idnoticia' => $noticia->idnoticia,
-        ]);
 
         $imagen->load('archivo');
 
@@ -494,7 +509,7 @@ class NoticiaController extends Controller
         ], 201);
     }
 
-    public function actualizarImagen(Request $request, int $id, ArchivoService $archivoService): JsonResponse
+    public function actualizarImagen(Request $request, int $id, ArchivoService $archivoService, ArchivoLimpiezaService $archivoLimpieza): JsonResponse
     {
         $imagen = NoticiaImagen::with('archivo')->find($id);
 
@@ -545,36 +560,46 @@ class NoticiaController extends Controller
             'orden.max' => 'El orden no debe superar 255.',
         ]);
 
-        if (($validated['es_portada'] ?? false) === true) {
-            NoticiaImagen::where('idnoticia', $imagen->idnoticia)
-                ->where('idnoticiaimagen', '!=', $imagen->idnoticiaimagen)
-                ->update([
-                    'es_portada' => false,
-                ]);
-        }
-
         $archivoAnterior = null;
+        $rutaGuardada = null;
 
-        if ($request->hasFile('imagen')) {
-            $archivoAnterior = $imagen->archivo;
+        try {
+            DB::transaction(function () use ($request, $imagen, $validated, $archivoService, &$archivoAnterior, &$rutaGuardada) {
+                if (($validated['es_portada'] ?? false) === true) {
+                    NoticiaImagen::where('idnoticia', $imagen->idnoticia)
+                        ->where('idnoticiaimagen', '!=', $imagen->idnoticiaimagen)
+                        ->update([
+                            'es_portada' => false,
+                        ]);
+                }
 
-            $archivoNuevo = $archivoService->guardarImagenNoticia(
-                $request->file('imagen')
-            );
+                if ($request->hasFile('imagen')) {
+                    $archivoAnterior = $imagen->archivo;
 
-            $imagen->idarchivo = $archivoNuevo->idarchivo;
+                    $archivoNuevo = $archivoService->guardarImagenNoticia(
+                        $request->file('imagen')
+                    );
+                    $rutaGuardada = $archivoNuevo->ruta;
+
+                    $imagen->idarchivo = $archivoNuevo->idarchivo;
+                }
+
+                $imagen->texto_alternativo = $validated['texto_alternativo'] ?? $imagen->texto_alternativo;
+                $imagen->descripcion = $validated['descripcion'] ?? $imagen->descripcion;
+                $imagen->es_portada = $validated['es_portada'] ?? $imagen->es_portada;
+                $imagen->orden = $validated['orden'] ?? $imagen->orden;
+
+                $imagen->save();
+            });
+        } catch (\Throwable $e) {
+            if ($rutaGuardada) {
+                Storage::disk('public')->delete($rutaGuardada);
+            }
+
+            throw $e;
         }
 
-        $imagen->texto_alternativo = $validated['texto_alternativo'] ?? $imagen->texto_alternativo;
-        $imagen->descripcion = $validated['descripcion'] ?? $imagen->descripcion;
-        $imagen->es_portada = $validated['es_portada'] ?? $imagen->es_portada;
-        $imagen->orden = $validated['orden'] ?? $imagen->orden;
-
-        $imagen->save();
-
-        if ($archivoAnterior) {
-            $this->eliminarArchivoSiNoTieneUsos($archivoAnterior);
-        }
+        $archivoLimpieza->eliminarSiNoEstaEnUso($archivoAnterior);
 
         $imagen->load('archivo');
 
@@ -585,7 +610,7 @@ class NoticiaController extends Controller
         ]);
     }
 
-    public function eliminarImagen(int $id): JsonResponse
+    public function eliminarImagen(int $id, ArchivoLimpiezaService $archivoLimpieza): JsonResponse
     {
         $imagen = NoticiaImagen::with('archivo')->find($id);
 
@@ -600,30 +625,12 @@ class NoticiaController extends Controller
 
         $imagen->delete();
 
-        if ($archivo) {
-            $this->eliminarArchivoSiNoTieneUsos($archivo);
-        }
+        $archivoLimpieza->eliminarSiNoEstaEnUso($archivo);
 
         return response()->json([
             'success' => true,
             'message' => 'Imagen eliminada correctamente.',
         ]);
-    }
-
-    private function eliminarArchivoSiNoTieneUsos($archivo): void
-    {
-        $usosArchivo = $archivo->noticiasImagen()->count()
-            + $archivo->documentos()->count()
-            + $archivo->eventos()->count()
-            + $archivo->eventosArchivos()->count()
-            + $archivo->tutoriales()->count()
-            + $archivo->solicitudesSoporte()->count()
-            + $archivo->proyectos()->count();
-
-        if ($usosArchivo === 0) {
-            Storage::disk('public')->delete($archivo->ruta);
-            $archivo->delete();
-        }
     }
 
 
